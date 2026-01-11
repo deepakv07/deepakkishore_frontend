@@ -4,6 +4,12 @@ export interface User {
     email: string;
     role: 'student' | 'admin';
     avatar?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    department?: string;
+    yearOfStudy?: string;
+    degree?: string;
 }
 
 export interface Student extends User {

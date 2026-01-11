@@ -28,7 +28,16 @@ const StudentProfile: React.FC = () => {
     return (
         <StudentLayout>
             <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-100/50 p-10 max-w-4xl mx-auto border border-gray-100">
-                <h2 className="text-3xl font-black text-gray-900 mb-8 tracking-tight">Your Profile</h2>
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">Your Profile</h2>
+                    <button
+                        onClick={() => navigate('/student/profile/edit')}
+                        className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 text-sm font-black uppercase tracking-widest"
+                    >
+                        <i className="fas fa-user-edit mr-2"></i>
+                        Edit Profile
+                    </button>
+                </div>
                 {loading ? (
                     <div className="py-20 flex justify-center">
                         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -41,11 +50,69 @@ const StudentProfile: React.FC = () => {
                                 {user?.name?.charAt(0) || 'S'}
                             </div>
                             <div>
-                                <h3 className="text-3xl font-black text-gray-900 mb-1">{user?.name}</h3>
+                                <div className="flex items-center space-x-4 mb-1">
+                                    <h3 className="text-3xl font-black text-gray-900">{user?.name}</h3>
+                                </div>
                                 <p className="text-gray-500 font-medium text-lg">{user?.email}</p>
-                                <span className="inline-block mt-3 px-4 py-1.5 bg-blue-50 text-blue-700 text-xs font-black uppercase tracking-widest rounded-xl">
-                                    Student Account
-                                </span>
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    <span className="px-4 py-1.5 bg-blue-50 text-blue-700 text-xs font-black uppercase tracking-widest rounded-xl">
+                                        Student Account
+                                    </span>
+                                    {user?.department && (
+                                        <span className="px-4 py-1.5 bg-gray-50 text-gray-600 text-xs font-black uppercase tracking-widest rounded-xl">
+                                            {user.department}
+                                        </span>
+                                    )}
+                                    {user?.degree && (
+                                        <span className="px-4 py-1.5 bg-gray-50 text-gray-600 text-xs font-black uppercase tracking-widest rounded-xl">
+                                            {user.degree}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Profile Details */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 py-12 border-b border-gray-100">
+                            <div className="space-y-8">
+                                <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-6 flex items-center">
+                                    <i className="fas fa-user-circle mr-2"></i>
+                                    Personal Information
+                                </h4>
+                                <div className="space-y-4">
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">First Name</span>
+                                        <span className="text-lg font-bold text-gray-900">{user?.firstName || user?.name?.split(' ')[0] || '—'}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Last Name</span>
+                                        <span className="text-lg font-bold text-gray-900">{user?.lastName || user?.name?.split(' ').slice(1).join(' ') || '—'}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Phone Number</span>
+                                        <span className="text-lg font-bold text-gray-900">{user?.phone || '—'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-8">
+                                <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-6 flex items-center">
+                                    <i className="fas fa-graduation-cap mr-2"></i>
+                                    Academic Highlights
+                                </h4>
+                                <div className="space-y-4">
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Department</span>
+                                        <span className="text-lg font-bold text-gray-900">{user?.department || '—'}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Year of Study</span>
+                                        <span className="text-lg font-bold text-gray-900">{user?.yearOfStudy || '—'}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Degree</span>
+                                        <span className="text-lg font-bold text-gray-900">{user?.degree || '—'}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
