@@ -90,53 +90,96 @@ const StudentQuizzes: React.FC = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredQuizzes.map((quiz) => (
-                            <div key={quiz.id} className="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 transition-all group">
-                                {/* Card Header Area */}
-                                <div className="h-48 bg-gradient-to-br from-blue-100 to-indigo-100 transition-colors group-hover:opacity-80"></div>
+                        {filteredQuizzes.map((quiz) => {
+                            const now = new Date();
+                            const scheduledAt = quiz.scheduledAt ? new Date(quiz.scheduledAt) : null;
+                            const expiresAt = quiz.expiresAt ? new Date(quiz.expiresAt) : null;
 
-                                <div className="p-8">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight">{quiz.title}</h3>
-                                    <p className="text-sm text-gray-400 font-medium mb-2">{quiz.courseTitle || 'General Quiz'}</p>
-                                    <p className="text-xs text-gray-300 mb-6">{quiz.description || 'Test your knowledge'}</p>
+                            const isUpcoming = scheduledAt && now < scheduledAt;
+                            const isExpired = expiresAt && now > expiresAt;
+                            const isActive = !isUpcoming && !isExpired;
 
-                                    <div className="space-y-4 mb-8">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-sm font-black text-blue-600">
-                                                {quiz.isCompleted ? `Score: ${quiz.score?.toFixed(0)}%` : 'Not Attempted'}
-                                            </span>
-                                            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                                                {quiz.totalQuestions} Questions
-                                            </span>
-                                        </div>
-                                        <div className="flex justify-between text-xs text-gray-400">
-                                            <span><i className="fas fa-clock mr-1"></i> {quiz.durationMinutes} mins</span>
-                                            {quiz.isCompleted && (
-                                                <span className={quiz.passed ? 'text-green-600' : 'text-red-600'}>
-                                                    {quiz.passed ? '✓ Passed' : '✗ Failed'}
+                            // Format dates
+                            const formatDate = (date: Date) => {
+                                return new Intl.DateTimeFormat('en-US', {
+                                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                                }).format(date);
+                            };
+
+                            return (
+                                <div key={quiz.id} className="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 transition-all group relative">
+                                    {/* Status Badge */}
+                                    {isUpcoming && <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-700 font-bold px-3 py-1 rounded-full text-xs">Upcoming</div>}
+                                    {isExpired && !quiz.isCompleted && <div className="absolute top-4 right-4 bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs">Expired</div>}
+
+                                    {/* Card Header Area */}
+                                    <div className={`h-48 transition-colors group-hover:opacity-80 ${isUpcoming ? 'bg-gray-100' :
+                                        isExpired && !quiz.isCompleted ? 'bg-red-50' :
+                                            'bg-gradient-to-br from-blue-100 to-indigo-100'
+                                        }`}></div>
+
+                                    <div className="p-8">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight">{quiz.title}</h3>
+                                        <p className="text-sm text-gray-400 font-medium mb-2">{quiz.courseTitle || 'General Quiz'}</p>
+                                        <p className="text-xs text-gray-300 mb-4 line-clamp-2">{quiz.description || 'Test your knowledge'}</p>
+
+                                        {/* Schedule Info */}
+                                        {(scheduledAt || expiresAt) && (
+                                            <div className="mb-4 space-y-1">
+                                                {scheduledAt && (
+                                                    <p className="text-xs font-medium text-gray-500">
+                                                        <span className="font-bold">Starts:</span> {formatDate(scheduledAt)}
+                                                    </p>
+                                                )}
+                                                {expiresAt && (
+                                                    <p className="text-xs font-medium text-gray-500">
+                                                        <span className="font-bold">Ends:</span> {formatDate(expiresAt)}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-4 mb-8">
+                                            <div className="flex justify-between items-end">
+                                                <span className="text-sm font-black text-blue-600">
+                                                    {quiz.isCompleted ? `Score: ${quiz.score?.toFixed(0)}%` : 'Not Attempted'}
                                                 </span>
-                                            )}
+                                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                                                    {quiz.totalQuestions} Questions
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between text-xs text-gray-400">
+                                                <span><i className="fas fa-clock mr-1"></i> {quiz.durationMinutes} mins</span>
+                                                {quiz.isCompleted && (
+                                                    <span className={quiz.passed ? 'text-green-600' : 'text-red-600'}>
+                                                        {quiz.passed ? '✓ Passed' : '✗ Failed'}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <button
-                                        onClick={() => {
-                                            if (quiz.isCompleted) {
-                                                navigate(`/quiz/${quiz.id}/results`);
-                                            } else {
-                                                navigate(`/quiz/${quiz.id}/details`);
-                                            }
-                                        }}
-                                        className={`w-full py-4 rounded-xl font-black tracking-widest uppercase transition-all flex items-center justify-center border-2 ${quiz.isCompleted
+                                        <button
+                                            onClick={() => {
+                                                if (quiz.isCompleted) {
+                                                    navigate(`/quiz/${quiz.id}/results`);
+                                                } else {
+                                                    navigate(`/quiz/${quiz.id}/details`);
+                                                }
+                                            }}
+                                            disabled={!quiz.isCompleted && (!isActive)}
+                                            className={`w-full py-4 rounded-xl font-black tracking-widest uppercase transition-all flex items-center justify-center border-2 ${quiz.isCompleted
                                                 ? 'border-green-600 text-green-600 bg-white hover:bg-green-50'
-                                                : 'border-blue-600 text-blue-600 bg-white hover:bg-blue-50'
-                                            }`}
-                                    >
-                                        {quiz.isCompleted ? 'View Results' : 'Attempt Quiz'}
-                                    </button>
+                                                : (!isActive)
+                                                    ? 'border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
+                                                    : 'border-blue-600 text-blue-600 bg-white hover:bg-blue-50'
+                                                }`}
+                                        >
+                                            {quiz.isCompleted ? 'View Results' : isUpcoming ? 'Available Soon' : isExpired ? 'Expired' : 'Attempt Quiz'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

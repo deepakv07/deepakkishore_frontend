@@ -427,6 +427,8 @@ router.get('/quizzes', async (req: AuthRequest, res: Response) => {
                     instructor: course?.instructor || 'Admin',
                     description: quiz.description || '',
                     durationMinutes: quiz.durationMinutes || 30,
+                    scheduledAt: quiz.scheduledAt,
+                    expiresAt: quiz.expiresAt,
                     totalQuestions: Array.isArray(quiz.questions) ? quiz.questions.length : 0,
                     isCompleted: !!submission,
                     score: submission ? submission.percentage : null,

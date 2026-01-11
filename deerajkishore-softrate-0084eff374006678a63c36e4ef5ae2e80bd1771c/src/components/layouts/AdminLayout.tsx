@@ -33,7 +33,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
+
     const handleLogout = () => {
+        setShowLogoutConfirm(true);
+    };
+
+    const confirmLogout = () => {
         logout();
         navigate('/');
     };
@@ -123,6 +129,35 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     {children}
                 </div>
             </main>
+            {/* Logout Confirmation Modal */}
+            {showLogoutConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+                    <div className="bg-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl transform transition-all scale-100 border border-gray-100">
+                        <div className="text-center mb-6">
+                            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg shadow-red-50">
+                                <i className="fas fa-sign-out-alt"></i>
+                            </div>
+                            <h3 className="text-xl font-black text-gray-900 mb-2">Logout?</h3>
+                            <p className="text-gray-500 font-medium text-sm">Are you sure you want to end your session?</p>
+                        </div>
+
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setShowLogoutConfirm(false)}
+                                className="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmLogout}
+                                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
+                            >
+                                Yes, Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

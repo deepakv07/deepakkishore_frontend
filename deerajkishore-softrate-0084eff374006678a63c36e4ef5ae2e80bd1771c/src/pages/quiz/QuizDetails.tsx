@@ -9,7 +9,6 @@ const QuizDetails: React.FC = () => {
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [agreed, setAgreed] = useState(false);
 
     useEffect(() => {
@@ -44,7 +43,6 @@ const QuizDetails: React.FC = () => {
             });
         } catch (err) {
             console.error('Error loading quiz details:', err);
-            setError('Failed to load quiz details. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -111,6 +109,22 @@ const QuizDetails: React.FC = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* Time Limit Alert */}
+                        <div className="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-xl shadow-lg shadow-orange-100/50 flex items-start space-x-6">
+                            <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xl shrink-0">
+                                <i className="fas fa-hourglass-half animate-pulse"></i>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-gray-900 mb-2">Strict Time Limit</h3>
+                                <p className="text-gray-600 font-medium leading-relaxed">
+                                    You have exactly <span className="text-orange-600 font-black">{quiz?.durationMinutes} minutes</span> to complete this assessment.
+                                    The timer will start the moment you click "Confirm & Start Quiz".
+                                    <br /><br />
+                                    <span className="font-bold text-gray-800">Note:</span> The quiz will <span className="underline decoration-orange-400 decoration-2">automatically submit</span> when the timer reaches the end. Please ensure you submit your answers before time runs out.
+                                </p>
                             </div>
                         </div>
 

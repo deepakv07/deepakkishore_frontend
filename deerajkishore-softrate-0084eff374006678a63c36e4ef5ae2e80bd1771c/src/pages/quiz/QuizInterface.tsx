@@ -20,6 +20,15 @@ const QuizInterface: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [warningCount, setWarningCount] = useState(0);
 
+    // ... (rest of the file)
+
+    <button
+        onClick={() => handleSubmitQuiz(true)}
+        className="w-full py-4 bg-blue-600 text-white rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-200"
+    >
+        Yes, Submit Everything
+    </button>
+
     // Load initial warnings
     useEffect(() => {
         if (quizId) {
@@ -200,12 +209,96 @@ const QuizInterface: React.FC = () => {
         }
     };
 
+    // Timer state
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const [showTimeWarning, setShowTimeWarning] = useState(false);
+
+    // Initialize timer
+    useEffect(() => {
+        if (quiz?.durationMinutes) {
+            setTimeLeft(quiz.durationMinutes * 60);
+        }
+    }, [quiz]);
+
+    // Timer countdown
+    useEffect(() => {
+        if (timeLeft === null || timeLeft <= 0) return;
+
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev === null || prev <= 0) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    // 1-Minute Warning Popup Logic
+    useEffect(() => {
+        if (timeLeft === 60) {
+            setShowTimeWarning(true);
+            const hideTimer = setTimeout(() => {
+                setShowTimeWarning(false);
+            }, 3000);
+            return () => clearTimeout(hideTimer);
+        }
+    }, [timeLeft]);
+
+    // Auto-submit when time reaches 0
+    useEffect(() => {
+        if (timeLeft === 0 && !isSubmittingRef.current && !showSuccessModal && !showViolationModal) {
+            // Auto-submit
+            console.log('⏰ Time is up! Auto-submitting...');
+            handleSubmitQuiz(false); // Submit without navigating yet
+            setShowSuccessModal(true); // Show success/time-up modal
+        }
+    }, [timeLeft]);
+
+    // Format time helper
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+
     const currentQuestion = quiz?.questions[currentQuestionIndex];
-    // For UI demo matching image
 
     return (
         <StudentLayout hideNavbar={true}>
-            <div className="max-w-4xl mx-auto py-8 px-4">
+            {/* Sticky Timer Header */}
+            {timeLeft !== null && (
+                <div className={`fixed top-0 left-0 right-0 z-40 px-6 py-3 shadow-md transition-colors duration-300 flex justify-between items-center ${timeLeft < 60 ? 'bg-red-600 text-white' : 'bg-white text-gray-800'
+                    }`}>
+                    <div className="font-black text-lg tracking-tight">
+                        {quiz?.title || 'Quiz in Progress'}
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        <div className="text-xs uppercase font-bold tracking-widest opacity-80">Time Remaining</div>
+                        <div className={`text-2xl font-mono font-black ${timeLeft < 60 ? 'text-white animate-pulse' : 'text-blue-600'
+                            }`}>
+                            {formatTime(timeLeft)}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 1-Minute Warning Popup (Non-intrusive) */}
+            {showTimeWarning && (
+                <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+                    <div className="bg-orange-500 text-white px-8 py-4 rounded-full shadow-2xl flex items-center space-x-4 border-4 border-white">
+                        <div className="bg-white text-orange-500 rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                            <i className="fas fa-exclamation"></i>
+                        </div>
+                        <span className="font-black text-lg tracking-wide">Hurry Up! Less than 1 minute remaining!</span>
+                    </div>
+                </div>
+            )}
+
+            <div className="max-w-4xl mx-auto py-8 px-4 pt-24">
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
                     {loading ? (
                         <div className="py-40 flex flex-col items-center justify-center">
@@ -352,7 +445,7 @@ const QuizInterface: React.FC = () => {
 
                             <div className="space-y-3">
                                 <button
-                                    onClick={handleSubmitQuiz}
+                                    onClick={() => handleSubmitQuiz(true)}
                                     className="w-full py-4 bg-blue-600 text-white rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-200"
                                 >
                                     Yes, Submit Everything
