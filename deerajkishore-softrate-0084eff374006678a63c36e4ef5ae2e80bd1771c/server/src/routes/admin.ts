@@ -134,14 +134,16 @@ router.post('/courses', async (req: AuthRequest, res: Response) => {
 // Create Quiz
 router.post('/quizzes', async (req: AuthRequest, res: Response) => {
     try {
-        const { title, courseId, description, questions, durationMinutes } = req.body;
+        const { title, courseId, description, questions, durationMinutes, scheduledAt, expiresAt } = req.body;
 
         console.log('📝 Create Quiz Request:', {
             title,
             courseId,
             description,
             questionsCount: questions?.length,
-            durationMinutes
+            durationMinutes,
+            scheduledAt,
+            expiresAt
         });
 
         if (!title || !courseId || !questions || !Array.isArray(questions)) {
@@ -197,10 +199,12 @@ router.post('/quizzes', async (req: AuthRequest, res: Response) => {
             description,
             questions,
             durationMinutes: durationMinutes || 30,
+            scheduledAt,
+            expiresAt,
         });
 
         await quiz.save();
-        
+
         console.log(`✅ Quiz created and saved to MongoDB quizzes collection`);
         console.log(`📝 Quiz ID: ${quiz._id}, Title: ${quiz.title}, Questions: ${questions.length}`);
         console.log(`📝 Course ID: ${courseId}, Quiz will be available to all students`);
@@ -227,6 +231,8 @@ router.post('/quizzes', async (req: AuthRequest, res: Response) => {
                 description: quiz.description,
                 questions: quiz.questions,
                 durationMinutes: quiz.durationMinutes,
+                scheduledAt: quiz.scheduledAt,
+                expiresAt: quiz.expiresAt,
             },
         });
     } catch (error: any) {
@@ -275,7 +281,7 @@ router.get('/quiz-submissions', async (req: AuthRequest, res: Response) => {
             .populate('quizId', 'title courseId')
             .populate('studentId', 'name email')
             .sort({ submittedAt: -1 });
-        
+
         console.log(`📝 Found ${submissions.length} quiz submissions in MongoDB quizsubmissions collection`);
 
         const results = await Promise.all(
@@ -515,7 +521,7 @@ router.get('/students/:studentId/results', async (req: AuthRequest, res: Respons
 router.get('/reports/students', async (req: AuthRequest, res: Response) => {
     try {
         const students = await User.find({ role: 'student' }).select('-password');
-        
+
         const studentReports = await Promise.all(
             students.map(async (student) => {
                 const submissions = await QuizSubmission.find({ studentId: student._id });
@@ -538,7 +544,7 @@ router.get('/reports/students', async (req: AuthRequest, res: Response) => {
                     totalPoints,
                     maxPossiblePoints,
                     overallPercentage: maxPossiblePoints > 0 ? Math.round((totalPoints / maxPossiblePoints) * 100 * 10) / 10 : 0,
-                    lastActivity: submissions.length > 0 
+                    lastActivity: submissions.length > 0
                         ? submissions.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime())[0].submittedAt
                         : null,
                 };
@@ -563,12 +569,12 @@ router.get('/reports/overall', async (req: AuthRequest, res: Response) => {
         const totalStudents = await User.countDocuments({ role: 'student' });
         const totalQuizzes = await Quiz.countDocuments();
         const totalSubmissions = await QuizSubmission.countDocuments();
-        
+
         const allSubmissions = await QuizSubmission.find();
         const avgScore = allSubmissions.length > 0
             ? allSubmissions.reduce((sum, s) => sum + s.percentage, 0) / allSubmissions.length
             : 0;
-        
+
         const passedSubmissions = allSubmissions.filter(s => s.passed).length;
         const passRate = allSubmissions.length > 0
             ? (passedSubmissions / allSubmissions.length) * 100

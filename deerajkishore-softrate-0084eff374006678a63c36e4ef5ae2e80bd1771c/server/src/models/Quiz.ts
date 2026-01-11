@@ -15,6 +15,8 @@ export interface IQuiz extends Document {
     description: string;
     questions: IQuestion[];
     durationMinutes: number;
+    scheduledAt?: Date;
+    expiresAt?: Date;
     customId?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -65,6 +67,14 @@ const QuizSchema: Schema = new Schema(
             type: Number,
             required: true,
             default: 30,
+        },
+        scheduledAt: {
+            type: Date,
+            required: false,
+        },
+        expiresAt: {
+            type: Date,
+            required: false,
         },
         customId: {
             type: String,

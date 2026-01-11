@@ -17,20 +17,7 @@ const CreateQuiz: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    // Initial 25 questions data
-    const initialQuestions: QuestionDraft[] = Array.from({ length: 25 }, (_, i) => {
-        const id = i + 1;
-        let type: 'MCQ' | 'Aptitude' = 'MCQ';
 
-        return {
-            id,
-            text: '',
-            type,
-            options: type === 'MCQ' ? ['', '', '', ''] : undefined,
-            correctAnswer: '',
-            points: 10,
-        };
-    });
 
     // Form State
     const [quizTitle, setQuizTitle] = useState('');
@@ -40,15 +27,13 @@ const CreateQuiz: React.FC = () => {
     const [numberOfQuestions, setNumberOfQuestions] = useState<number>(10);
     const [questions, setQuestions] = useState<QuestionDraft[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [durationMinutes, setDurationMinutes] = useState<number>(30);
+    const [scheduledDate, setScheduledDate] = useState('');
+    const [scheduledTime, setScheduledTime] = useState('');
+    const [expiryDate, setExpiryDate] = useState('');
+    const [expiryTime, setExpiryTime] = useState('');
 
-    // Predefined 5 courses (keeping for reference or auto-suggestion if needed, but not restricting)
-    const predefinedCourses = [
-        { id: 'course1', title: 'JavaScript Fundamentals' },
-        { id: 'course2', title: 'Python Programming' },
-        { id: 'course3', title: 'Data Structures & Algorithms' },
-        { id: 'course4', title: 'Web Development' },
-        { id: 'course5', title: 'Database Management' },
-    ];
+
 
     useEffect(() => {
         // loadCourses(); // No longer needed to fetch specific list for dropdown
@@ -216,12 +201,32 @@ const CreateQuiz: React.FC = () => {
                 return;
             }
 
+            let scheduledAt: string | undefined = undefined;
+            if (scheduledDate && scheduledTime) {
+                scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+            }
+
+            let expiresAt: string | undefined = undefined;
+            if (expiryDate && expiryTime) {
+                expiresAt = new Date(`${expiryDate}T${expiryTime}`).toISOString();
+
+                // Validate expiry is after start
+                if (scheduledAt && new Date(expiresAt) <= new Date(scheduledAt)) {
+                    alert('End time must be after start time');
+                    setLoading(false);
+                    return;
+                }
+            }
+
+
             console.log('Creating quiz with data:', {
                 title: quizTitle,
                 courseId,
                 description: courseDescription,
                 questionsCount: validQuestions.length,
-                durationMinutes: 30
+                durationMinutes,
+                scheduledAt,
+                expiresAt
             });
 
             const result = await apiService.createQuiz({
@@ -229,7 +234,9 @@ const CreateQuiz: React.FC = () => {
                 courseId,
                 description: courseDescription,
                 questions: validQuestions,
-                durationMinutes: 30
+                durationMinutes,
+                scheduledAt,
+                expiresAt
             });
 
             console.log('Quiz created successfully:', result);
@@ -288,6 +295,11 @@ const CreateQuiz: React.FC = () => {
                                     setQuizTitle('');
                                     setCourseDescription('');
                                     setNumberOfQuestions(10);
+                                    setDurationMinutes(30);
+                                    setScheduledDate('');
+                                    setScheduledTime('');
+                                    setExpiryDate('');
+                                    setExpiryTime('');
                                     initializeQuestions();
                                 }}
                                 className="w-full bg-white text-gray-500 font-black py-5 rounded-2xl border-2 border-gray-100 hover:bg-gray-50 transition-all hover:border-gray-200"
@@ -366,8 +378,58 @@ const CreateQuiz: React.FC = () => {
                                 placeholder="Enter course description"
                                 value={courseDescription}
                                 onChange={(e) => setCourseDescription(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none"
+                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none mb-6"
                             />
+
+                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Quiz Duration (Minutes)</label>
+                            <input
+                                type="number"
+                                placeholder="Enter duration in minutes"
+                                value={durationMinutes}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value);
+                                    if (!isNaN(val) && val > 0) setDurationMinutes(val);
+                                    else if (e.target.value === '') setDurationMinutes(0);
+                                }}
+                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium mb-6"
+                            />
+
+                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Schedule Quiz (Optional)</label>
+                            <div className="flex gap-4">
+                                <input
+                                    type="date"
+                                    value={scheduledDate}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => setScheduledDate(e.target.value)}
+                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
+                                />
+                                <input
+                                    type="time"
+                                    value={scheduledTime}
+                                    onChange={(e) => setScheduledTime(e.target.value)}
+                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-400 mt-2 mb-6">Leave blank to make quiz available immediately</p>
+
+                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Quiz Ends At (Optional)</label>
+                            <div className="flex gap-4">
+                                <input
+                                    type="date"
+                                    value={expiryDate}
+                                    min={scheduledDate || new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => setExpiryDate(e.target.value)}
+                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
+                                />
+                                <input
+                                    type="time"
+                                    value={expiryTime}
+                                    onChange={(e) => setExpiryTime(e.target.value)}
+                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-400 mt-2">Leave blank for no expiration</p>
+
                         </div>
                     </div>
 
@@ -575,7 +637,7 @@ const CreateQuiz: React.FC = () => {
                     )}
                 </div>
             </div>
-        </AdminLayout>
+        </AdminLayout >
     );
 };
 
