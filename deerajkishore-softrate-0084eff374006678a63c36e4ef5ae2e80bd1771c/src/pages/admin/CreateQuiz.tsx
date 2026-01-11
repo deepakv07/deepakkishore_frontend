@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
+import ValidationModal from '../../components/common/ValidationModal';
 
 interface QuestionDraft {
     id: number;
@@ -32,6 +33,32 @@ const CreateQuiz: React.FC = () => {
     const [scheduledTime, setScheduledTime] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
     const [expiryTime, setExpiryTime] = useState('');
+
+    // Modal State
+    const [modalConfig, setModalConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        type: 'error' | 'warning' | 'success';
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'error'
+    });
+
+    const showModal = (message: string, type: 'error' | 'warning' | 'success' = 'error', title?: string) => {
+        setModalConfig({
+            isOpen: true,
+            message,
+            type,
+            title: title || (type === 'error' ? 'Validation Error' : type === 'success' ? 'Success' : 'Warning')
+        });
+    };
+
+    const closeModal = () => {
+        setModalConfig(prev => ({ ...prev, isOpen: false }));
+    };
 
 
 
@@ -74,32 +101,29 @@ const CreateQuiz: React.FC = () => {
     const handleSubmit = async () => {
         // Validation
         if (!quizTitle || quizTitle.trim() === '') {
-            alert('Please enter a quiz title');
+            showModal('Please enter a quiz title');
             return;
         }
 
         if (!courseTitle || courseTitle.trim() === '') {
-            alert('Please enter a course name');
+            showModal('Please enter a course name');
             return;
         }
 
         if (numberOfQuestions < 1) {
-            // We allow > 50 if they really want, or keep it per server rules. 
-            // Server might handle it, but basic check is good.
-            // User just said "input text box", removing strict max limit check if implied.
-            alert('Please enter a valid number of questions (at least 1)');
+            showModal('Please enter a valid number of questions (at least 1)');
             return;
         }
 
         if (questions.length === 0) {
-            alert('Please set the number of questions first');
+            showModal('Please set the number of questions first');
             return;
         }
 
         // Validate all questions are filled
         const emptyQuestions = questions.filter(q => !q.text || q.text.trim() === '');
         if (emptyQuestions.length > 0) {
-            alert(`Please fill all ${numberOfQuestions} questions. ${emptyQuestions.length} question(s) are still empty.`);
+            showModal(`Please fill all ${numberOfQuestions} questions. ${emptyQuestions.length} question(s) are still empty.`);
             return;
         }
 
@@ -107,17 +131,31 @@ const CreateQuiz: React.FC = () => {
         for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
             if (q.type === 'MCQ') {
-                if (!q.options || q.options.some(opt => !opt || opt.trim() === '')) {
-                    alert(`Question ${i + 1} (MCQ) must have all 4 options filled`);
+                const filledOptions = q.options?.filter(opt => opt && opt.trim() !== '') || [];
+
+                if (filledOptions.length < 2) {
+                    showModal(`Question ${i + 1} (MCQ) must have at least 2 options filled along with correct answer`);
                     return;
                 }
+
                 if (!q.correctAnswer || q.correctAnswer.trim() === '') {
-                    alert(`Question ${i + 1} (MCQ) must have a correct answer selected`);
+                    showModal(`Question ${i + 1} (MCQ) must have a correct answer selected`);
                     return;
                 }
+
+                // Ensure the correct answer corresponds to a filled option
+                // If correctAnswer is 'A', 'B' etc, check if that index has a value
+                if (['A', 'B', 'C', 'D'].includes(q.correctAnswer)) {
+                    const idx = ['A', 'B', 'C', 'D'].indexOf(q.correctAnswer);
+                    if (!q.options || !q.options[idx] || q.options[idx].trim() === '') {
+                        showModal(`For Question ${i + 1}, you selected Option ${q.correctAnswer} as correct, but that option is empty.`);
+                        return;
+                    }
+                }
+
             } else if (q.type === 'Aptitude') {
                 if (!q.correctAnswer || q.correctAnswer.trim() === '') {
-                    alert(`Question ${i + 1} (Aptitude) must have a correct answer`);
+                    showModal(`Question ${i + 1} (Aptitude) must have a correct answer`);
                     return;
                 }
             }
@@ -138,7 +176,7 @@ const CreateQuiz: React.FC = () => {
             return {
                 text: q.text.trim(),
                 type: q.type === 'MCQ' ? 'mcq' : 'aptitude',
-                options: q.type === 'MCQ' ? q.options?.map(opt => opt.trim()) : undefined,
+                options: q.type === 'MCQ' ? q.options?.filter(opt => opt && opt.trim() !== '') : undefined,
                 correctAnswer: correctAnswer.trim(),
                 points: q.points || 10,
             };
@@ -150,7 +188,7 @@ const CreateQuiz: React.FC = () => {
         // But let's check basic consistency.
         if (validQuestions.length !== questions.length) {
             // This case is rare unless bug.
-            alert('Error processing questions. Please try again.');
+            showModal('Error processing questions. Please try again.', 'error');
             return;
         }
 
@@ -188,7 +226,7 @@ const CreateQuiz: React.FC = () => {
 
             // Validate courseId is present
             if (!courseId) {
-                alert('Failed to obtain a valid Course ID. Please try again.');
+                showModal('Failed to obtain a valid Course ID. Please try again.');
                 setLoading(false);
                 return;
             }
@@ -196,7 +234,7 @@ const CreateQuiz: React.FC = () => {
             // Validate courseId format (should be MongoDB ObjectId format - 24 hex characters)
             const objectIdRegex = /^[0-9a-fA-F]{24}$/;
             if (!objectIdRegex.test(courseId)) {
-                alert('Invalid course ID format. Please select a valid course.');
+                showModal('Invalid course ID format. Please select a valid course.');
                 setLoading(false);
                 return;
             }
@@ -212,7 +250,7 @@ const CreateQuiz: React.FC = () => {
 
                 // Validate expiry is after start
                 if (scheduledAt && new Date(expiresAt) <= new Date(scheduledAt)) {
-                    alert('End time must be after start time');
+                    showModal('End time must be after start time');
                     setLoading(false);
                     return;
                 }
@@ -246,7 +284,7 @@ const CreateQuiz: React.FC = () => {
             const errorMessage = err?.response?.data?.message ||
                 err?.message ||
                 'Failed to create quiz. Please check the console for details.';
-            alert(`Quiz Creation Failed: ${errorMessage}`);
+            showModal(`Quiz Creation Failed: ${errorMessage}`);
         } finally {
             setLoading(false);
         }
@@ -315,6 +353,13 @@ const CreateQuiz: React.FC = () => {
 
     return (
         <AdminLayout>
+            <ValidationModal
+                isOpen={modalConfig.isOpen}
+                onClose={closeModal}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                type={modalConfig.type}
+            />
             <div className="max-w-5xl mx-auto pb-20">
                 {/* Header (matching image 0) */}
                 <div className="flex items-center justify-between mb-12 py-4">
