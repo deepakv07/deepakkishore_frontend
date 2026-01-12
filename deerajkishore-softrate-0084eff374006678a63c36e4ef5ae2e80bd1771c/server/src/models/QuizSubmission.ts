@@ -29,6 +29,10 @@ const AnswerSchema: Schema = new Schema({
         type: String,
         required: true,
     },
+    timeSpent: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const QuizSubmissionSchema: Schema = new Schema(

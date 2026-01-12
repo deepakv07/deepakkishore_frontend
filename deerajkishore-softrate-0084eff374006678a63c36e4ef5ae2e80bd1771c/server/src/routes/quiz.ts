@@ -139,7 +139,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
         console.log('📝 Total questions:', quiz.questions.length);
         console.log('📝 Answers received:', answers.length);
 
-        answers.forEach((answer: { questionId: string; answer: string }, answerIndex: number) => {
+        const processedAnswers = answers.map((answer: { questionId: string; answer: string; timeSpent?: number }, answerIndex: number) => {
             // Try multiple ways to find the question
             let question = quiz.questions.find(
                 (q) => q._id?.toString() === answer.questionId
@@ -159,9 +159,9 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                 question = quiz.questions[answerIndex];
             }
 
-            if (question) {
-                let isCorrect = false;
+            let isCorrect = false;
 
+            if (question) {
                 // For MCQ questions
                 if (question.type === 'mcq' && question.options && question.options.length > 0) {
                     const correctAnswerValue = question.correctAnswer;
@@ -207,6 +207,11 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                 console.warn(`⚠️ Question not found for answer:`, answer);
                 incorrectAnswers++;
             }
+
+            return {
+                ...answer,
+                timeSpent: answer.timeSpent || 0
+            };
         });
 
         console.log(`📊 Evaluation complete: ${correctAnswers} correct, ${incorrectAnswers} incorrect, Score: ${score}/${totalPoints}`);
@@ -218,7 +223,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
         const submission = new QuizSubmission({
             quizId,
             studentId,
-            answers,
+            answers: processedAnswers,
             score,
             totalPoints,
             percentage,
@@ -288,15 +293,26 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
         let aptitudeCorrect = 0;
         let aptitudeTotal = aptitudeQuestions.length;
 
+        // Calculate time spent per question array
+        // Initialize with 0s for all questions
+        const timePerQuestion = new Array(quiz.questions.length).fill(0);
+
         // Analyze answers to determine section-wise performance
         submission.answers.forEach((answer: any) => {
-            const question = quiz.questions.find((q, idx) =>
+            const questionIndex = quiz.questions.findIndex((q, idx) =>
                 q._id?.toString() === answer.questionId ||
                 idx.toString() === answer.questionId ||
                 `q${idx}` === answer.questionId
             );
 
-            if (question) {
+            if (questionIndex !== -1) {
+                const question = quiz.questions[questionIndex];
+
+                // Update time spent for this question
+                if (answer.timeSpent) {
+                    timePerQuestion[questionIndex] = Math.round(answer.timeSpent); // Store in seconds
+                }
+
                 // Check if answer is correct
                 let isCorrect = false;
                 if (question.type === 'mcq' && question.options) {
@@ -389,6 +405,7 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                 passed: submission.passed,
                 correctAnswers: submission.correctAnswers,
                 incorrectAnswers: submission.incorrectAnswers,
+                timePerQuestion, // Add timePerQuestion array
                 sectionBreakdown,
                 performanceAnalysis: {
                     strongAreas: strongAreas.length > 0 ? strongAreas : ['General Knowledge'],

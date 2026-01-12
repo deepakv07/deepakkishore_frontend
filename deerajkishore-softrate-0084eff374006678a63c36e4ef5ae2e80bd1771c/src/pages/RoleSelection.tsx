@@ -16,7 +16,7 @@ const RoleSelection: React.FC = () => {
             title: 'Administrator',
             description: 'Manage courses, students, and view platform analytics.',
             icon: 'fas fa-user-shield',
-            color: 'indigo',
+            color: 'blue',
             path: '/admin/login',
         },
     ];

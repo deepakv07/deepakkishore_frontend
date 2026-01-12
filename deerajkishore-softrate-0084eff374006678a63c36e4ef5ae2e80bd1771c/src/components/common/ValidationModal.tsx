@@ -6,6 +6,8 @@ interface ValidationModalProps {
     title?: string;
     message: string;
     type?: 'error' | 'warning' | 'success';
+    onConfirm?: () => void;
+    showCancel?: boolean;
 }
 
 const ValidationModal: React.FC<ValidationModalProps> = ({
@@ -13,7 +15,9 @@ const ValidationModal: React.FC<ValidationModalProps> = ({
     onClose,
     title = 'Validation Error',
     message,
-    type = 'error'
+    type = 'error',
+    onConfirm,
+    showCancel
 }) => {
     if (!isOpen) return null;
 
@@ -56,12 +60,25 @@ const ValidationModal: React.FC<ValidationModalProps> = ({
                     {message}
                 </p>
 
-                <button
-                    onClick={onClose}
-                    className={`w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg transform transition-all active:scale-95 focus:outline-none focus:ring-4 ${getButtonColor()}`}
-                >
-                    Okay, Got it
-                </button>
+                <div className="flex gap-4">
+                    {showCancel && (
+                        <button
+                            onClick={onClose}
+                            className="flex-1 py-4 rounded-xl text-gray-600 font-bold text-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                    <button
+                        onClick={() => {
+                            if (onConfirm) onConfirm();
+                            else onClose();
+                        }}
+                        className={`${showCancel ? 'flex-1' : 'w-full'} py-4 rounded-xl text-white font-bold text-lg shadow-lg transform transition-all active:scale-95 focus:outline-none focus:ring-4 ${getButtonColor()}`}
+                    >
+                        {onConfirm ? 'Confirm' : 'Okay, Got it'}
+                    </button>
+                </div>
             </div>
         </div>
     );

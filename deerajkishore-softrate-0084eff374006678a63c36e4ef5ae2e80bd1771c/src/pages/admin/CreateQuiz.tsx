@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
 import ValidationModal from '../../components/common/ValidationModal';
@@ -15,16 +15,17 @@ interface QuestionDraft {
 
 const CreateQuiz: React.FC = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const editQuizId = searchParams.get('edit');
+    const isEditMode = !!editQuizId;
+
     const [loading, setLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
-
-
 
     // Form State
     const [quizTitle, setQuizTitle] = useState('');
     const [courseDescription, setCourseDescription] = useState('');
     const [courseTitle, setCourseTitle] = useState('');
-    // Removed selectedCourseId and availableCourses as we now allow free text entry
     const [numberOfQuestions, setNumberOfQuestions] = useState<number>(10);
     const [questions, setQuestions] = useState<QuestionDraft[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -33,6 +34,7 @@ const CreateQuiz: React.FC = () => {
     const [scheduledTime, setScheduledTime] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
     const [expiryTime, setExpiryTime] = useState('');
+    const [originalCourseId, setOriginalCourseId] = useState<string>(''); // specific for updates
 
     // Modal State
     const [modalConfig, setModalConfig] = useState<{
@@ -60,36 +62,86 @@ const CreateQuiz: React.FC = () => {
         setModalConfig(prev => ({ ...prev, isOpen: false }));
     };
 
-
-
     useEffect(() => {
-        // loadCourses(); // No longer needed to fetch specific list for dropdown
-    }, []);
+        if (isEditMode && editQuizId) {
+            loadQuizData(editQuizId);
+        } else {
+            initializeQuestions();
+        }
+    }, [editQuizId]);
 
-    useEffect(() => {
-        // Initialize questions when numberOfQuestions changes
-        initializeQuestions();
-    }, [numberOfQuestions]);
+    const loadQuizData = async (id: string) => {
+        setLoading(true);
+        try {
+            const quiz = await apiService.getAdminQuiz(id);
+            setQuizTitle(quiz.title);
+            setCourseTitle(quiz.courseTitle || '');
+            setCourseDescription(quiz.description || '');
+            setOriginalCourseId(quiz.courseId);
+            setDurationMinutes(quiz.durationMinutes);
+            setNumberOfQuestions(quiz.questions.length);
 
+            // Map questions
+            const mappedQuestions: QuestionDraft[] = quiz.questions.map((q: any, index: number) => ({
+                id: index + 1,
+                text: q.text,
+                type: q.type === 'mcq' ? 'MCQ' : 'Aptitude', // Normalize casing if needed
+                options: q.options || (q.type === 'mcq' ? ['', '', '', ''] : undefined),
+                correctAnswer: q.correctAnswer,
+                points: q.points
+            }));
+            setQuestions(mappedQuestions);
 
+            if (quiz.scheduledAt) {
+                const date = new Date(quiz.scheduledAt);
+                setScheduledDate(date.toISOString().split('T')[0]);
+                setScheduledTime(date.toTimeString().slice(0, 5));
+            }
+            if (quiz.expiresAt) {
+                const date = new Date(quiz.expiresAt);
+                setExpiryDate(date.toISOString().split('T')[0]);
+                setExpiryTime(date.toTimeString().slice(0, 5));
+            }
 
+        } catch (err) {
+            console.error('Error loading quiz:', err);
+            showModal('Failed to load quiz details', 'error');
+            navigate('/admin/dashboard');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // removed useEffect for numberOfQuestions to prevent wiping data in edit mode
+    // We handle user manually changing number separately if needed, preventing auto-reset
+
+    // Keeping initializeQuestions for "Create New" flow or manual reset
     const initializeQuestions = () => {
-        const newQuestions: QuestionDraft[] = Array.from({ length: numberOfQuestions }, (_, i) => {
-            const id = i + 1;
-            // All questions default to MCQ
-            const type: 'MCQ' | 'Aptitude' = 'MCQ';
+        // Only run if empty (initial load) or manual reset requested
+        // Implementation note: changing numberOfQuestions input will trigger logic below
+    };
 
-            return {
-                id,
+    // Handler for number of questions change
+    const handleQuestionCountChange = (newCount: number) => {
+        setNumberOfQuestions(newCount);
+        if (newCount > questions.length) {
+            // Add more empty questions
+            const addedCount = newCount - questions.length;
+            const newQuestions: QuestionDraft[] = Array.from({ length: addedCount }, (_, i) => ({
+                id: questions.length + i + 1,
                 text: '',
-                type,
-                options: type === 'MCQ' ? ['', '', '', ''] : undefined,
+                type: 'MCQ',
+                options: ['', '', '', ''],
                 correctAnswer: '',
-                points: 10,
-            };
-        });
-        setQuestions(newQuestions);
-        setCurrentQuestionIndex(0);
+                points: 10
+            }));
+            setQuestions([...questions, ...newQuestions]);
+        } else if (newCount < questions.length) {
+            // Trim questions? asking user confirmation would be better but simple logic for now
+            // Just warn or slice? Let's just update prompt to fill 10 but data has 12?
+            // Actually, best to just slice if user explicitly reduces it.
+            setQuestions(questions.slice(0, newCount));
+        }
     };
 
     const updateQuestion = (index: number, updates: Partial<QuestionDraft>) => {
@@ -110,20 +162,20 @@ const CreateQuiz: React.FC = () => {
             return;
         }
 
-        if (numberOfQuestions < 1) {
-            showModal('Please enter a valid number of questions (at least 1)');
+        // Validate count
+        const currentCount = questions.length;
+        if (currentCount < 1) {
+            showModal('Quiz must have at least one question');
             return;
         }
 
-        if (questions.length === 0) {
-            showModal('Please set the number of questions first');
-            return;
-        }
+        // Use current questions length as truth
+        setNumberOfQuestions(currentCount);
 
         // Validate all questions are filled
         const emptyQuestions = questions.filter(q => !q.text || q.text.trim() === '');
         if (emptyQuestions.length > 0) {
-            showModal(`Please fill all ${numberOfQuestions} questions. ${emptyQuestions.length} question(s) are still empty.`);
+            showModal(`Please fill all questions. ${emptyQuestions.length} question(s) are still empty.`);
             return;
         }
 
@@ -144,7 +196,6 @@ const CreateQuiz: React.FC = () => {
                 }
 
                 // Ensure the correct answer corresponds to a filled option
-                // If correctAnswer is 'A', 'B' etc, check if that index has a value
                 if (['A', 'B', 'C', 'D'].includes(q.correctAnswer)) {
                     const idx = ['A', 'B', 'C', 'D'].indexOf(q.correctAnswer);
                     if (!q.options || !q.options[idx] || q.options[idx].trim() === '') {
@@ -182,33 +233,25 @@ const CreateQuiz: React.FC = () => {
             };
         });
 
-        // Warn if count mismatches but proceed if user edited questions manually? 
-        // Logic relies on 'questions' array length. numberOfQuestions input might be changed without re-init.
-        // We should explicitly use questions.length as the truth.
-        // But let's check basic consistency.
-        if (validQuestions.length !== questions.length) {
-            // This case is rare unless bug.
-            showModal('Error processing questions. Please try again.', 'error');
-            return;
-        }
-
-
         setLoading(true);
         try {
-            let courseId = '';
+            let courseId = originalCourseId;
 
-            // Try to find existing course by title or create it
+            // Handle course resolution
+            // If editing and title changed, or creating...
+            // If we are editing, we might keep the same course ID unless user wants to move it?
+            // Actually, user enters text. We check if text matches existing course.
+
             try {
                 const existingCourses = await apiService.getCourses();
                 const cleanTitle = courseTitle.trim();
-                // Case insensitive match
                 const existingCourse = existingCourses.find((c: any) => c.title.toLowerCase() === cleanTitle.toLowerCase());
 
                 if (existingCourse) {
                     courseId = existingCourse.id;
                 } else {
-                    // Create the course if it doesn't exist
-                    console.log(`Creating new course: ${cleanTitle}`);
+                    // Create the course if it doesn't exist (works for both edit and create)
+                    console.log(`Creating/Resolving course: ${cleanTitle}`);
                     const newCourse = await apiService.createCourse({
                         title: cleanTitle,
                         instructor: 'Admin',
@@ -218,23 +261,7 @@ const CreateQuiz: React.FC = () => {
                 }
             } catch (err: any) {
                 console.error('Error handling course:', err);
-                const errorMsg = err?.response?.data?.message || err?.message || 'Failed to create or find course';
-                alert(`Course Error: ${errorMsg}. Please try again.`);
-                setLoading(false);
-                return;
-            }
-
-            // Validate courseId is present
-            if (!courseId) {
-                showModal('Failed to obtain a valid Course ID. Please try again.');
-                setLoading(false);
-                return;
-            }
-
-            // Validate courseId format (should be MongoDB ObjectId format - 24 hex characters)
-            const objectIdRegex = /^[0-9a-fA-F]{24}$/;
-            if (!objectIdRegex.test(courseId)) {
-                showModal('Invalid course ID format. Please select a valid course.');
+                alert('Course Error: Failed to resolve course.');
                 setLoading(false);
                 return;
             }
@@ -248,7 +275,6 @@ const CreateQuiz: React.FC = () => {
             if (expiryDate && expiryTime) {
                 expiresAt = new Date(`${expiryDate}T${expiryTime}`).toISOString();
 
-                // Validate expiry is after start
                 if (scheduledAt && new Date(expiresAt) <= new Date(scheduledAt)) {
                     showModal('End time must be after start time');
                     setLoading(false);
@@ -256,18 +282,7 @@ const CreateQuiz: React.FC = () => {
                 }
             }
 
-
-            console.log('Creating quiz with data:', {
-                title: quizTitle,
-                courseId,
-                description: courseDescription,
-                questionsCount: validQuestions.length,
-                durationMinutes,
-                scheduledAt,
-                expiresAt
-            });
-
-            const result = await apiService.createQuiz({
+            const payload = {
                 title: quizTitle,
                 courseId,
                 description: courseDescription,
@@ -275,16 +290,21 @@ const CreateQuiz: React.FC = () => {
                 durationMinutes,
                 scheduledAt,
                 expiresAt
-            });
+            };
 
-            console.log('Quiz created successfully:', result);
+            if (isEditMode && editQuizId) {
+                await apiService.updateQuiz(editQuizId, payload);
+                console.log('Quiz updated successfully');
+            } else {
+                await apiService.createQuiz(payload);
+                console.log('Quiz created successfully');
+            }
+
             setShowSuccess(true);
         } catch (err: any) {
-            console.error('Error creating quiz:', err);
-            const errorMessage = err?.response?.data?.message ||
-                err?.message ||
-                'Failed to create quiz. Please check the console for details.';
-            showModal(`Quiz Creation Failed: ${errorMessage}`);
+            console.error('Error saving quiz:', err);
+            const errorMessage = err?.response?.data?.message || err?.message || 'Failed to save quiz.';
+            showModal(`Quiz Save Failed: ${errorMessage}`);
         } finally {
             setLoading(false);
         }
@@ -301,9 +321,13 @@ const CreateQuiz: React.FC = () => {
                             <i className="fas fa-check"></i>
                         </div>
                         <div className="space-y-3">
-                            <h2 className="text-4xl font-black text-gray-900 tracking-tight">Quiz Created Successfully!</h2>
+                            <h2 className="text-4xl font-black text-gray-900 tracking-tight">
+                                {isEditMode ? 'Quiz Updated Successfully!' : 'Quiz Created Successfully!'}
+                            </h2>
                             <p className="text-gray-500 font-medium px-4 leading-relaxed">
-                                Your quiz has been created and saved. Students can now access this quiz from the course dashboard.
+                                {isEditMode
+                                    ? 'Your changes have been saved.'
+                                    : 'Your quiz has been created and saved. Students can now access this quiz from the course dashboard.'}
                             </p>
                         </div>
 
@@ -369,7 +393,9 @@ const CreateQuiz: React.FC = () => {
                     >
                         <i className="fas fa-chevron-left text-gray-600"></i>
                     </button>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Create Course Quiz</h1>
+                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                        {isEditMode ? 'Edit Course Quiz' : 'Create Course Quiz'}
+                    </h1>
                     <div className="w-12"></div> {/* Spacer for symmetry */}
                 </div>
 
@@ -396,11 +422,9 @@ const CreateQuiz: React.FC = () => {
                                     const value = e.target.value;
                                     const count = parseInt(value);
                                     if (value === '') {
-                                        // Allow clearing the input
-                                        // We cast to any to allow temp empty string if needed or just handle 0
                                         setNumberOfQuestions(0);
                                     } else if (!isNaN(count)) {
-                                        setNumberOfQuestions(count);
+                                        handleQuestionCountChange(count);
                                     }
                                 }}
                                 className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"

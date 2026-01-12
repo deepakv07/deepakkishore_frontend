@@ -139,6 +139,7 @@ export interface QuizSubmission {
     answers: {
         questionId: string;
         answer: string;
+        timeSpent?: number;
     }[];
 }
 
@@ -151,6 +152,7 @@ export interface QuizResult {
     passed: boolean;
     correctAnswers: number;
     incorrectAnswers: number;
+    timePerQuestion?: number[];
     sectionBreakdown?: {
         name: string;
         correct: number;

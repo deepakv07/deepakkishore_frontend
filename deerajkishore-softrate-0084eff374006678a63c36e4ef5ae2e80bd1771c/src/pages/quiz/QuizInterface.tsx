@@ -20,6 +20,30 @@ const QuizInterface: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [warningCount, setWarningCount] = useState(0);
 
+    // Time tracking state
+    const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
+    const [timeSpentPerQuestion, setTimeSpentPerQuestion] = useState<Record<string, number>>({});
+
+    // Track time when question changes
+    useEffect(() => {
+        setQuestionStartTime(Date.now());
+    }, [currentQuestionIndex]);
+
+    const updateTimeSpent = () => {
+        if (!quiz) return;
+        const now = Date.now();
+        const timeSpent = (now - questionStartTime) / 1000; // in seconds
+
+        const questionId = quiz.questions[currentQuestionIndex].id?.toString() ||
+            quiz.questions[currentQuestionIndex]._id?.toString() ||
+            `q${currentQuestionIndex}`;
+
+        setTimeSpentPerQuestion(prev => ({
+            ...prev,
+            [questionId]: (prev[questionId] || 0) + timeSpent
+        }));
+    };
+
     // ... (rest of the file)
 
     <button
@@ -145,12 +169,14 @@ const QuizInterface: React.FC = () => {
 
     const handleNext = () => {
         if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
+            updateTimeSpent();
             setCurrentQuestionIndex(prev => prev + 1);
         }
     };
 
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
+            updateTimeSpent();
             setCurrentQuestionIndex(prev => prev - 1);
         }
     };
@@ -180,7 +206,10 @@ const QuizInterface: React.FC = () => {
                 const answerKey = q.id?.toString() || q._id?.toString() || `q${index}`;
                 return {
                     questionId: questionId,
-                    answer: selectedAnswers[answerKey] || ''
+                    answer: selectedAnswers[answerKey] || '',
+                    timeSpent: index === currentQuestionIndex
+                        ? (timeSpentPerQuestion[questionId] || 0) + ((Date.now() - questionStartTime) / 1000)
+                        : (timeSpentPerQuestion[questionId] || 0)
                 };
             });
 

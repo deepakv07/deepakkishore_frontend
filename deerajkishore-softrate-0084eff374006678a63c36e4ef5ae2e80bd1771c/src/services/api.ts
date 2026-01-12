@@ -341,6 +341,21 @@ class APIService {
         const response = await this.api.get('/admin/quizzes');
         return response.data.data;
     }
+
+    async deleteQuiz(quizId: string) {
+        const response = await this.api.delete(`/admin/quizzes/${quizId}`);
+        return response.data;
+    }
+
+    async getAdminQuiz(quizId: string) {
+        const response = await this.api.get(`/admin/quizzes/${quizId}`);
+        return response.data.data;
+    }
+
+    async updateQuiz(quizId: string, data: any) {
+        const response = await this.api.put(`/admin/quizzes/${quizId}`, data);
+        return response.data.data;
+    }
 }
 
 // Export singleton instance

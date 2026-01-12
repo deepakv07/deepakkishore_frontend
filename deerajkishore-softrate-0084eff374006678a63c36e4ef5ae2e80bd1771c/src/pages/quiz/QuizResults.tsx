@@ -33,11 +33,12 @@ const QuizResults: React.FC = () => {
                     month: 'short',
                     year: 'numeric'
                 }) : '12 Apr 2023',
-                timeSpent: '50m', // Mocked
+                timeSpent: '50m', // Mocked - we can calculate this from total time if needed or BE returns it
                 percentile: 65,   // Mocked
                 attempts: 1,      // Mocked
                 avgTime: '50m',   // Mocked
-                timePerQuestion: [45, 120, 60, 90, 80, 180, 45, 95, 65, 120].slice(0, data.questions?.length || 10), // Mocked
+                // used existing data.timePerQuestion or fallback to 0s if missing
+                timePerQuestion: data.timePerQuestion || new Array(data.questions?.length || 10).fill(0),
             };
 
             setResult(enhancedData);

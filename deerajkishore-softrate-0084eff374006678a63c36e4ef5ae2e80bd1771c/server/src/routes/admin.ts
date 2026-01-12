@@ -460,6 +460,101 @@ router.get('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
     }
 });
 
+// Delete Quiz
+router.delete('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
+    try {
+        const { quizId } = req.params;
+
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
+            return res.status(404).json({
+                success: false,
+                message: 'Quiz not found',
+            });
+        }
+
+        // Delete the quiz
+        await Quiz.findByIdAndDelete(quizId);
+
+        // Update course quiz count
+        await Course.findByIdAndUpdate(quiz.courseId, {
+            $inc: { totalQuizzes: -1 },
+        });
+
+        // Optional: Delete associated submissions
+        await QuizSubmission.deleteMany({ quizId });
+
+        res.json({
+            success: true,
+            message: 'Quiz deleted successfully',
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error',
+        });
+    }
+});
+
+// Update Quiz
+router.put('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
+    try {
+        const { quizId } = req.params;
+        const { title, courseId, description, questions, durationMinutes, scheduledAt, expiresAt } = req.body;
+
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
+            return res.status(404).json({ success: false, message: 'Quiz not found' });
+        }
+
+        // Check if course needs updating (if courseId changed, though usually tied to creation)
+        // If courseId is valid and different, we might need to handle course quiz counts, but for simplicity assuming course stays same or just updating properties.
+
+        quiz.title = title || quiz.title;
+        quiz.description = description || quiz.description;
+        quiz.durationMinutes = durationMinutes || quiz.durationMinutes;
+        quiz.scheduledAt = scheduledAt; // allow null/undefined to unset? Need to check semantics.
+        quiz.expiresAt = expiresAt;
+
+        if (questions && Array.isArray(questions) && questions.length > 0) {
+            // Validate questions similar to create...
+            for (let i = 0; i < questions.length; i++) {
+                const q = questions[i];
+                // basic validation
+                if (!q.text || !q.type || !q.correctAnswer) {
+                    return res.status(400).json({ success: false, message: `Invalid question data at index ${i + 1}` });
+                }
+            }
+            quiz.questions = questions;
+        }
+
+        if (courseId && courseId !== quiz.courseId.toString()) {
+            // If course changed, decrement old course count and increment new
+            await Course.findByIdAndUpdate(quiz.courseId, { $inc: { totalQuizzes: -1 } });
+            await Course.findByIdAndUpdate(courseId, { $inc: { totalQuizzes: 1 } });
+            quiz.courseId = courseId;
+        }
+
+        await quiz.save();
+
+        res.json({
+            success: true,
+            data: {
+                id: quiz._id.toString(),
+                title: quiz.title,
+                // ... return updated fields
+            },
+            message: 'Quiz updated successfully'
+        });
+
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error',
+        });
+    }
+});
+
 // Get Student Results (for a specific student)
 router.get('/students/:studentId/results', async (req: AuthRequest, res: Response) => {
     try {
