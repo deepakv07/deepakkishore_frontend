@@ -3,12 +3,15 @@ import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { Quiz } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 
 const QuizDetails: React.FC = () => {
     const { quizId } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth(); // Get user
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(true);
+    const [startingQuiz, setStartingQuiz] = useState(false); // New state for start loading
     const [agreed, setAgreed] = useState(false);
 
     useEffect(() => {
@@ -16,6 +19,35 @@ const QuizDetails: React.FC = () => {
             loadQuizDetails(quizId);
         }
     }, [quizId]);
+
+    // ... existing loadQuizDetails ...
+
+    const handleStartQuiz = async () => {
+        if (!user || !quizId || !quiz) return;
+
+        try {
+            setStartingQuiz(true);
+
+            // Call AI Service to start quiz
+            console.log("Starting AI Quiz...");
+            const sessionData = await apiService.startAIQuiz(
+                user.id?.toString() || (user as any)._id?.toString() || 'unknown_user',
+                quizId,
+                quiz.title
+            );
+
+            console.log("AI Session Started:", sessionData);
+
+            // Navigate with session data
+            navigate(`/quiz/${quizId}`, { state: { aiSession: sessionData } });
+
+        } catch (error) {
+            console.error("Failed to start AI quiz:", error);
+            alert("Failed to start AI quiz. Please try again. Ensure the AI Service is running.");
+        } finally {
+            setStartingQuiz(false);
+        }
+    };
 
     const loadQuizDetails = async (id: string) => {
         try {
@@ -180,18 +212,17 @@ const QuizDetails: React.FC = () => {
                             <button
                                 onClick={() => {
                                     if (quiz?.isCompleted) {
-                                        // Go back to list or dashboard
                                         navigate('/student/quizzes');
                                         return;
                                     }
                                     if (agreed && quizId) {
-                                        navigate(`/quiz/${quizId}`);
+                                        handleStartQuiz();
                                     }
                                 }}
-                                disabled={(!agreed && !quiz?.isCompleted) || loading}
+                                disabled={(!agreed && !quiz?.isCompleted) || loading || startingQuiz}
                                 className={`w-full md:w-auto px-16 py-5 rounded-2xl font-black tracking-widest uppercase shadow-2xl transition flex items-center justify-center ${quiz?.isCompleted
                                     ? 'bg-green-600 text-white shadow-green-200 hover:scale-105 hover:bg-green-700'
-                                    : agreed && !loading
+                                    : agreed && !loading && !startingQuiz
                                         ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-blue-200 hover:scale-105 active:scale-95'
                                         : 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
                                     }`}
@@ -202,7 +233,7 @@ const QuizDetails: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <i className="fas fa-play-circle mr-3"></i> {loading ? 'Loading...' : 'Confirm & Start Quiz'}
+                                        <i className="fas fa-play-circle mr-3"></i> {loading || startingQuiz ? 'Starting AI...' : 'Confirm & Start Quiz'}
                                     </>
                                 )}
                             </button>
