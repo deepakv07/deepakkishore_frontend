@@ -21,24 +21,6 @@ const StudentDashboard: React.FC = () => {
             setDashboardData(data);
         } catch (err: any) {
             console.error('Error loading dashboard:', err);
-            // Show error but don't use mock data
-            alert('Failed to load dashboard data. Please refresh the page.');
-            // Set minimal data to prevent crashes
-            setDashboardData({
-                user: user as any,
-                stats: {
-                    totalCourses: 0,
-                    hoursLearned: 0,
-                    quizzesCompleted: 0,
-                    pendingQuizzes: 0,
-                },
-                recentActivity: [],
-                aiJobPrediction: {
-                    role: 'Student',
-                    confidence: 0,
-                    salaryRange: { min: 0, max: 0 },
-                },
-            });
         } finally {
             setLoading(false);
         }
@@ -48,147 +30,134 @@ const StudentDashboard: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#00E5FF55]"></div>
                 </div>
             </StudentLayout>
         );
     }
 
+    const stats = [
+        { label: 'QUizzes', value: dashboardData?.stats?.totalAvailableQuizzes || '0', icon: 'fa-check-circle', color: '#00E5FF' },
+        { label: 'COMPLETED', value: dashboardData?.stats?.quizzesCompleted || '0', icon: 'fa-hourglass-half', color: '#9D4EDD' },
+    ];
+
     return (
         <StudentLayout>
-            {/* Welcome Banner */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2rem] p-10 text-white shadow-2xl mb-10 relative overflow-hidden group">
-                <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-8">
-                    <div>
-                        <h2 className="text-4xl font-black mb-3">
-                            Welcome back, {user?.name || 'Alex Johnson'}!
-                        </h2>
-
+            <div className="space-y-8 animate-fade-in">
+                {/* Hero Banner */}
+                <div className="w-full h-40 bg-gradient-to-r from-[#00E5FF] to-[#9D4EDD] rounded-[2.5rem] flex items-center justify-between px-12 shadow-[0_20px_40px_rgba(0,229,255,0.15)] relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    <div className="relative z-10">
+                        <h1 className="text-4xl font-black text-white tracking-tighter">
+                            Welcome back, {user?.name || 'Student'}!
+                        </h1>
                     </div>
                     <button
                         onClick={() => navigate('/student/quizzes')}
-                        className="bg-white text-blue-600 px-10 py-4 rounded-2xl font-black shadow-xl shadow-blue-900/20 hover:scale-105 transition-all active:scale-95 whitespace-nowrap"
+                        className="relative z-10 px-8 py-3 bg-white text-[#9D4EDD] rounded-2xl font-black text-sm tracking-widest uppercase hover:scale-105 transition-transform shadow-lg"
                     >
                         View Quizzes
                     </button>
                 </div>
-            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Left Column (Progress & Activity) */}
-                <div className="lg:col-span-2 space-y-10">
-                    {/* Learning Progress */}
-                    <div>
-                        <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center">
-                            Your Learning Progress
-                        </h3>
-                        <div className="grid grid-cols-2 gap-6">
-                            {[
-                                {
-                                    label: 'Quizzes',
-                                    val: dashboardData?.stats.totalAvailableQuizzes || 0, // Showing Total Quizzes as requested
-                                    icon: 'fa-check-circle',
-                                    color: 'text-blue-600'
-                                },
-                                {
-                                    label: 'Pending',
-                                    val: dashboardData?.stats.pendingQuizzes && dashboardData.stats.pendingQuizzes > 0 ? 'Attend Quiz' : 'No quiz to attempt',
-                                    icon: 'fa-hourglass-half',
-                                    isAction: true,
-                                    hasPending: dashboardData?.stats.pendingQuizzes && dashboardData.stats.pendingQuizzes > 0
-                                },
-                            ].map((stat, i) => (
-                                <div key={i} className="bg-white p-8 rounded-[1.5rem] border border-gray-100/50 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all group">
-                                    <div className="text-blue-600 text-xl font-black mb-4 group-hover:scale-110 transition-transform">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
+                        <h3 className="text-2xl font-black tracking-tighter mb-6">Your Learning Progress</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {stats.map((stat, i) => (
+                                <div key={i} className="glass-card p-6 flex flex-col gap-4 relative overflow-hidden group">
+                                    <div
+                                        className="absolute -top-4 -right-4 w-16 h-16 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"
+                                        style={{ backgroundColor: stat.color }}
+                                    />
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-sm" style={{ color: stat.color }}>
                                         <i className={`fas ${stat.icon}`}></i>
                                     </div>
-                                    {!stat.isAction ? (
-                                        <>
-                                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</h3>
-                                            <p className="text-2xl font-black text-gray-800 tracking-tight">{stat.val}</p>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Pending</p>
-                                            <button
-                                                onClick={() => {
-                                                    if (stat.hasPending) {
-                                                        navigate('/student/quizzes');
-                                                    }
-                                                }}
-                                                disabled={!stat.hasPending}
-                                                className={`w-full text-xs font-black py-3 rounded-xl transition shadow-lg ${stat.hasPending
-                                                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100'
-                                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-gray-100'
-                                                    }`}
-                                            >
-                                                {stat.hasPending ? 'Attend Quiz' : 'No quiz to attempt'}
-                                            </button>
-                                        </>
-                                    )}
+                                    <div>
+                                        <p className="text-[10px] font-black tracking-widest text-[#8E9AAF] uppercase">{stat.label}</p>
+                                        <p className="text-3xl font-black tracking-tighter mt-1">{stat.value}</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* Recent Activity */}
-                    <div className="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 p-8">
-                        <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center">
-                            Recent Activity
-                        </h3>
-                        <div className="space-y-6">
-                            {dashboardData?.recentActivity && dashboardData.recentActivity.length > 0 ? (
-                                dashboardData.recentActivity.map((activity, i) => (
-                                    <div key={activity.id} className="flex items-center p-5 rounded-2xl hover:bg-gray-50/80 transition-all border border-transparent hover:border-gray-100">
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-5 ${i === 0 ? 'bg-blue-50 text-blue-600' :
-                                            i === 1 ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-50 text-gray-400'
-                                            }`}>
-                                            <i className={`fas ${i === 0 ? 'fa-check-circle' :
-                                                i === 1 ? 'fa-play' : 'fa-spinner fa-spin'
-                                                } text-sm`}></i>
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-gray-800">{activity.title}</p>
-                                            <p className="text-sm text-gray-400 font-medium">{activity.timestamp}</p>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : null}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Column */}
-                <div className="space-y-10">
-
-                    {/* Quick Actions */}
-                    <div className="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 p-8">
-                        <h3 className="text-lg font-black text-gray-800 mb-6">Quick Actions</h3>
-                        <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-6">
+                        <h3 className="text-2xl font-black tracking-tighter">Quick Actions</h3>
+                        <div className="glass-card p-6 grid grid-cols-2 gap-4">
                             <button
                                 onClick={() => navigate('/student/profile')}
-                                className="flex flex-col items-center justify-center p-6 border border-gray-50 rounded-2xl hover:bg-blue-50/50 hover:border-blue-100 transition-all group"
+                                className="aspect-square flex flex-col items-center justify-center gap-3 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 hover:border-[#9D4EDD]/30 transition-all group"
                             >
-                                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm group-hover:shadow-md">
-                                    <i className="fas fa-user-circle text-xl"></i>
+                                <div className="w-10 h-10 bg-[#9D4EDD]/10 rounded-xl flex items-center justify-center text-[#9D4EDD] group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(157,78,221,0.1)]">
+                                    <i className="fas fa-user"></i>
                                 </div>
-                                <span className="text-xs font-bold text-gray-600">My Profile</span>
+                                <span className="text-[10px] font-black tracking-widest text-[#8E9AAF] uppercase">My Profile</span>
                             </button>
                             <button
                                 onClick={() => navigate('/student/quizzes')}
-                                className="flex flex-col items-center justify-center p-6 border border-gray-50 rounded-2xl hover:bg-blue-50/50 hover:border-blue-100 transition-all group"
+                                className="aspect-square flex flex-col items-center justify-center gap-3 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 hover:border-[#00E5FF]/30 transition-all group"
                             >
-                                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm group-hover:shadow-md">
-                                    <i className="fas fa-file-invoice text-xl"></i>
+                                <div className="w-10 h-10 bg-[#00E5FF]/10 rounded-xl flex items-center justify-center text-[#00E5FF] group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(0,229,255,0.1)]">
+                                    <i className="fas fa-file-alt"></i>
                                 </div>
-                                <span className="text-xs font-bold text-gray-600">View Quizzes</span>
+                                <span className="text-[10px] font-black tracking-widest text-[#8E9AAF] uppercase">View Quizzes</span>
                             </button>
                         </div>
                     </div>
                 </div>
+
+                <div className="space-y-6">
+                    <div className="flex justify-between items-end">
+                        <h3 className="text-2xl font-black tracking-tighter">Recent Activity</h3>
+                        <button className="text-[10px] font-black tracking-widest uppercase text-[#00E5FF] bg-[#00E5FF11] border border-[#00E5FF33] px-4 py-1.5 rounded-full hover:bg-[#00E5FF] hover:text-black transition-all">
+                            See All
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                        {(() => {
+                            const completedActivities = dashboardData?.recentActivity.filter(a => a.type === 'quiz_completed') || [];
+
+                            if (completedActivities.length === 0) {
+                                return (
+                                    <div className="glass-card p-8 text-center opacity-50">
+                                        <p className="text-[10px] font-black tracking-widest uppercase">No recently completed quizzes found</p>
+                                    </div>
+                                );
+                            }
+
+                            return completedActivities.map((activity: any) => (
+                                <div key={activity.id} className="glass-card glass-card-hover p-5 flex items-center justify-between group">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#9D4EDD] group-hover:scale-110 transition-transform">
+                                            <i className="fas fa-clipboard-check text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-lg group-hover:text-[#00E5FF] transition-colors">
+                                                Completed quiz: {activity.title}
+                                            </h4>
+                                            <p className="text-[10px] font-bold text-[#8E9AAF] tracking-widest uppercase mt-1">
+                                                {new Date(activity.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ));
+                        })()}
+                    </div>
+                </div>
+            </div>
+
+            {/* Floating Attend Quiz button in middle section fallback or as extra action */}
+            <div className="pt-4 lg:hidden">
+                <button
+                    onClick={() => navigate('/student/quizzes')}
+                    className="w-full elite-button !py-4 shadow-[0_20px_40px_rgba(0,229,255,0.2)]"
+                >
+                    <i className="fas fa-play-circle text-lg"></i>
+                    <span className="text-sm font-black tracking-widest uppercase">Attend Quiz</span>
+                </button>
             </div>
         </StudentLayout>
     );

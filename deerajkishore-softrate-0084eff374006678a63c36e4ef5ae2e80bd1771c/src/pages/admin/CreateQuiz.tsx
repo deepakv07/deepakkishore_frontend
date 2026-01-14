@@ -17,21 +17,6 @@ const CreateQuiz: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    // Initial 25 questions data
-    const initialQuestions: QuestionDraft[] = Array.from({ length: 25 }, (_, i) => {
-        const id = i + 1;
-        let type: 'MCQ' | 'Aptitude' = 'MCQ';
-
-        return {
-            id,
-            text: '',
-            type,
-            options: type === 'MCQ' ? ['', '', '', ''] : undefined,
-            correctAnswer: '',
-            points: 10,
-        };
-    });
-
     // Form State
     const [quizTitle, setQuizTitle] = useState('');
     const [courseDescription, setCourseDescription] = useState('');
@@ -40,15 +25,6 @@ const CreateQuiz: React.FC = () => {
     const [numberOfQuestions, setNumberOfQuestions] = useState<number>(10);
     const [questions, setQuestions] = useState<QuestionDraft[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
-    // Predefined 5 courses (keeping for reference or auto-suggestion if needed, but not restricting)
-    const predefinedCourses = [
-        { id: 'course1', title: 'JavaScript Fundamentals' },
-        { id: 'course2', title: 'Python Programming' },
-        { id: 'course3', title: 'Data Structures & Algorithms' },
-        { id: 'course4', title: 'Web Development' },
-        { id: 'course5', title: 'Database Management' },
-    ];
 
     useEffect(() => {
         // loadCourses(); // No longer needed to fetch specific list for dropdown
@@ -245,6 +221,16 @@ const CreateQuiz: React.FC = () => {
         }
     };
 
+    const handleReset = () => {
+        if (window.confirm('Are you sure you want to reset the form? All progress will be lost.')) {
+            setQuizTitle('');
+            setCourseTitle('');
+            setCourseDescription('');
+            setNumberOfQuestions(10);
+            initializeQuestions();
+        }
+    };
+
     const currentQuestion = questions[currentQuestionIndex];
 
     if (showSuccess) {
@@ -303,278 +289,292 @@ const CreateQuiz: React.FC = () => {
 
     return (
         <AdminLayout>
-            <div className="max-w-5xl mx-auto pb-20">
-                {/* Header (matching image 0) */}
-                <div className="flex items-center justify-between mb-12 py-4">
+            <div className="max-w-6xl mx-auto pb-24 animate-fade-in">
+                {/* Tactical Header */}
+                <div className="flex items-center justify-between mb-12 py-6 border-b border-white/5">
                     <button
                         onClick={() => navigate(-1)}
-                        className="w-12 h-12 flex items-center justify-center bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition"
+                        className="w-14 h-14 flex items-center justify-center bg-white/2 rounded-2xl border border-white/10 text-gray-400 hover:text-white hover:border-[#FFD70044] hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] transition-all duration-300 group"
                     >
-                        <i className="fas fa-chevron-left text-gray-600"></i>
+                        <i className="fas fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
                     </button>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Create Course Quiz</h1>
-                    <div className="w-12"></div> {/* Spacer for symmetry */}
+                    <div className="text-center">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                            <span className="w-2 h-2 rounded-full bg-[#FFD700] animate-pulse"></span>
+                            <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.4em]">Quiz Management</span>
+                        </div>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Create <span className="text-[#FFD700]">Course Quiz</span></h1>
+                    </div>
+                    <div className="w-14"></div>
                 </div>
 
-                <div className="space-y-10">
-                    {/* Course Details Section (matching image 0) */}
-                    <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50 space-y-8">
-                        <div>
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Course/Subject *</label>
-                            <input
-                                type="text"
-                                placeholder="Enter course name (e.g., JavaScript Fundamentals)"
-                                value={courseTitle}
-                                onChange={(e) => setCourseTitle(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"
-                            />
-                            <p className="text-xs text-gray-400 mb-4 mt-2">Enter the name of the course for this quiz</p>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Left Column: Mission Parameters */}
+                    <div className="lg:col-span-4 space-y-8">
+                        <div className="glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFD70005] rounded-bl-full -mr-16 -mt-16"></div>
+                            <h3 className="text-xs font-black text-[#FFD700] uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                                <i className="fas fa-sliders-h"></i> Quiz Details
+                            </h3>
 
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Number of Questions *</label>
-                            <input
-                                type="number"
-                                placeholder="Enter number of questions"
-                                value={numberOfQuestions}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    const count = parseInt(value);
-                                    if (value === '') {
-                                        // Allow clearing the input
-                                        // We cast to any to allow temp empty string if needed or just handle 0
-                                        setNumberOfQuestions(0);
-                                    } else if (!isNaN(count)) {
-                                        setNumberOfQuestions(count);
-                                    }
-                                }}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"
-                            />
-                            <p className="text-xs text-gray-400 mt-2">This quiz will have {numberOfQuestions || 0} question{(numberOfQuestions || 0) !== 1 ? 's' : ''}</p>
-
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight mt-6">Quiz Title *</label>
-                            <input
-                                type="text"
-                                placeholder="Enter quiz title (e.g., JavaScript Basics Quiz)"
-                                value={quizTitle}
-                                onChange={(e) => setQuizTitle(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Course Description</label>
-                            <textarea
-                                rows={4}
-                                placeholder="Enter course description"
-                                value={courseDescription}
-                                onChange={(e) => setCourseDescription(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Progress Info (matching image 1) */}
-                    {questions.length > 0 && currentQuestion && (
-                        <div className="space-y-4 px-2">
-                            <div className="flex justify-between items-end">
-                                <span className="text-sm font-black text-gray-400 tracking-tight uppercase">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                                <span className={`text-xs px-4 py-1.5 rounded-xl font-black uppercase tracking-widest ${currentQuestion.type === 'MCQ' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                                    }`}>
-                                    {currentQuestion.type === 'MCQ' ? 'MCQ' : 'APTITUDE'}
-                                </span>
-                            </div>
-                            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                <div
-                                    className="bg-blue-600 h-full transition-all duration-700 ease-out"
-                                    style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-                                ></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Question Editor Card (matching image 1 & 2) */}
-                    {questions.length > 0 && currentQuestion && (
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50">
-                            <div className="flex justify-between items-center mb-10">
-                                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Question {currentQuestion.id}</h3>
-                                <span className={`text-[10px] px-3 py-1 rounded-lg font-black uppercase tracking-widest ${currentQuestion.type === 'MCQ' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                                    }`}>
-                                    {currentQuestion.type === 'MCQ' ? 'MCQ' : 'APTITUDE'}
-                                </span>
-                            </div>
-
-                            <div className="space-y-8">
-                                {/* Question Type Selector (Available for ALL questions) */}
+                            <div className="space-y-6">
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 mb-4 uppercase tracking-widest">Question Type *</label>
-                                    <div className="flex space-x-10">
-                                        <label className="flex items-center cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                className="hidden"
-                                                checked={currentQuestion.type === 'MCQ'}
-                                                onChange={() => {
-                                                    updateQuestion(currentQuestionIndex, {
-                                                        type: 'MCQ',
-                                                        options: ['', '', '', ''],
-                                                        correctAnswer: ''
-                                                    });
-                                                }}
-                                            />
-                                            <div className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center transition-all ${currentQuestion.type === 'MCQ' ? 'border-blue-600 bg-blue-600' : 'border-gray-200 group-hover:border-gray-300'}`}>
-                                                {currentQuestion.type === 'MCQ' && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                                            </div>
-                                            <span className={`text-sm font-bold ${currentQuestion.type === 'MCQ' ? 'text-gray-900' : 'text-gray-500'}`}>MCQ Type</span>
-                                        </label>
-                                        <label className="flex items-center cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                className="hidden"
-                                                checked={currentQuestion.type === 'Aptitude'}
-                                                onChange={() => {
-                                                    updateQuestion(currentQuestionIndex, {
-                                                        type: 'Aptitude',
-                                                        options: undefined,
-                                                        correctAnswer: ''
-                                                    });
-                                                }}
-                                            />
-                                            <div className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center transition-all ${currentQuestion.type === 'Aptitude' ? 'border-blue-600 bg-blue-600' : 'border-gray-200 group-hover:border-gray-300'}`}>
-                                                {currentQuestion.type === 'Aptitude' && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                                            </div>
-                                            <span className={`text-sm font-bold ${currentQuestion.type === 'Aptitude' ? 'text-gray-900' : 'text-gray-500'}`}>Aptitude Type</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-black text-gray-800 mb-3 tracking-tight">Question *</label>
-                                    <textarea
-                                        rows={4}
-                                        placeholder="Enter your question here..."
-                                        value={currentQuestion.text}
-                                        onChange={(e) => updateQuestion(currentQuestionIndex, { text: e.target.value })}
-                                        className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none shadow-sm"
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Course / Subject</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter course name (e.g., JavaScript Fundamentals)"
+                                        value={courseTitle}
+                                        onChange={(e) => setCourseTitle(e.target.value)}
+                                        className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white placeholder:text-gray-700 font-bold transition-all"
                                     />
                                 </div>
 
-                                {/* Conditional Rendering based on Type */}
-                                {currentQuestion.type === 'MCQ' && (
-                                    <>
-                                        <div className="space-y-4">
-                                            <label className="block text-sm font-black text-gray-800 mb-4 tracking-tight">Options *</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                {['A', 'B', 'C', 'D'].map((letter, idx) => (
-                                                    <div key={letter} className="relative group">
-                                                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-gray-400 font-black text-sm">{letter}.</span>
-                                                        <input
-                                                            type="text"
-                                                            placeholder={`Option ${letter}`}
-                                                            value={currentQuestion.options?.[idx] || ''}
-                                                            onChange={(e) => {
-                                                                const newOptions = [...(currentQuestion.options || [])];
-                                                                newOptions[idx] = e.target.value;
-                                                                updateQuestion(currentQuestionIndex, { options: newOptions });
-                                                            }}
-                                                            className="w-full pl-14 pr-8 py-5 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300"
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Quiz Title</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter quiz title (e.g., JavaScript Basics Quiz)"
+                                        value={quizTitle}
+                                        onChange={(e) => setQuizTitle(e.target.value)}
+                                        className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white placeholder:text-gray-700 font-bold transition-all"
+                                    />
+                                </div>
 
-                                        <div>
-                                            <label className="block text-sm font-black text-gray-800 mb-3 tracking-tight">Correct Answer *</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={currentQuestion.correctAnswer}
-                                                    onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
-                                                    className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none cursor-pointer appearance-none font-bold text-gray-700"
-                                                >
-                                                    <option value="">Select correct answer</option>
-                                                    <option value="A">Option A</option>
-                                                    <option value="B">Option B</option>
-                                                    <option value="C">Option C</option>
-                                                    <option value="D">Option D</option>
-                                                </select>
-                                                <i className="fas fa-chevron-down absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                {currentQuestion.type === 'Aptitude' && (
-                                    <div>
-                                        <label className="block text-sm font-black text-gray-800 mb-3 tracking-tight">Approximate Correct Answer *</label>
-                                        <textarea
-                                            rows={4}
-                                            placeholder="Enter the approximate correct answer or key points..."
-                                            value={currentQuestion.correctAnswer}
-                                            onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
-                                            className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none shadow-sm"
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Total Questions</label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            value={numberOfQuestions}
+                                            onChange={(e) => setNumberOfQuestions(parseInt(e.target.value) || 0)}
+                                            className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white font-black tabular-nums transition-all"
                                         />
-                                        <p className="text-xs text-gray-400 mt-4 italic font-medium">Provide key points or the approximate answer for evaluation</p>
+                                        <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-600 uppercase tracking-widest">Questions</span>
                                     </div>
-                                )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Quiz Description</label>
+                                    <textarea
+                                        rows={3}
+                                        placeholder="Enter quiz description"
+                                        value={courseDescription}
+                                        onChange={(e) => setCourseDescription(e.target.value)}
+                                        className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white placeholder:text-gray-700 font-medium transition-all resize-none"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    )}
 
-                    {/* Navigation Buttons (matching image 1 & 2) */}
-                    {questions.length > 0 && (
-                        <div className="grid grid-cols-2 gap-6">
-                            <button
-                                onClick={() => {
-                                    if (currentQuestionIndex > 0) {
-                                        setCurrentQuestionIndex(currentQuestionIndex - 1);
-                                    }
-                                }}
-                                disabled={currentQuestionIndex === 0}
-                                className={`py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center transition-all ${currentQuestionIndex === 0
-                                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                    }`}
-                            >
-                                <i className="fas fa-chevron-left mr-3"></i> Previous
-                            </button>
-                            <button
-                                onClick={() => {
-                                    if (currentQuestionIndex < questions.length - 1) {
-                                        setCurrentQuestionIndex(currentQuestionIndex + 1);
-                                    }
-                                }}
-                                className={`py-5 font-black rounded-2xl transition shadow-xl shadow-blue-100 uppercase tracking-widest flex items-center justify-center ${currentQuestionIndex === questions.length - 1
-                                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                                    }`}
-                                disabled={currentQuestionIndex === questions.length - 1}
-                            >
-                                Next <i className="fas fa-chevron-right ml-3 text-sm"></i>
-                            </button>
-                        </div>
-                    )}
+                    </div>
 
-                    {/* Bottom Action Buttons (matching image 2) */}
-                    {questions.length > 0 && (
-                        <div className="flex flex-col sm:flex-row gap-6 pt-10 border-t border-gray-100">
-                            <button
-                                className="flex-1 py-5 bg-white text-blue-600 border-2 border-blue-600 font-black rounded-2xl hover:bg-blue-50 transition-all flex items-center justify-center uppercase tracking-widest"
-                            >
-                                <i className="far fa-save mr-3"></i> Save Draft
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="flex-1 py-5 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center shadow-xl shadow-emerald-100 disabled:opacity-50 uppercase tracking-widest"
-                            >
-                                {loading ? (
-                                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <><i className="fas fa-check mr-3"></i> Submit Quiz</>
-                                )}
-                            </button>
-                        </div>
-                    )}
+                    {/* Right Column: Question Constructor */}
+                    <div className="lg:col-span-8 space-y-8">
+                        {questions.length > 0 && currentQuestion ? (
+                            <div className="space-y-8">
+                                {/* Navigation & Type Pulse */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex gap-2">
+                                        {questions.map((_, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setCurrentQuestionIndex(idx)}
+                                                className={`w-10 h-10 rounded-lg font-black text-[10px] transition-all border ${currentQuestionIndex === idx
+                                                    ? 'bg-[#FFD70011] text-[#FFD700] border-[#FFD70033] shadow-[0_0_15px_#FFD70022]'
+                                                    : questions[idx].text.trim() !== ''
+                                                        ? 'bg-white/5 text-white border-white/10'
+                                                        : 'bg-transparent text-gray-700 border-white/5 hover:border-white/20'
+                                                    }`}
+                                            >
+                                                {idx + 1}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border ${currentQuestion.type === 'MCQ' ? 'bg-[#00E5FF0D] text-[#00E5FF] border-[#00E5FF22]' : 'bg-[#9D4EDD0D] text-[#9D4EDD] border-[#9D4EDD22]'
+                                            }`}>
+                                            {currentQuestion.type} Mode
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Main Editor Card */}
+                                <div className="glass-card p-12 border border-white/5 shadow-2xl relative">
+                                    <div className="absolute top-12 right-12 text-[#FFD700] opacity-10 text-6xl font-black">
+                                        0{currentQuestionIndex + 1}
+                                    </div>
+
+                                    <div className="space-y-10 relative z-10">
+                                        <div>
+                                            <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-8">Edit Question</h3>
+
+                                            <div className="flex gap-8 mb-10 p-1 bg-white/2 rounded-2xl w-fit border border-white/5">
+                                                <button
+                                                    onClick={() => updateQuestion(currentQuestionIndex, { type: 'MCQ', options: ['', '', '', ''], correctAnswer: '' })}
+                                                    className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentQuestion.type === 'MCQ' ? 'bg-[#FFD70011] text-[#FFD700] shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                                                >
+                                                    Multiple Choice
+                                                </button>
+                                                <button
+                                                    onClick={() => updateQuestion(currentQuestionIndex, { type: 'Aptitude', options: undefined, correctAnswer: '' })}
+                                                    className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentQuestion.type === 'Aptitude' ? 'bg-[#FFD70011] text-[#FFD700] shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                                                >
+                                                    Aptitude
+                                                </button>
+                                            </div>
+
+                                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 ml-1">Question Text</label>
+                                            <textarea
+                                                rows={5}
+                                                placeholder="Enter question text..."
+                                                value={currentQuestion.text}
+                                                onChange={(e) => updateQuestion(currentQuestionIndex, { text: e.target.value })}
+                                                className="w-full px-8 py-6 bg-white/2 border border-white/10 rounded-2xl focus:border-[#FFD70044] outline-none text-xl font-medium text-white placeholder:text-gray-800 transition-all resize-none shadow-2xl"
+                                            />
+                                        </div>
+
+                                        {currentQuestion.type === 'MCQ' && (
+                                            <div className="space-y-8">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    {['A', 'B', 'C', 'D'].map((letter, idx) => (
+                                                        <div key={letter} className="relative group">
+                                                            <div className={`absolute left-0 top-0 bottom-0 w-12 bg-white/2 border-r border-white/5 rounded-l-xl flex items-center justify-center font-black text-xs transition-colors ${currentQuestion.correctAnswer === letter ? 'bg-[#FFD70022] text-[#FFD700] border-[#FFD70033]' : 'text-gray-600 group-hover:text-gray-400'}`}>
+                                                                {letter}
+                                                            </div>
+                                                            <input
+                                                                type="text"
+                                                                placeholder={`Option ${letter}...`}
+                                                                value={currentQuestion.options?.[idx] || ''}
+                                                                onChange={(e) => {
+                                                                    const opt = [...(currentQuestion.options || [])];
+                                                                    opt[idx] = e.target.value;
+                                                                    updateQuestion(currentQuestionIndex, { options: opt });
+                                                                }}
+                                                                className={`w-full pl-16 pr-6 py-4 bg-white/1 border border-white/5 rounded-xl focus:border-[#FFD70044] outline-none text-white font-bold transition-all ${currentQuestion.correctAnswer === letter ? 'border-[#FFD70044] bg-[#FFD70005]' : 'group-hover:bg-white/2'}`}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <div className="flex items-center gap-6 p-6 bg-white/2 rounded-2xl border border-white/5">
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Correct Answer:</span>
+                                                    <div className="flex gap-4">
+                                                        {['A', 'B', 'C', 'D'].map(l => (
+                                                            <button
+                                                                key={l}
+                                                                onClick={() => updateQuestion(currentQuestionIndex, { correctAnswer: l })}
+                                                                className={`w-10 h-10 rounded-lg font-black text-xs transition-all border ${currentQuestion.correctAnswer === l ? 'bg-[#FFD700] text-[#030508] border-[#FFD700]' : 'bg-white/5 text-gray-500 border-white/10 hover:border-white/20'}`}
+                                                            >
+                                                                {l}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {currentQuestion.type === 'Aptitude' && (
+                                            <div className="animate-fade-in">
+                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 ml-1">Correct Answer</label>
+                                                <textarea
+                                                    rows={4}
+                                                    placeholder="Enter the correct answer..."
+                                                    value={currentQuestion.correctAnswer}
+                                                    onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
+                                                    className="w-full px-8 py-6 bg-white/2 border border-white/10 rounded-2xl focus:border-[#FFD70044] outline-none text-white font-medium transition-all resize-none shadow-2xl"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Step Navigation */}
+                                <div className="flex flex-col gap-6">
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <button
+                                            onClick={() => currentQuestionIndex > 0 && setCurrentQuestionIndex(currentQuestionIndex - 1)}
+                                            disabled={currentQuestionIndex === 0}
+                                            className="py-5 bg-white/2 text-gray-500 font-black rounded-2xl hover:bg-white/5 border border-white/5 disabled:opacity-20 uppercase tracking-[0.3em] text-[10px] transition-all"
+                                        >
+                                            <i className="fas fa-chevron-left mr-3"></i> Previous
+                                        </button>
+                                        <button
+                                            onClick={() => currentQuestionIndex < questions.length - 1 && setCurrentQuestionIndex(currentQuestionIndex + 1)}
+                                            disabled={currentQuestionIndex === questions.length - 1}
+                                            className="py-5 bg-[#FFD70011] text-[#FFD700] font-black rounded-2xl border border-[#FFD70033] hover:bg-[#FFD70022] disabled:opacity-20 uppercase tracking-[0.3em] text-[10px] transition-all shadow-[0_0_30px_#FFD70008]"
+                                        >
+                                            Next <i className="fas fa-chevron-right ml-3 text-[8px]"></i>
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
+                                        <button
+                                            onClick={handleReset}
+                                            disabled={loading}
+                                            className="py-5 bg-red-500/10 text-red-500 font-black rounded-2xl border border-red-500/30 hover:bg-red-500/20 uppercase tracking-[0.3em] text-[10px] transition-all"
+                                        >
+                                            <i className="fas fa-undo mr-3 text-[8px]"></i> Reset Form
+                                        </button>
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={loading}
+                                            className="py-5 bg-white text-[#030508] font-black rounded-2xl hover:bg-gray-200 disabled:opacity-50 uppercase tracking-[0.3em] text-[10px] transition-all shadow-2xl shadow-white/5"
+                                        >
+                                            {loading ? (
+                                                <i className="fas fa-circle-notch animate-spin"></i>
+                                            ) : (
+                                                <>Submit Quiz <i className="fas fa-upload ml-3 text-[8px]"></i></>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center p-20 glass-card border border-white/5 border-dashed">
+                                <div className="w-20 h-20 bg-white/2 rounded-full flex items-center justify-center mb-8 text-gray-700 border border-white/5">
+                                    <i className="fas fa-microchip text-3xl"></i>
+                                </div>
+                                <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-xs">Waiting for payload initialization</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {/* Success Overlay */}
+            {showSuccess && (
+                <div className="fixed inset-0 bg-[#030508CC] backdrop-blur-3xl flex items-center justify-center z-[100] p-6 animate-fade-in">
+                    <div className="glass-card max-w-xl w-full p-16 border border-[#00FF4133] shadow-[0_0_100px_#00FF410D] text-center space-y-10 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00FF41] to-transparent"></div>
+
+                        <div className="w-24 h-24 bg-[#00FF4111] text-[#00FF41] rounded-[2rem] flex items-center justify-center mx-auto text-4xl border border-[#00FF4133] shadow-[0_0_30px_#00FF4122]">
+                            <i className="fas fa-check-double scale-125"></i>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h2 className="text-5xl font-black text-white tracking-tighter uppercase leading-none">Quiz <span className="text-[#00FF41]">Created Successfully</span></h2>
+                            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs leading-relaxed max-w-sm mx-auto">
+                                Your quiz has been successfully created and is now available for students in the {courseTitle} course.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-4 pt-6">
+                            <button
+                                onClick={() => navigate('/admin/dashboard')}
+                                className="w-full bg-[#00FF41] text-[#030508] font-black py-6 rounded-2xl hover:brightness-110 transition-all uppercase tracking-[0.3em] text-xs shadow-[0_0_30px_#00FF4133] group"
+                            >
+                                Go to Dashboard <i className="fas fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform"></i>
+                            </button>
+                            <button
+                                onClick={() => { setShowSuccess(false); setQuizTitle(''); navigate(0); }}
+                                className="w-full bg-white/5 text-gray-400 font-black py-6 rounded-2xl border border-white/5 hover:bg-white/10 hover:text-white transition-all uppercase tracking-[0.3em] text-xs"
+                            >
+                                Create Another Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
     );
 };

@@ -274,6 +274,11 @@ class APIService {
         return response.data.data;
     }
 
+    async deleteQuiz(quizId: number | string) {
+        const response = await this.api.delete(`/admin/quizzes/${quizId}`);
+        return response.data.data;
+    }
+
     // ========== Admin APIs ==========
 
     async getAdminDashboardStats(): Promise<AdminDashboardStats> {

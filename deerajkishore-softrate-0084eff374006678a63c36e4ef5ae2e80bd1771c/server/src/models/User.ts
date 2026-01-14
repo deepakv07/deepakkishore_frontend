@@ -6,6 +6,12 @@ export interface IUser extends Document {
     password: string;
     role: 'student' | 'admin';
     avatar?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    department?: string;
+    yearOfStudy?: string;
+    degree?: string;
     grade?: string;
     enrolledCourses?: number;
     permissions?: string[];
@@ -38,6 +44,30 @@ const UserSchema: Schema = new Schema(
         },
         avatar: {
             type: String,
+        },
+        firstName: {
+            type: String,
+            trim: true,
+        },
+        lastName: {
+            type: String,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            trim: true,
+        },
+        department: {
+            type: String,
+            trim: true,
+        },
+        yearOfStudy: {
+            type: String,
+            trim: true,
+        },
+        degree: {
+            type: String,
+            trim: true,
         },
         grade: {
             type: String,

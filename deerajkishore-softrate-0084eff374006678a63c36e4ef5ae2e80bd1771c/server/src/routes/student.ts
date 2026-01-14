@@ -182,6 +182,66 @@ router.get('/profile', async (req: AuthRequest, res: Response) => {
                 grade: user.grade,
                 enrolledCourses: user.enrolledCourses || 0,
                 avatar: user.avatar,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                department: user.department,
+                yearOfStudy: user.yearOfStudy,
+                degree: user.degree,
+            },
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error',
+        });
+    }
+});
+
+// Update Profile
+router.put('/profile', async (req: AuthRequest, res: Response) => {
+    try {
+        const studentId = req.user!.id;
+        const { firstName, lastName, phone, department, yearOfStudy, degree } = req.body;
+
+        const user = await User.findById(studentId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        // Update fields if provided
+        if (firstName !== undefined) user.firstName = firstName;
+        if (lastName !== undefined) user.lastName = lastName;
+        if (phone !== undefined) user.phone = phone;
+        if (department !== undefined) user.department = department;
+        if (yearOfStudy !== undefined) user.yearOfStudy = yearOfStudy;
+        if (degree !== undefined) user.degree = degree;
+
+        // Also update the full name if first or last name changed
+        if (firstName !== undefined || lastName !== undefined) {
+            user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name;
+        }
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'Profile updated successfully',
+            data: {
+                id: user._id.toString(),
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                avatar: user.avatar,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                department: user.department,
+                yearOfStudy: user.yearOfStudy,
+                degree: user.degree,
             },
         });
     } catch (error: any) {

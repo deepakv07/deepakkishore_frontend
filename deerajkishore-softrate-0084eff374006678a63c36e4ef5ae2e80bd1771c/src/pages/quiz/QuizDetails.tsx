@@ -9,7 +9,7 @@ const QuizDetails: React.FC = () => {
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [_error, setError] = useState('');
     const [agreed, setAgreed] = useState(false);
 
     useEffect(() => {
@@ -20,21 +20,12 @@ const QuizDetails: React.FC = () => {
 
     const loadQuizDetails = async (id: string) => {
         try {
-            // Fetch both detailed quiz data and student's status for this quiz
             const [detailsData, quizzesList] = await Promise.all([
                 apiService.getQuizQuestions(id),
                 apiService.getStudentQuizzes()
             ]);
 
-            // Find this quiz in the student's list to check completion status
             const quizStatus = quizzesList.find(q => String(q.id) === String(id) || String(q._id) === String(id));
-
-            console.log('🔍 Quiz Status Check:', {
-                quizId: id,
-                foundInList: !!quizStatus,
-                isCompleted: quizStatus?.isCompleted,
-                matchedId: quizStatus?.id || quizStatus?._id
-            });
 
             setQuiz({
                 ...detailsData,
@@ -52,89 +43,134 @@ const QuizDetails: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-5xl mx-auto py-12 px-4">
+            <div className="max-w-5xl mx-auto py-12 px-4 animate-fade-in">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-40">
-                        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-                        <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Loading assessment details...</p>
+                        <div className="relative w-24 h-24">
+                            <div className="absolute inset-0 border-4 border-[#00E5FF22] rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin"></div>
+                            <div className="absolute inset-4 border-2 border-[#9D4EDD] border-b-transparent rounded-full animate-spin-slow"></div>
+                        </div>
+                        <p className="mt-8 text-[#00E5FF] font-black uppercase tracking-[0.3em] text-sm animate-pulse">Initializing Assessment...</p>
                     </div>
                 ) : (
                     <div className="space-y-12">
-                        {/* Header & Stats */}
-                        <div className="text-center space-y-4">
-                            <h1 className="text-4xl font-black text-gray-900 tracking-tight">Assessment Details</h1>
-                            <div className="text-7xl font-black text-gray-900 leading-none">
+                        {/* Header & Stats (Match Image 3) */}
+                        <div className="text-center space-y-2">
+                            <h2 className="text-2xl font-black text-[#030508] tracking-tight">Assessment Details</h2>
+                            <div className="text-6xl font-black text-[#030508] tracking-tighter">
                                 {quiz?.questions?.length || 0}
                             </div>
-                            <p className="text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed">
-                                {quiz?.description || 'Test your knowledge and skills with this assessment.'}
+                            <p className="text-[#8E9AAF] font-bold text-sm">
+                                {quiz?.title || 'Details'}
                             </p>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pb-12 border-b border-gray-100">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-12 pb-12">
                                 {[
-                                    { label: 'Questions', val: quiz?.questions?.length?.toString() || '0', color: 'text-blue-600' },
-                                    { label: 'Duration', val: quiz?.durationMinutes?.toString() || '30', suffix: 'mins', color: 'text-green-600' },
-                                    { label: 'Total Points', val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0', color: 'text-purple-600' },
-                                    { label: 'Type', val: 'Mixed', color: 'text-red-600' },
+                                    { label: 'QUESTIONS', val: quiz?.questions?.length?.toString() || '0', color: 'text-[#0066FF]' },
+                                    { label: 'DURATION', val: quiz?.durationMinutes?.toString() || '30', color: 'text-[#00C853]' },
+                                    { label: 'TOTAL POINTS', val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0', color: 'text-[#9D4EDD]' },
+                                    { label: 'TYPE', val: quiz?.questions?.every(q => q.type === 'mcq') ? 'MCQ' : 'MIXED', color: 'text-[#FF3D00]' },
                                 ].map((stat, i) => (
-                                    <div key={i} className="bg-white p-6 rounded-[1.5rem] border border-gray-100 shadow-sm">
-                                        <div className={`text-4xl font-black ${stat.color} mb-1`}>{stat.val}</div>
-                                        <div className="text-gray-400 font-bold text-xs uppercase tracking-widest">{stat.label}</div>
+                                    <div key={i} className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col items-center justify-center transform transition-transform hover:scale-105">
+                                        <div className={`text-3xl font-black ${stat.color} mb-1`}>
+                                            {stat.val}
+                                        </div>
+                                        <div className="text-[#8E9AAF] font-black text-[10px] uppercase tracking-widest">{stat.label}</div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Breakdown */}
-                        <div className="space-y-6">
-                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase tracking-[0.2em] text-center">Structure Breakdown</h2>
-                            <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-100/50 space-y-4">
+                        {/* Breakdown (Match Image 4) */}
+                        <div className="space-y-8">
+                            <h2 className="text-center text-sm font-black text-[#030508] tracking-[0.2em] uppercase">STRUCTURE BREAKDOWN</h2>
+
+                            <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 space-y-4">
                                 {[
-                                    { title: 'Multiple Choice', desc: 'Standard MCQ questions', val: quiz?.questions?.filter(q => q.type === 'mcq').length.toString() || '0', icon: 'fa-list-ul', color: 'bg-blue-50 text-blue-500' },
-                                    { title: 'Points Per Question', desc: 'Average points', val: Math.round((quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0) || 0) / (quiz?.questions?.length || 1)).toString() || '0', icon: 'fa-brain', color: 'bg-green-50 text-green-500' },
-                                    { title: 'Total Duration', desc: 'In minutes', val: quiz?.durationMinutes?.toString() || '30', icon: 'fa-clock', color: 'bg-purple-50 text-purple-500' },
-                                    { title: 'Total Possible Score', desc: 'Sum of all sections', val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0', icon: 'fa-trophy', color: 'bg-indigo-50 text-indigo-500', isTotal: true },
+                                    {
+                                        title: 'Multiple Choice',
+                                        desc: 'Standard MCQ questions',
+                                        val: quiz?.questions?.filter(q => q.type === 'mcq').length.toString() || '0',
+                                        icon: 'fa-list-ul',
+                                        color: 'text-[#0066FF]',
+                                        bg: 'bg-[#E3EBFF]',
+                                        unit: 'MARKS/QTY'
+                                    },
+                                    {
+                                        title: 'Points Per Question',
+                                        desc: 'Average points',
+                                        val: quiz?.questions?.length ? (quiz.questions.reduce((sum, q) => sum + (q.points || 0), 0) / quiz.questions.length).toFixed(0) : '0',
+                                        icon: 'fa-brain',
+                                        color: 'text-[#00C853]',
+                                        bg: 'bg-[#E8F5E9]',
+                                        unit: 'MARKS/QTY'
+                                    },
+                                    {
+                                        title: 'Total Duration',
+                                        desc: 'In minutes',
+                                        val: quiz?.durationMinutes?.toString() || '30',
+                                        icon: 'fa-clock',
+                                        color: 'text-[#9D4EDD]',
+                                        bg: 'bg-[#F3E5F5]',
+                                        unit: 'MINS'
+                                    },
+                                    {
+                                        title: 'Total Possible Score',
+                                        desc: 'Sum of all sections',
+                                        val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0',
+                                        icon: 'fa-trophy',
+                                        color: 'text-[#0066FF]',
+                                        bg: 'bg-[#E3EBFF]',
+                                        unit: 'MARKS/QTY',
+                                        isHighlighted: true
+                                    },
                                 ].map((item, i) => (
-                                    <div key={i} className={`flex items-center justify-between p-6 rounded-2xl ${item.isTotal ? 'bg-blue-50/50 border border-blue-100' : 'border border-gray-50'}`}>
+                                    <div key={i} className={`flex items-center justify-between p-6 rounded-3xl transition-all duration-300 ${item.isHighlighted ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}>
                                         <div className="flex items-center space-x-6">
-                                            <div className={`w-14 h-14 ${item.color} rounded-2xl flex items-center justify-center text-xl`}>
+                                            <div className={`w-14 h-14 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center text-xl`}>
                                                 <i className={`fas ${item.icon}`}></i>
                                             </div>
                                             <div>
-                                                <h3 className="text-lg font-black text-gray-900">{item.title}</h3>
-                                                <p className="text-sm font-medium text-gray-500">{item.desc}</p>
+                                                <h3 className="font-black text-[#030508] text-base">{item.title}</h3>
+                                                <p className="text-xs text-[#8E9AAF] font-medium">{item.desc}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-3xl font-black text-gray-900">{item.val}</div>
-                                            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{item.title === 'Total Duration' ? 'Mins' : 'Marks/Qty'}</div>
+                                            <div className="text-3xl font-black text-[#030508]">{item.val}</div>
+                                            <div className="text-[8px] font-black text-[#8E9AAF] tracking-widest uppercase">{item.unit}</div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Guidelines */}
+                        {/* Directives Section (Restored from previous) */}
                         <div className="space-y-6">
-                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase tracking-[0.2em] text-center">Guidelines</h2>
-                            <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-100/50 space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#FF3D0033]"></div>
+                                <h2 className="text-sm font-black text-[#FF3D00] tracking-[0.3em] uppercase">Directives</h2>
+                                <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#FF3D0033]"></div>
+                            </div>
+
+                            <div className="glass-card rounded-[2.5rem] p-8 border border-white/5 space-y-8">
                                 {[
-                                    { title: 'Proctoring Rules', text: 'Screen sharing is strictly prohibited. The test will auto-submit after 3 warnings.', icon: 'fa-video-slash', color: 'bg-red-50 text-red-600', borderColor: 'border-red-100' },
-                                    { title: 'Important Notice', text: "There's no internet restriction. Refreshing the page may cause data loss.", icon: 'fa-exclamation-triangle', color: 'bg-blue-50 text-blue-600', borderColor: 'border-blue-100' },
-                                    { title: 'Time Management', text: 'Timer starts immediately after confirmation. Use your time wisely across sections.', icon: 'fa-clock', color: 'bg-green-50 text-green-600', borderColor: 'border-green-100' },
+                                    { title: 'Anti-Cheat Protcols', text: 'Screen tracking is active. Leaving the browser window will trigger a terminal warning.', icon: 'fa-shield-alt', color: 'text-[#FF3D00]' },
+                                    { title: 'Data Persistence', text: "Progress is saved per objective. Do not refresh current session.", icon: 'fa-database', color: 'text-[#00E5FF]' },
+                                    { title: 'Execution Window', text: 'The timer is absolute. System will auto-terminate upon expiration.', icon: 'fa-hourglass-start', color: 'text-[#9D4EDD]' },
                                 ].map((rule, i) => (
-                                    <div key={i} className={`flex items-start p-6 rounded-2xl ${rule.borderColor} border`}>
-                                        <div className={`w-10 h-10 ${rule.color} rounded-xl flex items-center justify-center mr-6 shrink-0`}>
-                                            <i className={`fas ${rule.icon} text-sm`}></i>
+                                    <div key={i} className="flex gap-6">
+                                        <div className={`${rule.color} text-xl pt-1`}>
+                                            <i className={`fas ${rule.icon}`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-gray-900 mb-1">{rule.title}</h3>
-                                            <p className="text-sm text-gray-500 font-medium leading-relaxed">{rule.text}</p>
+                                            <h3 className="font-black text-white mb-1 text-sm">{rule.title}</h3>
+                                            <p className="text-xs text-gray-400 font-medium leading-relaxed">{rule.text}</p>
                                         </div>
                                     </div>
                                 ))}
 
-                                <div className="pt-6">
+                                <div className="pt-4 border-t border-white/5">
                                     <label className="flex items-start space-x-4 cursor-pointer group">
                                         <div className="relative mt-1">
                                             <input
@@ -143,12 +179,12 @@ const QuizDetails: React.FC = () => {
                                                 checked={agreed}
                                                 onChange={() => setAgreed(!agreed)}
                                             />
-                                            <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all flex items-center justify-center">
-                                                <i className="fas fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i>
+                                            <div className="w-5 h-5 border-2 border-white/10 rounded-md peer-checked:bg-[#00E5FF] peer-checked:border-[#00E5FF] transition-all flex items-center justify-center">
+                                                <i className="fas fa-check text-[#030508] text-[8px] opacity-0 peer-checked:opacity-100"></i>
                                             </div>
                                         </div>
-                                        <span className="text-sm text-gray-500 font-medium leading-relaxed">
-                                            I have read and understood all the guidelines. I confirm that I will adhere to the assessment rules and complete the quiz without any malpractice.
+                                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed group-hover:text-gray-400 transition-colors">
+                                            I acknowledge the mission directives and agree to proceed under elite protocols.
                                         </span>
                                     </label>
                                 </div>
@@ -159,14 +195,13 @@ const QuizDetails: React.FC = () => {
                         <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-12">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="w-full md:w-auto px-12 py-5 bg-white text-gray-500 font-black tracking-widest uppercase rounded-2xl border-2 border-gray-100 hover:bg-gray-50 transition"
+                                className="w-full md:w-auto px-12 py-5 text-gray-500 font-black tracking-[0.2em] uppercase rounded-2xl border border-white/5 hover:bg-white/5 hover:text-white transition-all duration-300"
                             >
-                                <i className="fas fa-times mr-3"></i> Cancel
+                                <i className="fas fa-arrow-left mr-3"></i> Abort
                             </button>
                             <button
                                 onClick={() => {
                                     if (quiz?.isCompleted) {
-                                        // Go back to list or dashboard
                                         navigate('/student/quizzes');
                                         return;
                                     }
@@ -175,20 +210,20 @@ const QuizDetails: React.FC = () => {
                                     }
                                 }}
                                 disabled={(!agreed && !quiz?.isCompleted) || loading}
-                                className={`w-full md:w-auto px-16 py-5 rounded-2xl font-black tracking-widest uppercase shadow-2xl transition flex items-center justify-center ${quiz?.isCompleted
-                                    ? 'bg-green-600 text-white shadow-green-200 hover:scale-105 hover:bg-green-700'
+                                className={`w-full md:w-auto px-16 py-5 rounded-2xl font-black tracking-[0.2em] uppercase shadow-2xl transition-all duration-500 flex items-center justify-center group ${quiz?.isCompleted
+                                    ? 'bg-[#00E5FF] text-[#030508] shadow-[#00E5FF44] hover:scale-105'
                                     : agreed && !loading
-                                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-blue-200 hover:scale-105 active:scale-95'
-                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
+                                        ? 'bg-[#00E5FF] text-[#030508] shadow-[#00E5FF44] hover:scale-105 hover:shadow-[#00E5FF66] active:scale-95'
+                                        : 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
                                     }`}
                             >
                                 {quiz?.isCompleted ? (
                                     <>
-                                        <i className="fas fa-check-circle mr-3"></i> Completed
+                                        <i className="fas fa-check-double mr-3"></i> Mission Complete
                                     </>
                                 ) : (
                                     <>
-                                        <i className="fas fa-play-circle mr-3"></i> {loading ? 'Loading...' : 'Confirm & Start Quiz'}
+                                        <i className="fas fa-bolt mr-3 group-hover:animate-pulse"></i> {loading ? 'Syncing...' : 'Initiate Sequence'}
                                     </>
                                 )}
                             </button>

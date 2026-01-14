@@ -14,6 +14,7 @@ import GoogleSignup from './pages/auth/GoogleSignup';
 import StudentDashboard from './pages/student/Dashboard';
 import StudentQuizzes from './pages/student/Quizzes';
 import StudentProfile from './pages/student/Profile';
+import StudentEditProfile from './pages/student/EditProfile';
 import StudentReport from './pages/student/Report';
 
 // Quiz Pages
@@ -50,6 +51,7 @@ function App() {
                                     <Route path="dashboard" element={<StudentDashboard />} />
                                     <Route path="quizzes" element={<StudentQuizzes />} />
                                     <Route path="profile" element={<StudentProfile />} />
+                                    <Route path="profile/edit" element={<StudentEditProfile />} />
                                     <Route path="report" element={<StudentReport />} />
                                     <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
                                 </Routes>

@@ -17,14 +17,18 @@ const QuizInterface: React.FC = () => {
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showViolationModal, setShowViolationModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [warningCount, setWarningCount] = useState(0);
+
+    const [questionTimings, setQuestionTimings] = useState<Record<string, number>>({});
+    const [lastSwitchTime, setLastSwitchTime] = useState<number>(Date.now());
+    const prevIndexRef = React.useRef(0);
 
     // Load initial warnings
     useEffect(() => {
         if (quizId) {
             apiService.getQuizProgress(quizId)
-                .then(data => setWarningCount(data.warnings))
+                .then(() => {
+                    // warnings handled by handleDeviation
+                })
                 .catch(err => console.error('Failed to load progress:', err));
         }
     }, [quizId]);
@@ -34,7 +38,6 @@ const QuizInterface: React.FC = () => {
 
         try {
             const data = await apiService.recordWarning(quizId);
-            setWarningCount(data.warnings);
 
             if (data.warnings >= 2) {
                 // Strike 2: Auto-submit
@@ -59,7 +62,6 @@ const QuizInterface: React.FC = () => {
                 }
             } catch (err) {
                 console.warn('Full screen request denied or failed:', err);
-                // We proceed anyway, but ideally we'd show a "Start" overlay
             }
         };
         enterFullScreen();
@@ -78,13 +80,12 @@ const QuizInterface: React.FC = () => {
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [quiz, quizId]); // Re-bind when quiz is loaded
+    }, [quiz, quizId]);
 
     // Proctoring: Auto-submit on Full Screen Exit (Esc key)
     useEffect(() => {
         const handleFullScreenChange = () => {
             if (!document.fullscreenElement && !isSubmittingRef.current && quiz) {
-                // Check if it's already submitting to avoid duplicate alerts
                 if (!isSubmittingRef.current) {
                     handleDeviation();
                 }
@@ -99,6 +100,25 @@ const QuizInterface: React.FC = () => {
     }, [quiz, quizId]);
 
     useEffect(() => {
+        if (!quiz) return;
+
+        const now = Date.now();
+        const timeSpent = Math.floor((now - lastSwitchTime) / 1000);
+
+        const prevQuestion = quiz.questions[prevIndexRef.current];
+        if (prevQuestion) {
+            const qId = prevQuestion.id?.toString() || prevQuestion._id?.toString() || `q${prevIndexRef.current}`;
+            setQuestionTimings(prev => ({
+                ...prev,
+                [qId]: (prev[qId] || 0) + timeSpent
+            }));
+        }
+
+        setLastSwitchTime(now);
+        prevIndexRef.current = currentQuestionIndex;
+    }, [currentQuestionIndex]);
+
+    useEffect(() => {
         if (quizId) {
             loadQuiz(quizId);
         }
@@ -106,13 +126,11 @@ const QuizInterface: React.FC = () => {
 
     const loadQuiz = async (id: string) => {
         try {
-            // Fetch quiz data and user status
             const [quizData, quizzesList] = await Promise.all([
                 apiService.getQuizQuestions(id),
                 apiService.getStudentQuizzes()
             ]);
 
-            // Check if already completed
             const quizStatus = quizzesList.find(q => String(q.id) === String(id) || String(q._id) === String(id));
 
             if (quizStatus?.isCompleted) {
@@ -151,11 +169,8 @@ const QuizInterface: React.FC = () => {
     };
 
     const handleSubmitQuiz = async (navigateAfter = true) => {
-        // Prevent double submission
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
-
-        // Close confirmation if open
         setShowConfirmation(false);
 
         if (!quiz || !quizId) {
@@ -165,31 +180,33 @@ const QuizInterface: React.FC = () => {
 
         try {
             setLoading(true);
-            // Map answers properly - use the question ID from the quiz
             const answers = quiz.questions.map((q, index) => {
                 const questionId = q.id?.toString() || q._id?.toString() || `q${index}`;
-                const answerKey = q.id?.toString() || q._id?.toString() || `q${index}`;
                 return {
                     questionId: questionId,
-                    answer: selectedAnswers[answerKey] || ''
+                    answer: selectedAnswers[questionId] || ''
                 };
             });
 
-            console.log('📝 Submitting answers:', answers);
+            const now = Date.now();
+            const lastTimeSpent = Math.floor((now - lastSwitchTime) / 1000);
+            const currentQuestion = quiz.questions[currentQuestionIndex];
+            const currentQId = currentQuestion.id?.toString() || currentQuestion._id?.toString() || `q${currentQuestionIndex}`;
 
-            // Filter out empty answers
+            const finalTimings = {
+                ...questionTimings,
+                [currentQId]: (questionTimings[currentQId] || 0) + lastTimeSpent
+            };
+
             const validAnswers = answers.filter(a => a.answer);
-
-            // Note: We allow submitting even if only 1 is answered, or we can check logic here.
-            // But usually the user decides via confirmation.
 
             await apiService.submitQuiz({
                 quizId: quizId,
-                answers: validAnswers
+                answers: validAnswers,
+                questionTimings: finalTimings
             });
 
             if (navigateAfter) {
-                // Show success modal instead of immediate redirect
                 setShowSuccessModal(true);
             }
         } catch (err: any) {
@@ -201,75 +218,74 @@ const QuizInterface: React.FC = () => {
     };
 
     const currentQuestion = quiz?.questions[currentQuestionIndex];
-    // For UI demo matching image
+    const totalQuestions = quiz?.questions.length || 0;
 
     return (
         <StudentLayout hideNavbar={true}>
-            <div className="max-w-4xl mx-auto py-8 px-4">
-                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+            <div className="min-h-screen bg-[#030508] text-white flex flex-col font-mono">
+                {/* Clean Header - Match Image 0/1 */}
+                <div className="h-20 border-b border-white/5 bg-white/2 backdrop-blur-xl flex items-center justify-between px-10 sticky top-0 z-40">
+                    <div className="flex items-center gap-4">
+                        <span className="text-xl font-black text-white tracking-widest uppercase">{quiz?.title || 'ASSESSMENT'}</span>
+                    </div>
+
+                    <div className="flex items-center gap-10">
+                        <div className="flex items-center gap-4">
+                            <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em]">TIME REMAINING</span>
+                            <div className="text-2xl font-black text-[#00E5FF] tabular-nums tracking-wider">
+                                {quiz?.durationMinutes || '30'}:00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content Area - Centered Card */}
+                <div className="flex-1 flex items-center justify-center p-6 bg-grid-white/[0.02]">
                     {loading ? (
-                        <div className="py-40 flex flex-col items-center justify-center">
-                            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-                            <p className="text-gray-400 font-bold uppercase tracking-widest text-sm text-center">Preparing Your Quiz...</p>
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin"></div>
+                            <p className="mt-8 text-[#00E5FF] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">Syncing Mission Data...</p>
                         </div>
                     ) : error ? (
-                        <div className="py-40 flex flex-col items-center justify-center">
-                            <p className="text-red-600 font-bold mb-4">{error}</p>
-                            <button
-                                onClick={() => navigate('/student/quizzes')}
-                                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
-                            >
-                                Back to Quizzes
-                            </button>
-                        </div>
-                    ) : !quiz || !quiz.questions || quiz.questions.length === 0 ? (
-                        <div className="py-40 flex flex-col items-center justify-center">
-                            <p className="text-gray-400 font-bold mb-4">No questions available</p>
-                            <button
-                                onClick={() => navigate('/student/quizzes')}
-                                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
-                            >
-                                Back to Quizzes
-                            </button>
+                        <div className="text-center space-y-8">
+                            <i className="fas fa-exclamation-triangle text-5xl text-red-500 animate-pulse"></i>
+                            <h3 className="text-2xl font-black uppercase tracking-tighter">System Error Detected</h3>
+                            <p className="text-gray-500 font-medium">{error}</p>
+                            <button onClick={() => navigate('/student/quizzes')} className="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/10">Reboot Session</button>
                         </div>
                     ) : (
-                        <div className="p-8 md:p-12">
-                            {/* Question Card Content (matching Image 0) */}
-                            <div className="space-y-8">
-                                {/* Question Counter (Moved to top) */}
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className="text-sm font-black text-gray-400 uppercase tracking-widest">
-                                        Question {currentQuestionIndex + 1} <span className="text-gray-300">/</span> {quiz?.questions.length || 0}
-                                    </span>
+                        <div className="max-w-4xl w-full">
+                            {/* Question Card - Match Image 0/1 */}
+                            <div className="glass-card p-12 rounded-[3rem] border border-white/5 shadow-2xl space-y-10 relative overflow-hidden bg-white/5 transition-all">
+                                <div className="space-y-4">
+                                    <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-[0.3em]">
+                                        QUESTION {currentQuestionIndex + 1} / {totalQuestions}
+                                    </p>
+                                    <h2 className="text-3xl font-black text-white leading-tight tracking-tight">
+                                        {currentQuestion?.text}
+                                    </h2>
                                 </div>
 
-                                <h2 className="text-xl md:text-2xl font-bold text-gray-800 leading-snug">
-                                    {currentQuestion?.text || 'Question'}
-                                </h2>
-
-                                {/* Options with Outlined Style */}
+                                {/* Options List */}
                                 <div className="space-y-4">
                                     {(currentQuestion?.options || []).map((option, idx) => {
-                                        const questionId = currentQuestion?.id?.toString() || `q${currentQuestionIndex}`;
-                                        const isSelected = selectedAnswers[questionId] === option;
+                                        const qId = currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`;
+                                        const isSelected = selectedAnswers[qId] === option;
+
                                         return (
                                             <button
                                                 key={idx}
-                                                onClick={() => handleAnswerSelect(questionId, option)}
-                                                className={`w-full p-5 text-left rounded-2xl border-2 transition-all flex items-center group font-bold ${isSelected
-                                                    ? 'border-blue-600 bg-white'
-                                                    : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 text-gray-700'
+                                                onClick={() => handleAnswerSelect(qId, option)}
+                                                className={`w-full flex items-center p-6 rounded-2xl border transition-all duration-300 ${isSelected
+                                                    ? 'bg-[#00E5FF11] border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.1)]'
+                                                    : 'bg-white/2 border-white/5 hover:bg-white/5 hover:border-white/20'
                                                     }`}
                                             >
-                                                <div className={`w-6 h-6 rounded-full border-2 mr-6 flex items-center justify-center transition-all ${isSelected
-                                                    ? 'border-blue-600 bg-blue-600'
-                                                    : 'border-gray-200'
+                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-[#00E5FF] bg-[#00E5FF]' : 'border-white/10 bg-white/5'
                                                     }`}>
-                                                    {isSelected && (
-                                                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                                                    )}
+                                                    {isSelected && <div className="w-2 h-2 rounded-full bg-[#030508]"></div>}
                                                 </div>
-                                                <span className={`text-lg ${isSelected ? 'text-blue-600' : ''}`}>
+                                                <span className={`ml-6 text-lg font-medium transition-all ${isSelected ? 'text-[#00E5FF]' : 'text-gray-400'}`}>
                                                     {option}
                                                 </span>
                                             </button>
@@ -277,175 +293,131 @@ const QuizInterface: React.FC = () => {
                                     })}
                                 </div>
 
-                                {/* Mini Navigation (matching Image 0) */}
-                                <div className="flex justify-between items-center py-6 border-t border-gray-100 mt-8">
+                                {/* Navigation Actions */}
+                                <div className="flex items-center justify-between pt-10 border-t border-white/5">
                                     <button
                                         onClick={handlePrevious}
                                         disabled={currentQuestionIndex === 0}
-                                        className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-gray-200"
+                                        className="px-8 py-4 rounded-2xl bg-white/5 text-[#8E9AAF] border border-white/10 hover:bg-white/10 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed font-black text-xs uppercase tracking-widest flex items-center gap-3"
                                     >
-                                        <i className="fas fa-arrow-left mr-3"></i> Previous
+                                        <i className="fas fa-arrow-left"></i>
+                                        Previous
                                     </button>
 
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={currentQuestionIndex === (quiz?.questions.length || 1) - 1}
-                                        className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-gray-200"
-                                    >
-                                        Next <i className="fas fa-arrow-right ml-3"></i>
-                                    </button>
+                                    <div className="flex flex-col items-end gap-6">
+                                        {selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] && (
+                                            <button
+                                                onClick={() => {
+                                                    const qId = currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`;
+                                                    setSelectedAnswers(prev => {
+                                                        const n = { ...prev };
+                                                        delete n[qId];
+                                                        return n;
+                                                    });
+                                                }}
+                                                className="text-[10px] text-gray-500 font-black uppercase tracking-widest hover:text-[#00E5FF] transition-colors flex items-center gap-2"
+                                            >
+                                                <i className="fas fa-times-circle"></i>
+                                                Clear Selection
+                                            </button>
+                                        )}
+
+                                        <button
+                                            onClick={handleNext}
+                                            disabled={currentQuestionIndex === totalQuestions - 1}
+                                            className="px-10 py-4 rounded-2xl bg-[#030508] text-white border border-white/10 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed font-black text-xs uppercase tracking-widest flex items-center gap-3"
+                                        >
+                                            Next
+                                            <i className="fas fa-arrow-right"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div className="flex justify-end mb-4">
+                                {/* Submit Button - Highlighted at the bottom of the card */}
+                                <div className="pt-6">
                                     <button
-                                        onClick={() => {
-                                            const questionId = currentQuestion?.id?.toString() || `q${currentQuestionIndex}`;
-                                            setSelectedAnswers(prev => {
-                                                const newAnswers = { ...prev };
-                                                delete newAnswers[questionId];
-                                                return newAnswers;
-                                            });
-                                        }}
-                                        className="text-gray-400 hover:text-red-500 text-sm font-bold transition flex items-center"
-                                        disabled={!selectedAnswers[currentQuestion?.id?.toString() || `q${currentQuestionIndex}`]}
-                                        style={{ visibility: selectedAnswers[currentQuestion?.id?.toString() || `q${currentQuestionIndex}`] ? 'visible' : 'hidden' }}
+                                        onClick={confirmSubmit}
+                                        className="w-full py-5 bg-[#0066FF] text-white rounded-3xl font-black uppercase tracking-[0.3em] text-sm shadow-2xl shadow-[#0066FF44] hover:scale-[1.02] active:scale-[0.98] transition-all"
                                     >
-                                        <i className="fas fa-times-circle mr-2"></i> Clear Selection
+                                        Submit Quiz
                                     </button>
                                 </div>
-
-                                {/* Main Action (matching Image 0) */}
-                                <button
-                                    onClick={confirmSubmit}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-6 rounded-2xl font-black text-xl shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-8 ring-4 ring-blue-100"
-                                    disabled={Object.keys(selectedAnswers).length === 0}
-                                >
-                                    Submit Quiz
-                                </button>
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* Confirmation Modal */}
-                {showConfirmation && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-                        <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl transform transition-all scale-100 border border-gray-100">
-                            <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-yellow-100">
-                                    <i className="fas fa-question"></i>
+                {/* Modals */}
+                {(showConfirmation || showWarningModal || showViolationModal || showSuccessModal) && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#030508]/80 backdrop-blur-md">
+                        {showConfirmation && (
+                            <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-white/10 text-center animate-scale-up">
+                                <div className="w-20 h-20 bg-[#00E5FF11] text-[#00E5FF] rounded-3xl flex items-center justify-center mx-auto mb-8 text-3xl border border-[#00E5FF33]">
+                                    <i className="fas fa-upload"></i>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-2">Submit Assessment?</h3>
-                                <p className="text-gray-500 font-medium">Are you sure you want to finish this quiz?</p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-center">
-                                    <div className="text-3xl font-black text-blue-600 mb-1">{Object.keys(selectedAnswers).length}</div>
-                                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Answered</div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
-                                    <div className="text-3xl font-black text-gray-400 mb-1">{(quiz?.questions.length || 0) - Object.keys(selectedAnswers).length}</div>
-                                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Remaining</div>
+                                <h3 className="text-2xl font-black text-white mb-2 tracking-tighter uppercase">Final Submission?</h3>
+                                <p className="text-gray-500 font-medium mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
+                                    {Object.keys(selectedAnswers).length} of {totalQuestions} objectives secured. <br />
+                                    This action cannot be undone.
+                                </p>
+                                <div className="space-y-4">
+                                    <button onClick={() => handleSubmitQuiz()} className="w-full py-5 bg-[#00E5FF] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#00E5FF22] hover:scale-105 active:scale-95 transition-all">EXECUTE UPLOAD</button>
+                                    <button onClick={() => setShowConfirmation(false)} className="w-full py-5 text-gray-500 font-black uppercase tracking-[0.2em] hover:text-white transition-colors">ABORT</button>
                                 </div>
                             </div>
+                        )}
 
-                            <div className="space-y-3">
-                                <button
-                                    onClick={handleSubmitQuiz}
-                                    className="w-full py-4 bg-blue-600 text-white rounded-xl font-black text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-200"
-                                >
-                                    Yes, Submit Everything
-                                </button>
-                                <button
-                                    onClick={() => setShowConfirmation(false)}
-                                    className="w-full py-4 bg-white text-gray-500 rounded-xl font-bold hover:bg-gray-50 transition border-2 border-gray-100"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Warning Modal (Strike 1) */}
-                {showWarningModal && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-red-900/40 backdrop-blur-sm animate-fadeIn">
-                        <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl transform transition-all scale-100 border-4 border-red-100">
-                            <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-red-100 animate-pulse">
+                        {showWarningModal && (
+                            <div className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl text-center transform animate-scale-up">
+                                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
                                     <i className="fas fa-exclamation-triangle"></i>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-2">Warning!</h3>
-                                <p className="text-gray-500 font-medium">
-                                    You have deviated from the quiz window. This is your <span className="text-red-600 font-bold">final warning</span>.
-                                    <br />
-                                    Next time, your test will be <span className="font-bold text-gray-900">auto-submitted</span>.
+                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Warning!</h3>
+                                <p className="text-gray-600 font-medium mb-10 leading-relaxed">
+                                    You have deviated from the quiz window. This is your <span className="text-red-500 font-bold">final warning</span>. <br />
+                                    Next time, your test will be <span className="text-red-500 font-bold">auto-submitted</span>.
                                 </p>
+                                <button
+                                    onClick={() => { setShowWarningModal(false); if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { }); }}
+                                    className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-red-200"
+                                >
+                                    OK, I Understand
+                                </button>
                             </div>
+                        )}
 
-                            <button
-                                onClick={() => {
-                                    setShowWarningModal(false);
-                                    // Re-enter full screen if possible
-                                    if (document.documentElement.requestFullscreen) {
-                                        document.documentElement.requestFullscreen().catch(() => { });
-                                    }
-                                }}
-                                className="w-full py-4 bg-red-600 text-white rounded-xl font-black text-lg hover:bg-red-700 transition shadow-xl shadow-red-200"
-                            >
-                                OK, I Understand
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Violation Modal (Strike 2 - Auto Submit) */}
-                {showViolationModal && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-red-900/60 backdrop-blur-md animate-fadeIn">
-                        <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl transform transition-all scale-100 border-4 border-red-500">
-                            <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-red-200 animate-bounce">
+                        {showViolationModal && (
+                            <div className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl text-center transform animate-scale-up border-2 border-red-500">
+                                <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
                                     <i className="fas fa-ban"></i>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-2">Quiz Terminated</h3>
-                                <p className="text-gray-500 font-medium">
-                                    Multiple violations detected. Your quiz has been <span className="text-red-600 font-bold">automatically submitted</span>.
+                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Quiz Terminated</h3>
+                                <p className="text-gray-600 font-medium mb-10 leading-relaxed">
+                                    Multiple violations detected. Your quiz has been <br />
+                                    <span className="text-red-500 font-bold">automatically submitted</span>.
                                 </p>
+                                <button
+                                    onClick={() => navigate('/student/dashboard')}
+                                    className="w-full py-4 bg-[#1A1F26] hover:bg-[#2D343D] text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl"
+                                >
+                                    Return to Dashboard
+                                </button>
                             </div>
+                        )}
 
-                            <button
-                                onClick={() => navigate('/student/dashboard')}
-                                className="w-full py-4 bg-gray-900 text-white rounded-xl font-black text-lg hover:bg-gray-800 transition shadow-xl shadow-gray-200"
-                            >
-                                Return to Dashboard
-                            </button>
-                        </div>
-                    </div>
-                )}
-                {/* Success Modal (Normal Submission) */}
-                {showSuccessModal && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-green-900/40 backdrop-blur-sm animate-fadeIn">
-                        <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl transform transition-all scale-100 border-4 border-green-100">
-                            <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-green-100 animate-bounce">
-                                    <i className="fas fa-check-circle"></i>
+                        {showSuccessModal && (
+                            <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-[#00E5FF33] text-center animate-scale-up">
+                                <div className="w-24 h-24 bg-[#00E5FF22] text-[#00E5FF] rounded-full flex items-center justify-center mx-auto mb-8 text-4xl border border-[#00E5FF44] shadow-[0_0_40px_rgba(0,229,255,0.2)]">
+                                    <i className="fas fa-satellite-dish animate-bounce"></i>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-2">Submission Successful!</h3>
-                                <p className="text-gray-500 font-medium">
-                                    Your test has been submitted successfully.
-                                    <br />
-                                    You can now view your results in the dashboard.
+                                <h3 className="text-2xl font-black text-[#00E5FF] mb-2 tracking-tighter uppercase">Transmission Success</h3>
+                                <p className="text-gray-500 font-medium mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
+                                    All data packets secured. <br />
+                                    Proceed to results and analysis.
                                 </p>
+                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="w-full py-5 bg-[#00E5FF] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#00E5FF22] hover:scale-105 active:scale-95 transition-all">VIEW RESULTS</button>
                             </div>
-
-                            <button
-                                onClick={() => navigate('/student/dashboard')}
-                                className="w-full py-4 bg-green-600 text-white rounded-xl font-black text-lg hover:bg-green-700 transition shadow-xl shadow-green-200"
-                            >
-                                Return to Dashboard
-                            </button>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>

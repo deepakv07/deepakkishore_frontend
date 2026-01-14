@@ -4,6 +4,12 @@ export interface User {
     email: string;
     role: 'student' | 'admin';
     avatar?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    department?: string;
+    yearOfStudy?: string;
+    degree?: string;
 }
 
 export interface Student extends User {
@@ -38,7 +44,7 @@ export interface Question {
     id: number;
     _id?: string | number;
     text: string;
-    type: 'mcq' | 'aptitude';
+    type: 'mcq' | 'aptitude' | 'programming';
     options?: string[];
     correctAnswer?: string;
     points: number;
@@ -74,7 +80,9 @@ export interface StudentDashboardData {
         hoursLearned: number;
         quizzesCompleted: number;
         pendingQuizzes: number;
-        totalAvailableQuizzes?: number; // Optional to ignore lint errors if backend missing, but we added it.
+        totalAvailableQuizzes?: number;
+        averageScore?: number;
+        growth?: number;
     };
     recentActivity: Activity[];
     aiJobPrediction: JobPrediction;
@@ -88,10 +96,13 @@ export interface AdminDashboardStats {
 }
 
 export interface Activity {
-    id: number;
+    id: number | string;
     type: 'quiz_completed' | 'course_enrolled' | 'badge_earned';
     title: string;
     timestamp: string;
+    score?: number;
+    startTime?: string;
+    endTime?: string;
     details?: string;
 }
 
@@ -134,6 +145,7 @@ export interface QuizSubmission {
         questionId: string;
         answer: string;
     }[];
+    questionTimings?: Record<string, number>;
 }
 
 export interface QuizResult {
@@ -142,9 +154,18 @@ export interface QuizResult {
     score: number;
     totalPoints: number;
     percentage: number;
+    percentile?: number;
     passed: boolean;
     correctAnswers: number;
     incorrectAnswers: number;
+    submittedAt?: string;
+    completedDate?: string;
+    timeSpent?: string;
+    totalTimeSpent?: string;
+    avgTime?: string;
+    attempts?: number;
+    timePerQuestion?: number[];
+    questionTimings?: Record<string, number>;
     sectionBreakdown?: {
         name: string;
         correct: number;
@@ -168,5 +189,6 @@ export interface QuizResult {
         isCorrect: boolean;
         type: string;
         points: number;
+        explanation?: string;
     }[];
 }
