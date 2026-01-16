@@ -3,19 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import type { StudentDashboardData } from '../../types';
 
 const StudentProfile: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const [dashboardData, setDashboardData] = useState<StudentDashboardData | null>(null);
+    const [profileData, setProfileData] = useState<any>(null);
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                const data = await apiService.getStudentDashboard();
-                setDashboardData(data);
+                const profile = await apiService.getStudentProfile();
+                setProfileData(profile);
             } catch (err) {
                 console.error('Error loading profile data:', err);
             } finally {
@@ -62,9 +61,7 @@ const StudentProfile: React.FC = () => {
                             </div>
 
                             <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                                <span className="px-4 py-1.5 bg-[#00E5FF11] border border-[#00E5FF33] text-[#00E5FF] text-[10px] font-black uppercase tracking-widest rounded-full">
-                                    Student Tier
-                                </span>
+
                                 {user?.department && (
                                     <span className="px-4 py-1.5 bg-white/5 border border-white/10 text-[#8E9AAF] text-[10px] font-black uppercase tracking-widest rounded-full">
                                         {user.department}
@@ -93,13 +90,13 @@ const StudentProfile: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-6">
                             {[
-                                { label: 'First Name', val: user?.firstName || user?.name?.split(' ')[0] },
-                                { label: 'Last Name', val: user?.lastName || user?.name?.split(' ').slice(1).join(' ') },
-                                { label: 'Contact', val: user?.phone || 'UNREGISTERED' },
+                                { label: 'First Name', val: profileData?.firstName || user?.firstName || user?.name?.split(' ')[0] || 'N/A' },
+                                { label: 'Last Name', val: profileData?.lastName || user?.lastName || user?.name?.split(' ').slice(1).join(' ') || 'N/A' },
+                                { label: 'Contact', val: profileData?.phone || user?.phone || 'UNREGISTERED' },
                             ].map((field, idx) => (
                                 <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 group hover:border-[#00E5FF33] transition-colors">
                                     <p className="text-[8px] font-black text-[#8E9AAF] uppercase tracking-widest mb-1">{field.label}</p>
-                                    <p className="font-black tracking-tight">{field.val}</p>
+                                    <p className="font-black tracking-tight text-white">{field.val}</p>
                                 </div>
                             ))}
                         </div>
@@ -113,13 +110,13 @@ const StudentProfile: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-6">
                             {[
-                                { label: 'Department', val: user?.department || 'GENERAL' },
-                                { label: 'Cycle of Study', val: user?.yearOfStudy || 'N/A' },
-                                { label: 'Accreditation', val: user?.degree || 'NONE' },
+                                { label: 'Department', val: profileData?.department || user?.department || 'GENERAL' },
+                                { label: 'Cycle of Study', val: profileData?.yearOfStudy || user?.yearOfStudy || 'N/A' },
+                                { label: 'Accreditation', val: profileData?.degree || user?.degree || 'NONE' },
                             ].map((field, idx) => (
                                 <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 group hover:border-[#9D4EDD33] transition-colors">
                                     <p className="text-[8px] font-black text-[#8E9AAF] uppercase tracking-widest mb-1">{field.label}</p>
-                                    <p className="font-black tracking-tight">{field.val}</p>
+                                    <p className="font-black tracking-tight text-white">{field.val}</p>
                                 </div>
                             ))}
                         </div>
@@ -136,18 +133,16 @@ const StudentProfile: React.FC = () => {
                                 <h3 className="text-3xl font-black tracking-tighter mb-4">Career Projection</h3>
                                 <div className="inline-flex items-center gap-4 bg-white/5 px-6 py-3 rounded-full border border-white/10">
                                     <span className="text-xs font-black tracking-widest uppercase text-white/60">Primary Vector:</span>
-                                    <span className="text-xs font-black tracking-widest uppercase text-[#00E5FF] neon-text-cyan">{dashboardData?.aiJobPrediction?.role || 'ARCHITECT'}</span>
+                                    <span className="text-xs font-black tracking-widest uppercase text-[#00E5FF] neon-text-cyan">SOFTWARE DEVELOPER</span>
                                     <span className="w-1 h-1 bg-white/20 rounded-full" />
-                                    <span className="text-[10px] font-black text-[#8E9AAF]">{dashboardData?.aiJobPrediction?.confidence || 94}% CONFIDENCE</span>
+                                    <span className="text-[10px] font-black text-[#8E9AAF]">85% CONFIDENCE</span>
                                 </div>
                             </div>
 
                             <div className="text-center md:text-right">
                                 <p className="text-[8px] font-black text-[#8E9AAF] tracking-[0.3em] uppercase mb-1">Projected Compensation</p>
                                 <p className="text-4xl font-black tracking-tighter neon-text-cyan">
-                                    {dashboardData?.aiJobPrediction?.salaryRange
-                                        ? `₹${dashboardData.aiJobPrediction.salaryRange.min} – ₹${dashboardData.aiJobPrediction.salaryRange.max} LPA`
-                                        : '₹6.5 – ₹12.0 LPA'}
+                                    ₹6.0 – ₹12.0 LPA
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/report')}

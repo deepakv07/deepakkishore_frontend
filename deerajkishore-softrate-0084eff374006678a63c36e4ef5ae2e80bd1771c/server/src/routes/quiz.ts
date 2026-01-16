@@ -117,7 +117,7 @@ router.post('/:id/warning', async (req: AuthRequest, res: Response) => {
 // Submit Quiz
 router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
     try {
-        const { answers } = req.body;
+        const { answers, questionTimings } = req.body;
         const quizId = req.params.id;
         const studentId = req.user!.id;
 
@@ -225,6 +225,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
             passed,
             correctAnswers,
             incorrectAnswers,
+            questionTimings: questionTimings || {},
         });
         await submission.save();
 
@@ -436,6 +437,7 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                     salaryRange,
                     confidence: Math.round(confidence),
                 },
+                questionTimings: submission.questionTimings || {},
             },
         });
     } catch (error: any) {

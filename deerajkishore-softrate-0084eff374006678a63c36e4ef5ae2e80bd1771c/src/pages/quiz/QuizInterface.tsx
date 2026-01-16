@@ -108,6 +108,7 @@ const QuizInterface: React.FC = () => {
         const prevQuestion = quiz.questions[prevIndexRef.current];
         if (prevQuestion) {
             const qId = prevQuestion.id?.toString() || prevQuestion._id?.toString() || `q${prevIndexRef.current}`;
+            console.log(`Time for question ${prevIndexRef.current + 1} (${qId}): ${timeSpent}s`);
             setQuestionTimings(prev => ({
                 ...prev,
                 [qId]: (prev[qId] || 0) + timeSpent
@@ -140,6 +141,10 @@ const QuizInterface: React.FC = () => {
             }
 
             setQuiz(quizData);
+            // Reset timing when quiz loads
+            setLastSwitchTime(Date.now());
+            setQuestionTimings({});
+            console.log('Quiz loaded, timer started at:', new Date().toISOString());
         } catch (err) {
             console.error('Error loading quiz:', err);
             setError('Failed to load quiz. Please try again.');
@@ -197,6 +202,9 @@ const QuizInterface: React.FC = () => {
                 ...questionTimings,
                 [currentQId]: (questionTimings[currentQId] || 0) + lastTimeSpent
             };
+
+            console.log('Final timings before submit:', finalTimings);
+            console.log('Total time tracked:', Object.values(finalTimings).reduce((a, b) => a + b, 0), 'seconds');
 
             const validAnswers = answers.filter(a => a.answer);
 

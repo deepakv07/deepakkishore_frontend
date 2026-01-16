@@ -7,6 +7,7 @@ const StudentQuizzes: React.FC = () => {
     const [quizzes, setQuizzes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -20,7 +21,12 @@ const StudentQuizzes: React.FC = () => {
             setQuizzes(quizzesArray);
         } catch (err: any) {
             console.error('Error loading quizzes:', err);
-            setQuizzes([]);
+            // Check if error is related to casting (often meaning deleted resource or bad ID)
+            if (err.response?.data?.message?.includes('Cast to ObjectId') || err.message?.includes('Cast to ObjectId')) {
+                setError('The quiz you are trying to access has been deleted by the admin.');
+            } else {
+                setQuizzes([]);
+            }
         } finally {
             setLoading(false);
         }
@@ -68,7 +74,7 @@ const StudentQuizzes: React.FC = () => {
                         <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
                             <i className="fas fa-satellite-dish text-[#8E9AAF] text-2xl"></i>
                         </div>
-                        <p className="text-[#8E9AAF] font-bold tracking-widest uppercase text-xs">No active transmissions found</p>
+                        <p className="text-[#8E9AAF] font-bold tracking-widest uppercase text-xs">NO quizz is yet assingned</p>
                         <p className="text-white/40 text-[10px] mt-2 italic px-10">Check back later for new mission assignments in this sector.</p>
                     </div>
                 ) : (
@@ -90,13 +96,27 @@ const StudentQuizzes: React.FC = () => {
 
                                         {/* Timestamps */}
                                         <div className="space-y-1.5 mb-8">
-                                            <div className="flex items-center gap-2 text-[10px] font-black text-[#8E9AAF]">
-                                                <span className="opacity-70">Starts:</span>
-                                                <span className="text-black/80 font-bold">{quiz.startDate ? new Date(quiz.startDate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
+                                            <div className="flex items-center gap-2 text-[10px] font-black">
+                                                <span className="text-white/60">Starts:</span>
+                                                <span className={`font-bold px-2 py-1 rounded ${quiz.isCompleted
+                                                    ? 'bg-[#00C85311] text-[#00C853]'
+                                                    : isExpired
+                                                        ? 'bg-[#FF3D0011] text-[#FF3D00]'
+                                                        : 'bg-[#00E5FF11] text-[#00E5FF]'
+                                                    }`}>
+                                                    {quiz.startDate ? new Date(quiz.startDate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                                                </span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-[10px] font-black text-[#8E9AAF]">
-                                                <span className="opacity-70">Ends:</span>
-                                                <span className="text-black/80 font-bold">{quiz.endDate ? new Date(quiz.endDate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
+                                            <div className="flex items-center gap-2 text-[10px] font-black">
+                                                <span className="text-white/60">Ends:</span>
+                                                <span className={`font-bold px-2 py-1 rounded ${quiz.isCompleted
+                                                    ? 'bg-[#00C85311] text-[#00C853]'
+                                                    : isExpired
+                                                        ? 'bg-[#FF3D0011] text-[#FF3D00]'
+                                                        : 'bg-[#00E5FF11] text-[#00E5FF]'
+                                                    }`}>
+                                                    {quiz.endDate ? new Date(quiz.endDate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                                                </span>
                                             </div>
                                         </div>
 
@@ -141,9 +161,37 @@ const StudentQuizzes: React.FC = () => {
                             );
                         })}
                     </div>
+
+                )}
+                {/* Error Logic Popup */}
+                {error && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+                        <div className="glass-card max-w-md w-full p-8 rounded-[2rem] border border-white/10 shadow-2xl transform scale-100 animate-scale-in relative overflow-hidden">
+                            <div className="absolute inset-0 bg-red-500/5"></div>
+
+                            <div className="relative z-10 text-center">
+                                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+                                    <i className="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                                </div>
+
+                                <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Quiz Access Error</h3>
+                                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-8 leading-relaxed">
+                                    The quiz you are looking for is no longer available.<br />
+                                    <span className="text-red-400">It may have been deleted by the administrator.</span>
+                                </p>
+
+                                <button
+                                    onClick={() => setError(null)}
+                                    className="w-full py-4 rounded-xl bg-white/5 border border-white/5 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all"
+                                >
+                                    Dismiss
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 )}
             </div>
-        </StudentLayout>
+        </StudentLayout >
     );
 };
 

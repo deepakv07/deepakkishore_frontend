@@ -14,7 +14,6 @@ export interface User {
 
 export interface Student extends User {
     role: 'student';
-    grade?: string;
     enrolledCourses: number;
 }
 

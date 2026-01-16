@@ -69,7 +69,7 @@ const StudentLogin: React.FC = () => {
                             onClick={() => setIsLogin(false)}
                             className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${!isLogin ? 'bg-[#9D4EDD] text-black shadow-lg shadow-[#9D4EDD]/20' : 'text-[#8E9AAF] hover:text-white'}`}
                         >
-                            Enlist
+                            Register
                         </button>
                     </div>
 

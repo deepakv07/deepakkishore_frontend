@@ -248,7 +248,10 @@ class APIService {
     async submitQuiz(submission: QuizSubmission): Promise<QuizResult> {
         const response = await this.api.post<APIResponse<QuizResult>>(
             `/quiz/${submission.quizId}/submit`,
-            { answers: submission.answers }
+            {
+                answers: submission.answers,
+                questionTimings: submission.questionTimings
+            }
         );
         return response.data.data;
     }

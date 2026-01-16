@@ -25,9 +25,22 @@ const QuizResults: React.FC = () => {
         try {
             const data = await apiService.getQuizResults(id);
 
-            // Integrate actual or mock data if actual timing missing
+            // Integrate actual timing data from backend
             const timings = data.questionTimings || {};
-            const timePerQuestionArray = data.questions?.map((q: any) => timings[q.id] || timings[q._id] || Math.floor(Math.random() * 120) + 30) || [];
+            const timePerQuestionArray = data.questions?.map((q: any) => {
+                const questionId = q.id || q._id;
+                // Convert Map or object to plain object if needed
+                const timingValue = timings instanceof Map ? timings.get(questionId) : timings[questionId];
+                return timingValue || 0; // Use 0 if no timing data available
+            }) || [];
+
+            // Calculate total time spent from questionTimings
+            const totalSeconds = Object.values(timings).reduce((sum: number, time: any) => sum + (Number(time) || 0), 0);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const formattedTime = minutes > 0
+                ? `${minutes}m ${seconds}s`
+                : `${seconds}s`;
 
             const enhancedData = {
                 ...data,
@@ -36,10 +49,10 @@ const QuizResults: React.FC = () => {
                     month: 'short',
                     year: 'numeric'
                 }) : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-                timeSpent: data.totalTimeSpent || '50m',
+                timeSpent: formattedTime,
                 percentile: data.percentile || 65,
                 attempts: data.attempts || 1,
-                avgTime: data.avgTime || '50m',
+                avgTime: data.avgTime || formattedTime,
                 timePerQuestion: timePerQuestionArray,
             };
 

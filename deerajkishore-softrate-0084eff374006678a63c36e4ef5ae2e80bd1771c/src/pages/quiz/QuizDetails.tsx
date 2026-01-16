@@ -57,8 +57,8 @@ const QuizDetails: React.FC = () => {
                     <div className="space-y-12">
                         {/* Header & Stats (Match Image 3) */}
                         <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-black text-[#030508] tracking-tight">Assessment Details</h2>
-                            <div className="text-6xl font-black text-[#030508] tracking-tighter">
+                            <h2 className="text-2xl font-black text-white tracking-tight">Assessment Details</h2>
+                            <div className="text-6xl font-black text-white tracking-tighter">
                                 {quiz?.questions?.length || 0}
                             </div>
                             <p className="text-[#8E9AAF] font-bold text-sm">
@@ -84,7 +84,7 @@ const QuizDetails: React.FC = () => {
 
                         {/* Breakdown (Match Image 4) */}
                         <div className="space-y-8">
-                            <h2 className="text-center text-sm font-black text-[#030508] tracking-[0.2em] uppercase">STRUCTURE BREAKDOWN</h2>
+                            <h2 className="text-center text-sm font-black text-white tracking-[0.2em] uppercase">STRUCTURE BREAKDOWN</h2>
 
                             <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 space-y-4">
                                 {[

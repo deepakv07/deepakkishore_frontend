@@ -81,16 +81,7 @@ const EditProfile: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="flex gap-4">
-                        <div className="text-center bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-                            <p className="text-[8px] font-black text-[#8E9AAF] uppercase tracking-widest">Efficiency</p>
-                            <p className="text-lg font-black tracking-tighter text-[#00E5FF]">92%</p>
-                        </div>
-                        <div className="text-center bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-                            <p className="text-[8px] font-black text-[#8E9AAF] uppercase tracking-widest">Tier</p>
-                            <p className="text-lg font-black tracking-tighter text-[#9D4EDD]">ALPHA</p>
-                        </div>
-                    </div>
+
                 </div>
 
                 {/* Edit Profile Form */}

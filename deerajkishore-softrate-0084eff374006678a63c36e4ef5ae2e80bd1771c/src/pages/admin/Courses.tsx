@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 const AdminCourses: React.FC = () => {
     const [quizzes, setQuizzes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deleteQuizId, setDeleteQuizId] = useState<string | number | null>(null);
 
     useEffect(() => {
         loadData();
@@ -23,16 +24,20 @@ const AdminCourses: React.FC = () => {
         }
     };
 
-    const handleDeleteQuiz = async (quizId: string | number) => {
-        if (!window.confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
-            return;
-        }
+    const handleDeleteClick = (quizId: string | number) => {
+        setDeleteQuizId(quizId);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteQuizId) return;
 
         try {
-            await apiService.deleteQuiz(quizId);
+            await apiService.deleteQuiz(deleteQuizId);
+            setDeleteQuizId(null);
             loadData(); // Refresh the list
         } catch (err) {
             console.error('Error deleting quiz:', err);
+            // Optional: You could add an error toast here if you have a toast system
             alert('Failed to delete quiz.');
         }
     };
@@ -110,7 +115,7 @@ const AdminCourses: React.FC = () => {
                                                 <i className="fas fa-pencil-alt text-xs"></i>
                                             </button>
                                             <button
-                                                onClick={() => handleDeleteQuiz(quiz.id)}
+                                                onClick={() => handleDeleteClick(quiz.id)}
                                                 className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-gray-500 hover:text-red-500 hover:border-red-500/33 transition-all"
                                                 title="Delete Quiz"
                                             >
@@ -143,6 +148,41 @@ const AdminCourses: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+                {/* Delete Confirmation Modal */}
+                {deleteQuizId && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+                        <div className="glass-card max-w-md w-full p-8 rounded-[2rem] border border-white/10 shadow-2xl transform scale-100 animate-scale-in relative overflow-hidden">
+                            <div className="absolute inset-0 bg-red-500/5"></div>
+
+                            <div className="relative z-10 text-center">
+                                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+                                    <i className="fas fa-trash-alt text-3xl text-red-500"></i>
+                                </div>
+
+                                <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Delete Quiz?</h3>
+                                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-8 leading-relaxed">
+                                    Are you sure you want to delete this quiz?<br />
+                                    <span className="text-red-400">This action cannot be undone.</span>
+                                </p>
+
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setDeleteQuizId(null)}
+                                        className="flex-1 py-4 rounded-xl bg-white/5 border border-white/5 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmDelete}
+                                        className="flex-1 py-4 rounded-xl bg-red-500 text-white font-black uppercase tracking-widest text-[10px] hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

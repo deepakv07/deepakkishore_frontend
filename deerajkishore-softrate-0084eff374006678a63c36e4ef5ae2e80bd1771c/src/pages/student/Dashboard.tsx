@@ -135,7 +135,7 @@ const StudentDashboard: React.FC = () => {
                                         </div>
                                         <div>
                                             <h4 className="font-black text-lg group-hover:text-[#00E5FF] transition-colors">
-                                                Completed quiz: {activity.title}
+                                                {activity.title}
                                             </h4>
                                             <p className="text-[10px] font-bold text-[#8E9AAF] tracking-widest uppercase mt-1">
                                                 {new Date(activity.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

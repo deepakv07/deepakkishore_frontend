@@ -87,6 +87,95 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
     }
 });
 
+// Get Student Profile
+router.get('/profile', async (req: AuthRequest, res: Response) => {
+    try {
+        const studentId = req.user!.id;
+
+        const user = await User.findById(studentId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        res.json({
+            success: true,
+            data: {
+                id: user._id.toString(),
+                name: user.name,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                department: user.department,
+                yearOfStudy: user.yearOfStudy,
+                degree: user.degree,
+                role: user.role,
+            },
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error',
+        });
+    }
+});
+
+// Update Student Profile
+router.put('/profile', async (req: AuthRequest, res: Response) => {
+    try {
+        const studentId = req.user!.id;
+        const { firstName, lastName, phone, department, yearOfStudy, degree } = req.body;
+
+        const user = await User.findById(studentId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+        // Update allowed fields
+        if (firstName !== undefined) user.firstName = firstName;
+        if (lastName !== undefined) user.lastName = lastName;
+        if (phone !== undefined) user.phone = phone;
+        if (department !== undefined) user.department = department;
+        if (yearOfStudy !== undefined) user.yearOfStudy = yearOfStudy;
+        if (degree !== undefined) user.degree = degree;
+
+        // Update full name if first/last name changed
+        if (firstName || lastName) {
+            user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name;
+        }
+
+        await user.save();
+
+        res.json({
+            success: true,
+            data: {
+                id: user._id.toString(),
+                name: user.name,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                department: user.department,
+                yearOfStudy: user.yearOfStudy,
+                degree: user.degree,
+                role: user.role,
+            },
+            message: 'Profile updated successfully',
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error',
+        });
+    }
+});
+
 // Get Enrolled Courses
 router.get('/courses', async (req: AuthRequest, res: Response) => {
     try {
@@ -159,44 +248,7 @@ router.get('/courses/available', async (req: AuthRequest, res: Response) => {
     }
 });
 
-// Get Profile
-router.get('/profile', async (req: AuthRequest, res: Response) => {
-    try {
-        const studentId = req.user!.id;
 
-        const user = await User.findById(studentId);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found',
-            });
-        }
-
-        res.json({
-            success: true,
-            data: {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                grade: user.grade,
-                enrolledCourses: user.enrolledCourses || 0,
-                avatar: user.avatar,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                phone: user.phone,
-                department: user.department,
-                yearOfStudy: user.yearOfStudy,
-                degree: user.degree,
-            },
-        });
-    } catch (error: any) {
-        res.status(500).json({
-            success: false,
-            message: error.message || 'Server error',
-        });
-    }
-});
 
 // Update Profile
 router.put('/profile', async (req: AuthRequest, res: Response) => {
