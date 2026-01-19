@@ -6,3 +6,4 @@ scikit-learn>=1.2.0
 python-dateutil>=2.8.0
 fastapi
 uvicorn
+python-dotenv
