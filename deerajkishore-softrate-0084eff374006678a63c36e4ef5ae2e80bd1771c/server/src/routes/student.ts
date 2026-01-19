@@ -100,6 +100,82 @@ router.get('/profile', async (req: AuthRequest, res: Response) => {
             });
         }
 
+        // Fetch submissions for career projection aggregation
+        const submissions = await QuizSubmission.find({ studentId });
+
+        let careerProjection = {
+            role: 'Junior Developer',
+            confidence: 50,
+            salaryRange: '₹4.0 - ₹6.0 LPA'
+        };
+
+        if (submissions.length > 0) {
+            const avgScore = submissions.reduce((sum, s) => sum + s.percentage, 0) / submissions.length;
+
+            // 1. Determine Seniority Level based on Avg Score
+            let seniority = 'Junior';
+            let minLPA = 3;
+            let maxLPA = 6;
+
+            if (avgScore >= 90) {
+                seniority = 'Senior';
+                minLPA = 12;
+                maxLPA = 24;
+            } else if (avgScore >= 75) {
+                seniority = 'Mid-Level';
+                minLPA = 8;
+                maxLPA = 16;
+            } else if (avgScore >= 60) {
+                seniority = 'Associate';
+                minLPA = 5;
+                maxLPA = 10;
+            }
+
+            // 2. Determine Dominant Skill/Domain from Quiz Titles
+            // Fetch quizzes to get titles
+            const quizIds = submissions.map(s => s.quizId);
+            const quizzes = await Quiz.find({ _id: { $in: quizIds } });
+
+            const topicCounts: { [key: string]: number } = {};
+            quizzes.forEach(q => {
+                const title = q.title.toLowerCase();
+                // Simple keyword extraction
+                const keywords = ['react', 'node', 'python', 'java', 'javascript', 'frontend', 'backend', 'full stack', 'data science', 'machine learning', 'sql', 'cloud'];
+                let found = false;
+                keywords.forEach(k => {
+                    if (title.includes(k)) {
+                        topicCounts[k] = (topicCounts[k] || 0) + 1;
+                        found = true;
+                    }
+                });
+                if (!found) topicCounts['Software'] = (topicCounts['Software'] || 0) + 1;
+            });
+
+            // Find most frequent topic
+            let dominantTopic = 'Software';
+            let maxCount = 0;
+            Object.entries(topicCounts).forEach(([topic, count]) => {
+                if (count > maxCount) {
+                    maxCount = count;
+                    dominantTopic = topic.charAt(0).toUpperCase() + topic.slice(1); // Capitalize
+                }
+            });
+
+            // Construct Role
+            let role = `${seniority} ${dominantTopic} Developer`;
+            if (dominantTopic === 'Software') role = `${seniority} Software Engineer`;
+
+            // Refine confidence based on number of quizzes taken
+            const confidenceBoost = Math.min((submissions.length / 5) * 15, 20);
+            let confidence = Math.min(Math.round(avgScore + confidenceBoost), 98);
+
+            careerProjection = {
+                role,
+                confidence,
+                salaryRange: `₹${minLPA}.0 - ₹${maxLPA}.0 LPA`
+            };
+        }
+
         res.json({
             success: true,
             data: {
@@ -113,6 +189,7 @@ router.get('/profile', async (req: AuthRequest, res: Response) => {
                 yearOfStudy: user.yearOfStudy,
                 degree: user.degree,
                 role: user.role,
+                careerProjection // Add the new field
             },
         });
     } catch (error: any) {

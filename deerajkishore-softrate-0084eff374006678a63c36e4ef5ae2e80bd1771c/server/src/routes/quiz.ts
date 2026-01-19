@@ -1,4 +1,5 @@
 import express, { Response } from 'express';
+import mongoose from 'mongoose';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import Quiz from '../models/Quiz';
 import QuizSubmission from '../models/QuizSubmission';
@@ -129,15 +130,106 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
             });
         }
 
+        // --- STRICT AI SERVICE HANDOFF ---
+        try {
+            console.log('🤖 Function Call: Forwarding to AI Engine...');
+            const aiPayload = {
+                user_id: studentId,
+                quiz_id: quizId,
+                quiz_title: quiz.title,
+                answers: answers
+            };
+
+            const aiResponse = await fetch('http://localhost:8000/submit_quiz_bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(aiPayload)
+            });
+
+            if (aiResponse.ok) {
+                const aiResult = await aiResponse.json() as any;
+                if (aiResult.success) {
+                    console.log('✅ AI Engine processed submission successfully.');
+
+                    // Transform AI report into local submission format (if needed)
+                    // The AI Engine ALREADY saved the report to 'reports' collection and likely 
+                    // should have synced with 'quizsubmissions' if configured, but let's double check.
+                    // Our current server.py bulk endpoint returns { success: true, report: ..., score: ... }
+                    // but DOES NOT save to 'quizsubmissions' in the bulk endpoint logic we wrote (wait, did we?).
+                    // Checking the code: yes, we did NOT add the specific sync to 'quizsubmissions' 
+                    // in submit_quiz_bulk, only in the interactive submit_answer. 
+                    // So we MUST save to local DB here using the AI's numbers.
+
+                    const aiReport = aiResult.report;
+                    const aiScore = aiResult.score;
+                    const aiPercentage = aiResult.percentage;
+
+                    // We need to map the AI results back to our schema
+                    const processedAnswers = answers.map((answer: any) => {
+                        // We can't easily map correctness from bulk report without parsing it deep
+                        // For now, let's keep the answer list as is, trusting the summary stats
+                        return { ...answer, timeSpent: answer.timeSpent || 0 };
+                    });
+
+                    // Save submission to MongoDB quizsubmissions collection (using AI stats)
+                    const submission = new QuizSubmission({
+                        quizId,
+                        studentId,
+                        answers: processedAnswers,
+                        score: aiScore,
+                        totalPoints: quiz.questions.length * 10, // AI uses 10 pts per Q
+                        percentage: aiPercentage,
+                        passed: aiPercentage >= 60,
+                        correctAnswers: Math.round((aiPercentage / 100) * quiz.questions.length), // Approx
+                        incorrectAnswers: quiz.questions.length - Math.round((aiPercentage / 100) * quiz.questions.length),
+                        questionTimings: questionTimings || {},
+                        aiProcessed: true,
+                        aiReportId: aiReport._id // If we had it
+                    });
+
+                    await submission.save();
+
+                    console.log(`✅ AI-Enhanced Quiz submission saved.`);
+
+                    // Create activity
+                    const activity = new Activity({
+                        userId: studentId,
+                        type: 'quiz_completed',
+                        title: `Completed quiz: ${quiz.title}`,
+                        details: `Score: ${aiScore} (${aiPercentage.toFixed(1)}%) - AI Analyzed`,
+                    });
+                    await activity.save();
+
+                    return res.json({
+                        success: true,
+                        data: {
+                            quizId: submission.quizId.toString(),
+                            score: submission.score,
+                            totalPoints: submission.totalPoints,
+                            percentage: submission.percentage,
+                            passed: submission.passed,
+                            correctAnswers: submission.correctAnswers,
+                            incorrectAnswers: submission.incorrectAnswers,
+                        },
+                    });
+                }
+            } else {
+                console.warn(`⚠️ AI Service returned ${aiResponse.status}, falling back to local logic.`);
+            }
+        } catch (aiError) {
+            console.error('❌ AI Service unreachable or failed:', aiError);
+            console.log('⚠️ Falling back to legacy local grading...');
+        }
+
+        // --- FALLBACK: LOCAL CALCULATION ---
+
         // Calculate score
         let score = 0;
         let correctAnswers = 0;
         let incorrectAnswers = 0;
         const totalPoints = quiz.questions.reduce((sum, q) => sum + q.points, 0);
 
-        console.log('📝 Evaluating quiz answers...');
-        console.log('📝 Total questions:', quiz.questions.length);
-        console.log('📝 Answers received:', answers.length);
+        console.log('📝 Evaluating quiz answers (LOCAL BACKUP)...');
 
         const processedAnswers = answers.map((answer: { questionId: string; answer: string; timeSpent?: number }, answerIndex: number) => {
             // Try multiple ways to find the question
@@ -190,13 +282,6 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                     }
                 }
 
-                console.log(`Question ${answerIndex + 1}: ${isCorrect ? '✅ Correct' : '❌ Incorrect'}`, {
-                    questionId: answer.questionId,
-                    correctAnswer: question.correctAnswer,
-                    studentAnswer: answer.answer,
-                    isCorrect
-                });
-
                 if (isCorrect) {
                     score += question.points;
                     correctAnswers++;
@@ -204,7 +289,6 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                     incorrectAnswers++;
                 }
             } else {
-                console.warn(`⚠️ Question not found for answer:`, answer);
                 incorrectAnswers++;
             }
 
@@ -213,8 +297,6 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                 timeSpent: answer.timeSpent || 0
             };
         });
-
-        console.log(`📊 Evaluation complete: ${correctAnswers} correct, ${incorrectAnswers} incorrect, Score: ${score}/${totalPoints}`);
 
         const percentage = totalPoints > 0 ? (score / totalPoints) * 100 : 0;
         const passed = percentage >= 60;
@@ -234,8 +316,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
         });
         await submission.save();
 
-        console.log(`✅ Quiz submission saved to MongoDB quizsubmissions collection`);
-        console.log(`📝 Student: ${studentId}, Quiz: ${quizId}, Score: ${score}/${totalPoints} (${percentage.toFixed(1)}%)`);
+        console.log(`✅ (Local) Quiz submission saved to MongoDB quizsubmissions collection`);
 
         // Create activity
         const activity = new Activity({
@@ -283,6 +364,23 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
         }
 
         const user = await import('../models/User').then((m) => m.default.findById(studentId));
+
+        // Check if there's an AI report linked
+        let aiReportData: any = null;
+        if (submission.aiProcessed && submission.aiReportId) {
+            try {
+                if (mongoose.connection.db) {
+                    const reportsCollection = mongoose.connection.db.collection('reports');
+                    aiReportData = await reportsCollection.findOne({ _id: submission.aiReportId });
+                }
+            } catch (err) {
+                console.error("Error fetching AI report:", err);
+            }
+        } else if (submission.aiProcessed) {
+            // Fallback: Try to find latest report for this user and quiz... 
+            // but report doesn't have quizId easily accessible at top level.
+            // We will rely on submission.score which was saved from AI.
+        }
 
         // Calculate section breakdown based on actual question types
         const mcqQuestions = quiz.questions.filter(q => q.type === 'mcq');
@@ -360,7 +458,67 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
             });
         }
 
-        // Generate performance analysis based on actual results
+        // OVERRIDE WITH AI DATA IF AVAILABLE
+        let finalScore = submission.score;
+        let finalPercentage = submission.percentage;
+        let finalRole = 'Junior Developer';
+        let finalSalaryRange = '₹4.0 - ₹6.0 LPA';
+
+        let finalCorrectAnswers = submission.correctAnswers;
+        let finalIncorrectAnswers = submission.incorrectAnswers;
+
+        if (aiReportData) {
+            console.log("🔹 Using AI Report Data for Results");
+
+            // Extract Score from Report (quiz_summary.average_score is usually 0.0-1.0)
+            // But let's check the structure found in server.py
+            if (aiReportData.quiz_summary) {
+                const avg = aiReportData.quiz_summary.average_score || 0;
+                if (avg <= 1.0) {
+                    finalPercentage = avg * 100;
+                    finalScore = Math.round(avg * submission.totalPoints); // Approx
+                } else {
+                    // If AI returned percentage directly
+                    finalPercentage = avg;
+                    finalScore = Math.round((avg / 100) * submission.totalPoints);
+                }
+            }
+
+            // Extract Correct/Incorrect Counts
+            if (aiReportData.detailed_analysis) {
+                let aiCorrect = 0;
+                let aiIncorrect = 0;
+                aiReportData.detailed_analysis.forEach((q: any) => {
+                    // Check 'effectiveness' or 'score' or 'final_score'
+                    const s = q.score || q.effectiveness || q.final_score || 0;
+                    if (s >= 0.6) aiCorrect++;
+                    else aiIncorrect++;
+                });
+                // Only override if we found data
+                if (aiCorrect + aiIncorrect > 0) {
+                    finalCorrectAnswers = aiCorrect;
+                    finalIncorrectAnswers = aiIncorrect;
+                }
+
+                // 4. Extract time per question from AI (for total duration accuracy)
+                if (aiReportData.detailed_analysis && aiReportData.detailed_analysis.length === timePerQuestion.length) {
+                    aiReportData.detailed_analysis.forEach((q: any, idx: number) => {
+                        const t = q.time_taken || 0;
+                        timePerQuestion[idx] = Math.round(t);
+                    });
+                }
+            }
+
+            // Extract LPA
+            if (aiReportData.lpa_estimation) {
+                finalRole = aiReportData.lpa_estimation.role || finalRole;
+                finalSalaryRange = aiReportData.lpa_estimation.range || finalSalaryRange;
+            } else if (aiReportData.market_value) { // quick_summary_view structure
+                finalRole = aiReportData.market_value.estimated_role || finalRole;
+                finalSalaryRange = aiReportData.market_value.salary_range || finalSalaryRange;
+            }
+        }
+
         const strongAreas: string[] = [];
         const toImprove: string[] = [];
 
@@ -382,17 +540,29 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
             }
         }
 
-        // Career prediction based on actual score
-        let role = 'Junior Developer';
-        let salaryRange = '₹4.0 - ₹6.0 LPA';
-        let confidence = Math.min(95, Math.max(60, submission.percentage));
+        // Use AI Report Strength/Weakness if available
+        if (aiReportData && aiReportData.topic_analysis) {
+            if (aiReportData.topic_analysis.strengths && aiReportData.topic_analysis.strengths.length > 0) {
+                strongAreas.length = 0; // Clear local
+                strongAreas.push(...aiReportData.topic_analysis.strengths);
+            }
+            if (aiReportData.topic_analysis.weaknesses && aiReportData.topic_analysis.weaknesses.length > 0) {
+                toImprove.length = 0; // Clear local
+                toImprove.push(...aiReportData.topic_analysis.weaknesses);
+            }
+        }
 
-        if (submission.percentage >= 80) {
-            role = 'Senior Developer';
-            salaryRange = '₹8.0 - ₹12.0 LPA';
-        } else if (submission.percentage >= 60) {
-            role = 'Mid-Level Developer';
-            salaryRange = '₹6.0 - ₹8.0 LPA';
+        let confidence = Math.min(95, Math.max(60, finalPercentage));
+
+        if (!aiReportData) {
+            // Only use local logic for career if NO AI report
+            if (finalPercentage >= 80) {
+                finalRole = 'Senior Developer';
+                finalSalaryRange = '₹8.0 - ₹12.0 LPA';
+            } else if (finalPercentage >= 60) {
+                finalRole = 'Mid-Level Developer';
+                finalSalaryRange = '₹6.0 - ₹8.0 LPA';
+            }
         }
 
         res.json({
@@ -400,12 +570,12 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
             data: {
                 quizId: submission.quizId.toString(),
                 studentName: user?.name || 'Student',
-                score: submission.score,
+                score: finalScore,
                 totalPoints: submission.totalPoints,
-                percentage: submission.percentage,
-                passed: submission.passed,
-                correctAnswers: submission.correctAnswers,
-                incorrectAnswers: submission.incorrectAnswers,
+                percentage: finalPercentage,
+                passed: finalPercentage >= 60,
+                correctAnswers: finalCorrectAnswers,
+                incorrectAnswers: finalIncorrectAnswers,
                 timePerQuestion, // Add timePerQuestion array
                 sectionBreakdown,
                 performanceAnalysis: {
@@ -450,8 +620,8 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                     };
                 }),
                 careerPrediction: {
-                    role,
-                    salaryRange,
+                    role: finalRole,
+                    salaryRange: finalSalaryRange,
                     confidence: Math.round(confidence),
                 },
                 questionTimings: submission.questionTimings || {},

@@ -133,16 +133,16 @@ const StudentProfile: React.FC = () => {
                                 <h3 className="text-3xl font-black tracking-tighter mb-4">Career Projection</h3>
                                 <div className="inline-flex items-center gap-4 bg-white/5 px-6 py-3 rounded-full border border-white/10">
                                     <span className="text-xs font-black tracking-widest uppercase text-white/60">Primary Vector:</span>
-                                    <span className="text-xs font-black tracking-widest uppercase text-[#00E5FF] neon-text-cyan">SOFTWARE DEVELOPER</span>
+                                    <span className="text-xs font-black tracking-widest uppercase text-[#00E5FF] neon-text-cyan">{profileData?.careerProjection?.role || 'SOFTWARE DEVELOPER'}</span>
                                     <span className="w-1 h-1 bg-white/20 rounded-full" />
-                                    <span className="text-[10px] font-black text-[#8E9AAF]">85% CONFIDENCE</span>
+                                    <span className="text-[10px] font-black text-[#8E9AAF]">{profileData?.careerProjection?.confidence || 85}% CONFIDENCE</span>
                                 </div>
                             </div>
 
                             <div className="text-center md:text-right">
                                 <p className="text-[8px] font-black text-[#8E9AAF] tracking-[0.3em] uppercase mb-1">Projected Compensation</p>
                                 <p className="text-4xl font-black tracking-tighter neon-text-cyan">
-                                    ₹6.0 – ₹12.0 LPA
+                                    {profileData?.careerProjection?.salaryRange || '₹6.0 – ₹12.0 LPA'}
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/report')}

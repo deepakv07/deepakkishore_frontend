@@ -19,6 +19,10 @@ export interface IQuizSubmission extends Document {
     submittedAt: Date;
     createdAt: Date;
     updatedAt: Date;
+    aiProcessed?: boolean;
+    aiReportId?: mongoose.Types.ObjectId;
+    estimatedLPA?: string;
+    jobReadiness?: any;
 }
 
 const AnswerSchema: Schema = new Schema({
@@ -82,6 +86,23 @@ const QuizSubmissionSchema: Schema = new Schema(
             type: Date,
             default: Date.now,
         },
+        // AI Integration Fields
+        aiProcessed: {
+            type: Boolean,
+            default: false
+        },
+        aiReportId: {
+            type: Schema.Types.ObjectId,
+            required: false
+        },
+        estimatedLPA: {
+            type: String,
+            required: false
+        },
+        jobReadiness: {
+            type: Schema.Types.Mixed,
+            required: false
+        }
     },
     {
         timestamps: true,
