@@ -20,15 +20,12 @@ const StudentLogin: React.FC = () => {
         try {
             if (isLogin) {
                 await login({ email, password }, 'student');
-                // Only navigate on successful login
                 navigate('/student/dashboard');
             } else {
                 await register({ name, email, password, role: 'student' });
-                // Only navigate on successful registration
                 navigate('/student/dashboard');
             }
         } catch (err: any) {
-            // Stay on login page and show error
             const errorMessage = err?.response?.data?.message ||
                 err?.message ||
                 'Authentication failed. Please check your credentials and try again.';
@@ -38,82 +35,99 @@ const StudentLogin: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-6">
-            <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-                <div className="p-8 sm:p-12">
-                    {/* Logo */}
-                    <div className="flex justify-center mb-8">
-                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl">
-                            SB
-                        </div>
-                    </div>
+        <div className="min-h-screen bg-[#030508] relative overflow-hidden flex items-center justify-center p-6">
+            {/* Background Glows */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#9D4EDD]/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#00E5FF]/10 rounded-full blur-[120px]" />
 
-                    <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                            {isLogin ? 'Student Login' : 'Create Account'}
-                        </h2>
-                        <p className="text-gray-500">
-                            {isLogin ? 'Welcome back! Please enter your details.' : 'Join our learning community today.'}
-                        </p>
+            <div className="max-w-md w-full relative z-10">
+                <div className="text-center mb-10 space-y-4">
+                    <div className="w-20 h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-3xl mx-auto mb-6 shadow-[0_0_30px_rgba(157,78,221,0.2)]">
+                        SB
+                    </div>
+                    {/* <p className="text-[#9D4EDD] font-bold tracking-[0.4em] text-xs uppercase opacity-70">Student Portal</p> */}
+                    <h2 className="text-4xl font-black text-white tracking-tighter">
+                        {isLogin ? 'Student Login' : 'Create Account'}
+                    </h2>
+                    {!isLogin && (
+                        <p className="text-[#8E9AAF] text-sm italic">Join our learning community today.</p>
+                    )}
+                    {isLogin && (
+                        <p className="text-[#8E9AAF] text-sm">Welcome back! Please enter your details.</p>
+                    )}
+                </div>
+
+                <div className="glass-card p-10 border-white/10">
+                    <div className="flex bg-white/5 p-1 rounded-xl mb-8">
+                        <button
+                            onClick={() => setIsLogin(true)}
+                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${isLogin ? 'bg-[#9D4EDD] text-black shadow-lg shadow-[#9D4EDD]/20' : 'text-[#8E9AAF] hover:text-white'}`}
+                        >
+                            Sign In
+                        </button>
+                        <button
+                            onClick={() => setIsLogin(false)}
+                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${!isLogin ? 'bg-[#9D4EDD] text-black shadow-lg shadow-[#9D4EDD]/20' : 'text-[#8E9AAF] hover:text-white'}`}
+                        >
+                            Register
+                        </button>
                     </div>
 
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-                            {error}
+                        <div className="mb-8 p-4 bg-red-500/10 border-l-4 border-red-500 text-red-400 text-sm rounded-r-lg">
+                            <i className="fas fa-exclamation-triangle mr-2"></i> {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {!isLogin && (
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                            <div className="space-y-2">
+                                <label className="block text-xs font-black text-white uppercase tracking-widest ml-1">Full Name</label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                        <i className="fas fa-user"></i>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
+                                        <i className="fas fa-user text-sm"></i>
                                     </span>
                                     <input
                                         type="text"
                                         required
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition"
+                                        className="elite-input pl-12"
                                         placeholder="John Doe"
                                     />
                                 </div>
                             </div>
                         )}
 
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <div className="space-y-2">
+                            <label className="block text-xs font-black text-white uppercase tracking-widest ml-1">Email Address</label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <i className="fas fa-envelope"></i>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
+                                    <i className="fas fa-envelope text-sm"></i>
                                 </span>
                                 <input
                                     type="email"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition"
+                                    className="elite-input pl-12"
                                     placeholder="Email"
                                 />
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Password <span className="text-red-500">*</span>
-                            </label>
+                        <div className="space-y-2">
+                            <label className="block text-xs font-black text-white uppercase tracking-widest ml-1">Password *</label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <i className="fas fa-lock"></i>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
+                                    <i className="fas fa-lock text-sm"></i>
                                 </span>
                                 <input
                                     type="password"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition"
+                                    className="elite-input pl-12"
                                     placeholder="Password"
                                     minLength={isLogin ? 1 : 6}
                                 />
@@ -123,52 +137,45 @@ const StudentLogin: React.FC = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 active:scale-[0.98] transition disabled:opacity-50"
+                            className="elite-button w-full py-4 text-xs tracking-widest uppercase disabled:opacity-50 !from-[#9D4EDD] !to-[#0077FF]"
                         >
                             {loading ? (
-                                <span className="flex items-center justify-center">
+                                <>
                                     <i className="fas fa-spinner fa-spin mr-2"></i> Processing...
-                                </span>
-                            ) : (
-                                isLogin ? 'Sign In' : 'Create Account'
-                            )}
+                                </>
+                            ) : (isLogin ? 'Sign In' : 'Create Account')}
                         </button>
                     </form>
 
-                    {/* Social Login/Signup */}
                     <div className="mt-8">
                         <div className="relative flex items-center justify-center mb-8">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-100"></div>
+                                <div className="w-full border-t border-white/10"></div>
                             </div>
-                            <span className="relative px-4 bg-white text-gray-400 text-sm">or continue with</span>
+                            <span className="relative px-4 bg-[#0A0E14] text-[#8E9AAF] text-[10px] uppercase tracking-widest">or continue with</span>
                         </div>
 
                         <button
                             onClick={() => {
                                 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-                                const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || 'http://localhost:5173/auth/callback';
+                                const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/callback`;
                                 window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=email profile openid&access_type=offline`;
                             }}
-                            className="w-full flex items-center justify-center gap-3 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition font-medium text-gray-700"
+                            className="w-full flex items-center justify-center gap-3 py-3 border border-white/10 rounded-xl hover:bg-white/5 transition font-bold text-white text-xs tracking-widest uppercase"
                         >
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" className="w-5 h-5" alt="Google" />
-                            {isLogin ? 'Continue with Google' : 'Sign up with Google'}
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" className="w-4 h-4" alt="Google" />
+                            Continue with Google
                         </button>
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="p-8 bg-gray-50 border-t border-gray-100 text-center text-sm">
-                    <p className="text-gray-600">
-                        {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-                        <button
-                            onClick={() => setIsLogin(!isLogin)}
-                            className="text-blue-600 font-bold hover:underline"
-                        >
-                            {isLogin ? 'Sign up now' : 'Sign in instead'}
-                        </button>
-                    </p>
+                <div className="mt-8 text-center text-xs">
+                    <button
+                        onClick={() => navigate('/role-selection')}
+                        className="text-[#8E9AAF] hover:text-white transition-all flex items-center justify-center gap-2 mx-auto font-bold tracking-widest uppercase"
+                    >
+                        <i className="fas fa-arrow-left text-[10px]"></i> Back to Role Selection
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,247 +1,434 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import type { Quiz } from '../../types';
 
 const QuizInterface: React.FC = () => {
     const { quizId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
-
-    // Core State
-    const [quiz, setQuiz] = useState<Quiz | null>(null); // Stores quiz metadata (title etc)
+    const [quiz, setQuiz] = useState<Quiz | null>(null);
     const [loading, setLoading] = useState(true);
-    const [analyzing, setAnalyzing] = useState(false); // New state for AI thinking
     const [error, setError] = useState('');
-
-    // Interactive Session State
-    const [aiSessionId, setAiSessionId] = useState<string | null>(null);
-    const [currentQuestionData, setCurrentQuestionData] = useState<any>(null); // The current question object from AI
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [totalQuestions, setTotalQuestions] = useState(0);
-    const [currentAnswer, setCurrentAnswer] = useState<string>('');
-    const [feedback, setFeedback] = useState<any>(null); // Feedback from previous answer
-
-    // Time tracking
-    const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
-
-    // Proctoring & Modals
+    const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const isSubmittingRef = React.useRef(false);
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showViolationModal, setShowViolationModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    // AI Session Initialization
+    const [questionTimings, setQuestionTimings] = useState<Record<string, number>>({});
+    const [lastSwitchTime, setLastSwitchTime] = useState<number>(Date.now());
+    const prevIndexRef = React.useRef(0);
+
+    // Load initial warnings
     useEffect(() => {
-        if (location.state?.aiSession) {
-            const session = location.state.aiSession;
-            console.log("Initializing AI Interactive Session", session);
-
-            setAiSessionId(session.session_id);
-            setTotalQuestions(session.total_questions || 10);
-            setCurrentQuestionIndex(session.current_index || 0);
-
-            // Set Initial Question
-            if (session.next_question) {
-                setCurrentQuestionData(normalizeQuestion(session.next_question));
-            }
-
-            // Set Quiz Metadata
-            setQuiz({
-                id: session.quiz_id,
-                title: session.quiz_title || "AI Assessment",
-                description: "AI Generated Interactive Assessment",
-                durationMinutes: 30,
-                questions: [], // We don't have all questions yet
-                isCompleted: false,
-                courseId: 0
-            } as Quiz);
-
-            setLoading(false);
-            setQuestionStartTime(Date.now());
-        } else if (quizId) {
-            // Fallback for non-AI / legacy (Redirect or Error for now to force AI flow)
-            setError("Interactive AI Quiz session not found. Please start from the dashboard.");
-            setLoading(false);
+        if (quizId) {
+            apiService.getQuizProgress(quizId)
+                .then(() => {
+                    // warnings handled by handleDeviation
+                })
+                .catch(err => console.error('Failed to load progress:', err));
         }
-    }, [quizId, location.state]);
+    }, [quizId]);
 
-    // Helper to normalize question structure from AI
-    const normalizeQuestion = (q: any) => ({
-        id: q.id || q._id || q.question_id,
-        text: q.question_text || q.text,
-        options: q.options || [],
-        type: q.options && q.options.length > 0 ? 'mcq' : 'descriptive',
-        points: 10,
-        ...q
-    });
-
-    const handleAnswerChange = (val: string) => {
-        setCurrentAnswer(val);
-    };
-
-    const handleSubmitAnswer = async () => {
-        if (!aiSessionId || !currentQuestionData || !currentAnswer) return;
+    const handleDeviation = async () => {
+        if (!quizId || isSubmittingRef.current) return;
 
         try {
-            setAnalyzing(true);
-            const timeTaken = (Date.now() - questionStartTime) / 1000;
+            const data = await apiService.recordWarning(quizId);
 
-            const payload = {
-                session_id: aiSessionId,
-                question_id: currentQuestionData.id,
-                user_answer: currentAnswer,
-                time_taken: timeTaken
-            };
-
-            const response = await apiService.submitAIAnswer(payload);
-            console.log("AI Response:", response);
-
-            if (response.completed) {
-                setShowSuccessModal(true);
-                // navigate('/student/dashboard'); // Done via modal
+            if (data.warnings >= 2) {
+                // Strike 2: Auto-submit
+                setShowViolationModal(true);
+                // Submit in background, don't redirect yet
+                handleSubmitQuiz(false);
             } else {
-                // Next Question
-                setFeedback(response.feedback);
-                setCurrentQuestionData(normalizeQuestion(response.next_question));
-                setCurrentQuestionIndex(response.current_index);
-                setCurrentAnswer(''); // Reset answer
-                setQuestionStartTime(Date.now());
-
-                // Optional: Show feedback toast or transient state
+                // Strike 1: Warning
+                setShowWarningModal(true);
             }
-
-        } catch (err: any) {
-            console.error("Error submitting answer:", err);
-            setError(err.message || "Failed to submit answer.");
-        } finally {
-            setAnalyzing(false);
+        } catch (err) {
+            console.error('Failed to record warning:', err);
         }
     };
 
-    // --- RENDER ---
+    // Proctoring: Request Full Screen on Mount
+    useEffect(() => {
+        const enterFullScreen = async () => {
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+            } catch (err) {
+                console.warn('Full screen request denied or failed:', err);
+            }
+        };
+        enterFullScreen();
+    }, []);
+
+    // Proctoring: Auto-submit on tab switch
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden' && !isSubmittingRef.current && quiz) {
+                handleDeviation();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [quiz, quizId]);
+
+    // Proctoring: Auto-submit on Full Screen Exit (Esc key)
+    useEffect(() => {
+        const handleFullScreenChange = () => {
+            if (!document.fullscreenElement && !isSubmittingRef.current && quiz) {
+                if (!isSubmittingRef.current) {
+                    handleDeviation();
+                }
+            }
+        };
+
+        document.addEventListener('fullscreenchange', handleFullScreenChange);
+
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullScreenChange);
+        };
+    }, [quiz, quizId]);
+
+    useEffect(() => {
+        if (!quiz) return;
+
+        const now = Date.now();
+        const timeSpent = Math.floor((now - lastSwitchTime) / 1000);
+
+        const prevQuestion = quiz.questions[prevIndexRef.current];
+        if (prevQuestion) {
+            const qId = prevQuestion.id?.toString() || prevQuestion._id?.toString() || `q${prevIndexRef.current}`;
+            console.log(`Time for question ${prevIndexRef.current + 1} (${qId}): ${timeSpent}s`);
+            setQuestionTimings(prev => ({
+                ...prev,
+                [qId]: (prev[qId] || 0) + timeSpent
+            }));
+        }
+
+        setLastSwitchTime(now);
+        prevIndexRef.current = currentQuestionIndex;
+    }, [currentQuestionIndex]);
+
+    useEffect(() => {
+        if (quizId) {
+            loadQuiz(quizId);
+        }
+    }, [quizId]);
+
+    const loadQuiz = async (id: string) => {
+        try {
+            const [quizData, quizzesList] = await Promise.all([
+                apiService.getQuizQuestions(id),
+                apiService.getStudentQuizzes()
+            ]);
+
+            const quizStatus = quizzesList.find(q => String(q.id) === String(id) || String(q._id) === String(id));
+
+            if (quizStatus?.isCompleted) {
+                alert('You have already completed this quiz.');
+                navigate('/student/dashboard');
+                return;
+            }
+
+            setQuiz(quizData);
+            // Reset timing when quiz loads
+            setLastSwitchTime(Date.now());
+            setQuestionTimings({});
+            console.log('Quiz loaded, timer started at:', new Date().toISOString());
+        } catch (err) {
+            console.error('Error loading quiz:', err);
+            setError('Failed to load quiz. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAnswerSelect = (questionId: string, answer: string) => {
+        setSelectedAnswers(prev => ({ ...prev, [questionId]: answer }));
+    };
+
+    const handleNext = () => {
+        if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1);
+        }
+    };
+
+    const confirmSubmit = () => {
+        setShowConfirmation(true);
+    };
+
+    const handleSubmitQuiz = async (navigateAfter = true) => {
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
+        setShowConfirmation(false);
+
+        if (!quiz || !quizId) {
+            isSubmittingRef.current = false;
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const answers = quiz.questions.map((q, index) => {
+                const questionId = q.id?.toString() || q._id?.toString() || `q${index}`;
+                return {
+                    questionId: questionId,
+                    answer: selectedAnswers[questionId] || ''
+                };
+            });
+
+            const now = Date.now();
+            const lastTimeSpent = Math.floor((now - lastSwitchTime) / 1000);
+            const currentQuestion = quiz.questions[currentQuestionIndex];
+            const currentQId = currentQuestion.id?.toString() || currentQuestion._id?.toString() || `q${currentQuestionIndex}`;
+
+            const finalTimings = {
+                ...questionTimings,
+                [currentQId]: (questionTimings[currentQId] || 0) + lastTimeSpent
+            };
+
+            console.log('Final timings before submit:', finalTimings);
+            console.log('Total time tracked:', Object.values(finalTimings).reduce((a, b) => a + b, 0), 'seconds');
+
+            const validAnswers = answers.filter(a => a.answer);
+
+            await apiService.submitQuiz({
+                quizId: quizId,
+                answers: validAnswers,
+                questionTimings: finalTimings
+            });
+
+            if (navigateAfter) {
+                setShowSuccessModal(true);
+            }
+        } catch (err: any) {
+            console.error('Error submitting quiz:', err);
+            setError(err?.response?.data?.message || 'Failed to submit quiz. Please try again.');
+            setLoading(false);
+            isSubmittingRef.current = false;
+        }
+    };
+
+    const currentQuestion = quiz?.questions[currentQuestionIndex];
+    const totalQuestions = quiz?.questions.length || 0;
 
     return (
         <StudentLayout hideNavbar={true}>
-            <div className="max-w-4xl mx-auto py-8 px-4 pt-24">
-                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden min-h-[600px] relative">
+            <div className="min-h-screen bg-[#030508] text-white flex flex-col font-mono">
+                {/* Clean Header - Match Image 0/1 */}
+                <div className="h-20 border-b border-white/5 bg-white/2 backdrop-blur-xl flex items-center justify-between px-10 sticky top-0 z-40">
+                    <div className="flex items-center gap-4">
+                        <span className="text-xl font-black text-white tracking-widest uppercase">{quiz?.title || 'ASSESSMENT'}</span>
+                    </div>
 
+                    <div className="flex items-center gap-10">
+                        <div className="flex items-center gap-4">
+                            <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em]">TIME REMAINING</span>
+                            <div className="text-2xl font-black text-[#00E5FF] tabular-nums tracking-wider">
+                                {quiz?.durationMinutes || '30'}:00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content Area - Centered Card */}
+                <div className="flex-1 flex items-center justify-center p-6 bg-grid-white/[0.02]">
                     {loading ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
-                            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-                            <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Initializing Assessment...</p>
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin"></div>
+                            <p className="mt-8 text-[#00E5FF] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">Syncing Mission Data...</p>
                         </div>
                     ) : error ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 p-8 text-center">
-                            <div className="text-red-500 text-5xl mb-4"><i className="fas fa-exclamation-circle"></i></div>
-                            <p className="text-gray-800 font-bold text-xl mb-4">{error}</p>
-                            <button onClick={() => navigate('/student/dashboard')} className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold">Return to Dashboard</button>
-                        </div>
-                    ) : analyzing ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm z-20">
-                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 animate-pulse">
-                                <i className="fas fa-brain text-blue-600 text-3xl"></i>
-                            </div>
-                            <h3 className="text-2xl font-black text-gray-900 mb-2">AI is analyzing...</h3>
-                            <p className="text-gray-500 font-medium">Evaluating your response and selecting the next question.</p>
+                        <div className="text-center space-y-8">
+                            <i className="fas fa-exclamation-triangle text-5xl text-red-500 animate-pulse"></i>
+                            <h3 className="text-2xl font-black uppercase tracking-tighter">System Error Detected</h3>
+                            <p className="text-gray-500 font-medium">{error}</p>
+                            <button onClick={() => navigate('/student/quizzes')} className="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/10">Reboot Session</button>
                         </div>
                     ) : (
-                        <div className="p-8 md:p-12 flex flex-col h-full">
-
-                            {/* Header */}
-                            <div className="flex justify-between items-center mb-8">
-                                <div>
-                                    <h1 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-1">{quiz?.title}</h1>
-                                    <div className="text-3xl font-black text-gray-900">Question {currentQuestionIndex + 1}</div>
+                        <div className="max-w-4xl w-full">
+                            {/* Question Card - Match Image 0/1 */}
+                            <div className="glass-card p-12 rounded-[3rem] border border-white/5 shadow-2xl space-y-10 relative overflow-hidden bg-white/5 transition-all">
+                                <div className="space-y-4">
+                                    <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-[0.3em]">
+                                        QUESTION {currentQuestionIndex + 1} / {totalQuestions}
+                                    </p>
+                                    <h2 className="text-3xl font-black text-white leading-tight tracking-tight">
+                                        {currentQuestion?.text}
+                                    </h2>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Progress</div>
-                                    <div className="text-xl font-black text-gray-900">{currentQuestionIndex + 1} / {totalQuestions}</div>
-                                </div>
-                            </div>
 
-                            {/* Question Text */}
-                            <div className="mb-8 flex-grow">
-                                <h2 className="text-2xl font-bold text-gray-800 leading-snug">
-                                    {currentQuestionData?.text}
-                                </h2>
-                            </div>
+                                {/* Options List */}
+                                <div className="space-y-4">
+                                    {(currentQuestion?.options || []).map((option, idx) => {
+                                        const qId = currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`;
+                                        const isSelected = selectedAnswers[qId] === option;
 
-                            {/* Answer Input */}
-                            <div className="mb-8 space-y-4">
-                                {currentQuestionData?.type === 'mcq' ? (
-                                    <div className="grid gap-4">
-                                        {currentQuestionData.options.map((opt: string, idx: number) => (
+                                        return (
                                             <button
                                                 key={idx}
-                                                onClick={() => handleAnswerChange(opt)}
-                                                className={`w-full p-6 text-left rounded-2xl border-2 transition-all flex items-center group font-bold text-lg
-                                                    ${currentAnswer === opt
-                                                        ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-lg shadow-blue-100'
-                                                        : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-gray-700'
+                                                onClick={() => handleAnswerSelect(qId, option)}
+                                                className={`w-full flex items-center p-6 rounded-2xl border transition-all duration-300 ${isSelected
+                                                    ? 'bg-[#00E5FF11] border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.1)]'
+                                                    : 'bg-white/2 border-white/5 hover:bg-white/5 hover:border-white/20'
                                                     }`}
                                             >
-                                                <div className={`w-8 h-8 rounded-full border-2 mr-6 flex items-center justify-center transition-all shrink-0
-                                                    ${currentAnswer === opt ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}`}>
-                                                    {currentAnswer === opt && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-[#00E5FF] bg-[#00E5FF]' : 'border-white/10 bg-white/5'
+                                                    }`}>
+                                                    {isSelected && <div className="w-2 h-2 rounded-full bg-[#030508]"></div>}
                                                 </div>
-                                                {opt}
+                                                <span className={`ml-6 text-lg font-medium transition-all ${isSelected ? 'text-[#00E5FF]' : 'text-gray-400'}`}>
+                                                    {option}
+                                                </span>
                                             </button>
-                                        ))}
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Navigation Actions */}
+                                <div className="flex items-center justify-between pt-10 border-t border-white/5">
+                                    <button
+                                        onClick={handlePrevious}
+                                        disabled={currentQuestionIndex === 0}
+                                        className="px-8 py-4 rounded-2xl bg-white/5 text-[#8E9AAF] border border-white/10 hover:bg-white/10 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed font-black text-xs uppercase tracking-widest flex items-center gap-3"
+                                    >
+                                        <i className="fas fa-arrow-left"></i>
+                                        Previous
+                                    </button>
+
+                                    <div className="flex flex-col items-end gap-6">
+                                        {selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] && (
+                                            <button
+                                                onClick={() => {
+                                                    const qId = currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`;
+                                                    setSelectedAnswers(prev => {
+                                                        const n = { ...prev };
+                                                        delete n[qId];
+                                                        return n;
+                                                    });
+                                                }}
+                                                className="text-[10px] text-gray-500 font-black uppercase tracking-widest hover:text-[#00E5FF] transition-colors flex items-center gap-2"
+                                            >
+                                                <i className="fas fa-times-circle"></i>
+                                                Clear Selection
+                                            </button>
+                                        )}
+
+                                        <button
+                                            onClick={handleNext}
+                                            disabled={currentQuestionIndex === totalQuestions - 1}
+                                            className="px-10 py-4 rounded-2xl bg-[#030508] text-white border border-white/10 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed font-black text-xs uppercase tracking-widest flex items-center gap-3"
+                                        >
+                                            Next
+                                            <i className="fas fa-arrow-right"></i>
+                                        </button>
                                     </div>
-                                ) : (
-                                    <textarea
-                                        className="w-full p-6 rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all text-xl min-h-[200px] resize-none"
-                                        placeholder="Type your detailed answer here..."
-                                        value={currentAnswer}
-                                        onChange={(e) => handleAnswerChange(e.target.value)}
-                                        autoFocus
-                                    />
-                                )}
-                            </div>
+                                </div>
 
-                            {/* Action Bar */}
-                            <div className="pt-8 border-t border-gray-100">
-                                <button
-                                    onClick={handleSubmitAnswer}
-                                    disabled={!currentAnswer || analyzing}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-6 rounded-2xl font-black text-xl shadow-xl shadow-blue-200 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
-                                >
-                                    <span>{currentQuestionIndex === totalQuestions - 1 ? 'Finish Assessment' : 'Next Question'}</span>
-                                    <i className="fas fa-arrow-right"></i>
-                                </button>
+                                {/* Submit Button - Highlighted at the bottom of the card */}
+                                <div className="pt-6">
+                                    <button
+                                        onClick={confirmSubmit}
+                                        className="w-full py-5 bg-[#0066FF] text-white rounded-3xl font-black uppercase tracking-[0.3em] text-sm shadow-2xl shadow-[#0066FF44] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                    >
+                                        Submit Quiz
+                                    </button>
+                                </div>
                             </div>
-
                         </div>
                     )}
                 </div>
-            </div>
 
-            {/* Success Modal */}
-            {showSuccessModal && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-green-900/40 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg p-8 shadow-2xl transform transition-all scale-100 border-4 border-green-100">
-                        <div className="text-center mb-8">
-                            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-green-100 animate-bounce">
-                                <i className="fas fa-check-circle"></i>
+                {/* Modals */}
+                {(showConfirmation || showWarningModal || showViolationModal || showSuccessModal) && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#030508]/80 backdrop-blur-md">
+                        {showConfirmation && (
+                            <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-white/10 text-center animate-scale-up">
+                                <div className="w-20 h-20 bg-[#00E5FF11] text-[#00E5FF] rounded-3xl flex items-center justify-center mx-auto mb-8 text-3xl border border-[#00E5FF33]">
+                                    <i className="fas fa-upload"></i>
+                                </div>
+                                <h3 className="text-2xl font-black text-white mb-2 tracking-tighter uppercase">Final Submission?</h3>
+                                <p className="text-gray-500 font-medium mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
+                                    {Object.keys(selectedAnswers).length} of {totalQuestions} objectives secured. <br />
+                                    This action cannot be undone.
+                                </p>
+                                <div className="space-y-4">
+                                    <button onClick={() => handleSubmitQuiz()} className="w-full py-5 bg-[#00E5FF] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#00E5FF22] hover:scale-105 active:scale-95 transition-all">EXECUTE UPLOAD</button>
+                                    <button onClick={() => setShowConfirmation(false)} className="w-full py-5 text-gray-500 font-black uppercase tracking-[0.2em] hover:text-white transition-colors">ABORT</button>
+                                </div>
                             </div>
-                            <h3 className="text-2xl font-black text-gray-900 mb-2">Assessment Completed!</h3>
-                            <p className="text-gray-500 font-medium">
-                                You have successfully completed the interactive assessment.
-                                <br />
-                                Your personalized AI report is ready.
-                            </p>
-                        </div>
+                        )}
 
-                        <button
-                            onClick={() => navigate('/student/dashboard')}
-                            className="w-full py-4 bg-green-600 text-white rounded-xl font-black text-lg hover:bg-green-700 transition shadow-xl shadow-green-200"
-                        >
-                            View Results
-                        </button>
+                        {showWarningModal && (
+                            <div className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl text-center transform animate-scale-up">
+                                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
+                                    <i className="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Warning!</h3>
+                                <p className="text-gray-600 font-medium mb-10 leading-relaxed">
+                                    You have deviated from the quiz window. This is your <span className="text-red-500 font-bold">final warning</span>. <br />
+                                    Next time, your test will be <span className="text-red-500 font-bold">auto-submitted</span>.
+                                </p>
+                                <button
+                                    onClick={() => { setShowWarningModal(false); if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { }); }}
+                                    className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-red-200"
+                                >
+                                    OK, I Understand
+                                </button>
+                            </div>
+                        )}
+
+                        {showViolationModal && (
+                            <div className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl text-center transform animate-scale-up border-2 border-red-500">
+                                <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
+                                    <i className="fas fa-ban"></i>
+                                </div>
+                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Quiz Terminated</h3>
+                                <p className="text-gray-600 font-medium mb-10 leading-relaxed">
+                                    Multiple violations detected. Your quiz has been <br />
+                                    <span className="text-red-500 font-bold">automatically submitted</span>.
+                                </p>
+                                <button
+                                    onClick={() => navigate('/student/dashboard')}
+                                    className="w-full py-4 bg-[#1A1F26] hover:bg-[#2D343D] text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl"
+                                >
+                                    Return to Dashboard
+                                </button>
+                            </div>
+                        )}
+
+                        {showSuccessModal && (
+                            <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-[#00E5FF33] text-center animate-scale-up">
+                                <div className="w-24 h-24 bg-[#00E5FF22] text-[#00E5FF] rounded-full flex items-center justify-center mx-auto mb-8 text-4xl border border-[#00E5FF44] shadow-[0_0_40px_rgba(0,229,255,0.2)]">
+                                    <i className="fas fa-satellite-dish animate-bounce"></i>
+                                </div>
+                                <h3 className="text-2xl font-black text-[#00E5FF] mb-2 tracking-tighter uppercase">Transmission Success</h3>
+                                <p className="text-gray-500 font-medium mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
+                                    All data packets secured. <br />
+                                    Proceed to results and analysis.
+                                </p>
+                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="w-full py-5 bg-[#00E5FF] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#00E5FF22] hover:scale-105 active:scale-95 transition-all">VIEW RESULTS</button>
+                            </div>
+                        )}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </StudentLayout>
     );
 };

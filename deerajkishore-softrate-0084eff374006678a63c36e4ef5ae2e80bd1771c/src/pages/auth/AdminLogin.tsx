@@ -29,87 +29,100 @@ const AdminLogin: React.FC = () => {
 
         try {
             await login({ email, password }, 'admin');
-            // Only navigate on successful login
             navigate('/admin/dashboard');
         } catch (err: any) {
             console.error('Admin login error:', err);
-            // Stay on login page and show error
-            const errorMessage = err?.response?.data?.message || 
-                                err?.message || 
-                                'Invalid email or password. Please try again.';
+            const errorMessage = err?.response?.data?.message ||
+                err?.message ||
+                'Invalid email or password. Please try again.';
             setError(errorMessage);
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
-            <div className="max-w-md w-full">
-                <div className="text-center mb-10">
-                    <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-4xl mx-auto mb-6 shadow-xl">
+        <div className="min-h-screen bg-[#030508] relative overflow-hidden flex items-center justify-center p-6">
+            {/* Background Glows */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00E5FF]/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#9D4EDD]/10 rounded-full blur-[120px]" />
+
+            <div className="max-w-md w-full relative z-10">
+                <div className="text-center mb-10 space-y-4">
+                    <div className="w-20 h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-3xl mx-auto mb-6 shadow-[0_0_30px_rgba(0,229,255,0.2)]">
                         SB
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-2">Administrator Panel</h2>
-                    <p className="text-gray-400">Secure sign-in for platform management</p>
+                    <h2 className="text-4xl font-black text-white tracking-tighter">Administrator Panel</h2>
+                    <p className="text-[#00E5FF] font-medium tracking-wide text-sm opacity-70">Secure sign-in for platform management</p>
                 </div>
 
-                <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10">
+                <div className="glass-card p-10 border-white/10">
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-                            {error}
+                        <div className="mb-8 p-4 bg-red-500/10 border-l-4 border-red-500 text-red-400 text-sm rounded-r-lg">
+                            <i className="fas fa-exclamation-triangle mr-2"></i> {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Admin Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition"
-                                placeholder="Email"
-                            />
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="space-y-2">
+                            <label className="block text-sm font-bold text-gray-400 ml-1">Admin Email</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
+                                    <i className="fas fa-envelope text-sm"></i>
+                                </span>
+                                <input
+                                    type="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="elite-input pl-12"
+                                    placeholder="Email"
+                                />
+                            </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
-                                Password <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition"
-                                placeholder="Password"
-                                minLength={1}
-                            />
+                        <div className="space-y-2">
+                            <label className="block text-sm font-bold text-gray-400 ml-1">Password *</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
+                                    <i className="fas fa-lock text-sm"></i>
+                                </span>
+                                <input
+                                    type="password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="elite-input pl-12"
+                                    placeholder="Password"
+                                />
+                            </div>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-black active:scale-[0.98] transition disabled:opacity-50"
+                            className="elite-button w-full py-4 text-sm font-bold tracking-wide disabled:opacity-50"
                         >
-                            {loading ? 'Authenticating...' : 'Sign In as Admin'}
+                            {loading ? (
+                                <>
+                                    <i className="fas fa-spinner fa-spin mr-2"></i> Initializing...
+                                </>
+                            ) : 'Sign In as Admin'}
                         </button>
                     </form>
 
-                    <div className="mt-6 text-center">
-                        <p className="text-xs text-gray-400">
+                    <div className="mt-8 text-center">
+                        <p className="text-xs text-[#8E9AAF] leading-relaxed">
                             Note: Administrator access is restricted to authorized personnel only.
                         </p>
                     </div>
                 </div>
 
-                <div className="mt-8 text-center">
+                <div className="mt-8 text-center text-xs">
                     <button
                         onClick={() => navigate('/role-selection')}
-                        className="text-gray-500 hover:text-white transition-colors"
+                        className="text-[#8E9AAF] hover:text-white transition-all flex items-center justify-center gap-2 mx-auto font-bold tracking-wide"
                     >
-                        ← Back to Role Selection
+                        <i className="fas fa-chevron-left text-[10px]"></i> Return to Role Selection
                     </button>
                 </div>
             </div>

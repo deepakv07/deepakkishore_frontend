@@ -56,9 +56,7 @@ const EditProfile: React.FC = () => {
         setLoading(true);
         try {
             await apiService.updateStudentProfile(formData);
-            alert('Profile updated successfully');
             navigate('/student/profile');
-            // If the auth context needs manual update:
             window.location.reload();
         } catch (err: any) {
             console.error('Error updating profile:', err);
@@ -70,184 +68,92 @@ const EditProfile: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-5xl mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto space-y-10 animate-fade-in">
                 {/* Header Information */}
-                <div className="bg-white rounded-[2rem] p-8 mb-6 shadow-sm border border-gray-100 flex justify-between items-start">
-                    <div className="flex items-center space-x-6">
-                        <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
-                            <i className="fas fa-user text-3xl"></i>
+                <div className="glass-card p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 rounded-2xl bg-[#00E5FF11] border border-[#00E5FF33] flex items-center justify-center text-[#00E5FF]">
+                            <i className="fas fa-id-card-clip text-3xl"></i>
                         </div>
-                        <div>
-                            <div className="flex items-center space-x-2">
-                                <h1 className="text-2xl font-black text-gray-900">{user?.name}</h1>
-                                <i className="fas fa-pen text-xs text-gray-400"></i>
-                            </div>
-                            <p className="text-gray-500 font-medium">{user?.yearOfStudy || 'Year of Study'}</p>
-                            <div className="flex items-center space-x-4 mt-2">
-                                <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wider rounded-lg">Active</span>
-                                <span className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-wider rounded-lg">5 Assessments</span>
-                            </div>
+                        <div className="text-center md:text-left">
+                            <h1 className="text-2xl font-black tracking-tighter">{user?.name}</h1>
+                            <p className="text-[#8E9AAF] text-xs font-bold tracking-widest uppercase mt-1">{user?.email}</p>
                         </div>
                     </div>
-                    <div className="text-right flex space-x-12">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Department:</p>
-                            <p className="text-sm font-bold text-gray-900">{user?.department || 'Not Set'}</p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Degree:</p>
-                            <p className="text-sm font-bold text-gray-900">{user?.degree || 'Not Set'}</p>
-                        </div>
-                    </div>
+
+
                 </div>
 
                 {/* Edit Profile Form */}
-                <div className="bg-white rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
-                    <div className="p-8 border-b border-gray-50 flex justify-between items-center">
-                        <h2 className="text-xl font-black text-gray-900 flex items-center">
-                            <i className="fas fa-pen-nib text-indigo-600 mr-3"></i>
+                <div className="glass-card overflow-hidden">
+                    <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
+                        <h2 className="text-xl font-black tracking-tight flex items-center gap-3">
+                            <i className="fas fa-edit text-[#00E5FF]"></i>
                             Edit Profile
                         </h2>
                         <button
                             onClick={() => navigate('/student/profile')}
-                            className="text-gray-400 hover:text-gray-600 text-sm font-bold"
+                            className="text-[#8E9AAF] hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
                         >
                             Cancel
                         </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="p-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                            {/* First Name */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">First Name</label>
-                                <input
-                                    type="text"
-                                    name="firstName"
-                                    value={formData.firstName}
-                                    onChange={handleChange}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl transition-all outline-none font-bold text-gray-700"
-                                    placeholder="Enter first name"
-                                />
-                            </div>
+                    <form onSubmit={handleSubmit} className="p-10 space-y-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                            {[
+                                { name: 'firstName', label: 'FIRST NAME', placeholder: 'Enter first name' },
+                                { name: 'lastName', label: 'LAST NAME', placeholder: 'Enter last name' },
+                                { name: 'phone', label: 'PHONE NUMBER', placeholder: '+91 98765 43210' },
+                                { name: 'department', label: 'DEPARTMENT', placeholder: 'e.g. Computer Science' },
+                                { name: 'yearOfStudy', label: 'YEAR OF STUDY', placeholder: 'e.g. B.Tech CSE | 2024-2028' },
+                                { name: 'degree', label: 'DEGREE', placeholder: 'e.g. B.Tech' },
+                            ].map((field) => (
+                                <div key={field.name} className="space-y-2 group">
+                                    <label className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-widest ml-1 transition-colors group-focus-within:text-[#00E5FF]">
+                                        {field.label}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name={field.name}
+                                        value={(formData as any)[field.name]}
+                                        onChange={handleChange}
+                                        placeholder={field.placeholder}
+                                        className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-[#00E5FF] focus:bg-[#00E5FF08] transition-all font-black text-sm tracking-tight placeholder:text-white/20"
+                                    />
+                                </div>
+                            ))}
 
-                            {/* Last Name */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Last Name</label>
-                                <input
-                                    type="text"
-                                    name="lastName"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                    className="w-full px-5 py-4 bg-white border-2 border-indigo-500 rounded-2xl transition-all outline-none font-bold text-gray-700"
-                                    placeholder="Enter last name"
-                                />
-                            </div>
-
-                            {/* Email ID */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email ID</label>
+                            <div className="space-y-2 opacity-50">
+                                <label className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-widest ml-1">EMAIL ID</label>
                                 <input
                                     type="email"
-                                    name="email"
                                     value={formData.email}
                                     disabled
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl transition-all outline-none font-bold text-gray-400 cursor-not-allowed"
+                                    className="w-full px-6 py-4 bg-white/5 border border-white/5 rounded-2xl outline-none font-black text-sm tracking-tight text-[#8E9AAF] cursor-not-allowed"
                                 />
                             </div>
-
-                            {/* Department */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Department</label>
-                                <input
-                                    type="text"
-                                    name="department"
-                                    value={formData.department}
-                                    onChange={handleChange}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl transition-all outline-none font-bold text-gray-700"
-                                    placeholder="e.g. Computer Science"
-                                />
-                            </div>
-
-                            {/* Phone Number */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                                <input
-                                    type="text"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl transition-all outline-none font-bold text-gray-700"
-                                    placeholder="+91 98765 43210"
-                                />
-                            </div>
-
-                            {/* Year of Study */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Year of Study</label>
-                                <input
-                                    type="text"
-                                    name="yearOfStudy"
-                                    value={formData.yearOfStudy}
-                                    onChange={handleChange}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl transition-all outline-none font-bold text-gray-700"
-                                    placeholder="e.g. B.Tech CSE | 2024-2028"
-                                />
-                            </div>
-
-                            {/* Degree */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Degree</label>
-                                <input
-                                    type="text"
-                                    name="degree"
-                                    value={formData.degree}
-                                    onChange={handleChange}
-                                    className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl transition-all outline-none font-bold text-gray-700"
-                                    placeholder="e.g. B.Tech"
-                                />
-                            </div>
-
                         </div>
 
-                        <div className="flex justify-end space-x-4 pt-6 border-t border-gray-50">
+                        <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="px-8 py-3 bg-gray-100 text-gray-600 font-black rounded-xl hover:bg-gray-200 transition-all text-xs uppercase tracking-widest"
+                                className="px-10 py-4 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest border border-white/5"
                             >
-                                Reset
+                                RESET
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-8 py-3 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 text-xs uppercase tracking-widest flex items-center"
+                                className="px-10 py-4 bg-[#0066FF] hover:bg-[#0052cc] text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest shadow-lg shadow-[#0066FF22]"
                             >
                                 {loading ? (
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                                ) : null}
-                                Save Changes
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : 'SAVE CHANGES'}
                             </button>
                         </div>
                     </form>
-                </div>
-
-                {/* Bottom Navigation Tabs */}
-                <div className="grid grid-cols-2 gap-4 mt-8">
-                    <button
-                        onClick={() => navigate('/student/profile')}
-                        className="p-6 bg-indigo-50 rounded-2xl border-2 border-indigo-100 flex flex-col items-center justify-center space-y-2 group"
-                    >
-                        <i className="fas fa-home text-indigo-600 text-xl group-hover:scale-110 transition-transform"></i>
-                        <span className="text-xs font-black text-indigo-900 uppercase tracking-widest">Profile</span>
-                    </button>
-                    <button
-                        onClick={() => navigate('/student/report')}
-                        className="p-6 bg-white rounded-2xl border-2 border-transparent hover:border-gray-100 flex flex-col items-center justify-center space-y-2 group transition-all"
-                    >
-                        <i className="fas fa-file-download text-gray-400 text-xl group-hover:scale-110 transition-transform"></i>
-                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Latest Report</span>
-                    </button>
                 </div>
             </div>
         </StudentLayout>

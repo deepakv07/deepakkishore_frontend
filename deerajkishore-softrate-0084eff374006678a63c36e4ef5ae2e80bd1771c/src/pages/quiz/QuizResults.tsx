@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
-import type { QuizResult } from '../../types';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useAuth } from '../../context/AuthContext';
+import type { QuizResult } from '../../types';
 
 const QuizResults: React.FC = () => {
     const { quizId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<QuizResult | null>(null);
     const [loading, setLoading] = useState(true);
     const [showMore, setShowMore] = useState(false);
 
@@ -25,20 +25,35 @@ const QuizResults: React.FC = () => {
         try {
             const data = await apiService.getQuizResults(id);
 
-            // Add mock data for the dashboard refinement
+            // Integrate actual timing data from backend
+            const timings = data.questionTimings || {};
+            const timePerQuestionArray = data.questions?.map((q: any) => {
+                const questionId = q.id || q._id;
+                // Convert Map or object to plain object if needed
+                const timingValue = timings instanceof Map ? timings.get(questionId) : timings[questionId];
+                return timingValue || 0; // Use 0 if no timing data available
+            }) || [];
+
+            // Calculate total time spent from questionTimings
+            const totalSeconds = Object.values(timings).reduce((sum: number, time: any) => sum + (Number(time) || 0), 0);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const formattedTime = minutes > 0
+                ? `${minutes}m ${seconds}s`
+                : `${seconds}s`;
+
             const enhancedData = {
                 ...data,
                 completedDate: data.submittedAt ? new Date(data.submittedAt).toLocaleDateString('en-GB', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric'
-                }) : '12 Apr 2023',
-                timeSpent: '50m', // Mocked - we can calculate this from total time if needed or BE returns it
-                percentile: 65,   // Mocked
-                attempts: 1,      // Mocked
-                avgTime: '50m',   // Mocked
-                // used existing data.timePerQuestion or fallback to 0s if missing
-                timePerQuestion: data.timePerQuestion || new Array(data.questions?.length || 10).fill(0),
+                }) : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                timeSpent: formattedTime,
+                percentile: data.percentile || 65,
+                attempts: data.attempts || 1,
+                avgTime: data.avgTime || formattedTime,
+                timePerQuestion: timePerQuestionArray,
             };
 
             setResult(enhancedData);
@@ -95,7 +110,7 @@ const QuizResults: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#00E5FF55]"></div>
                 </div>
             </StudentLayout>
         );
@@ -105,30 +120,30 @@ const QuizResults: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-7xl mx-auto py-8 px-4">
-                {/* Dashboard Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div className="max-w-7xl mx-auto py-12 px-4 animate-fade-in">
+                {/* Dashboard Header (Match Image 2) */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
                     <div>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center">
-                            Quiz Reports <span className="text-blue-600 ml-2">Dashboard</span>
+                        <h1 className="text-5xl font-black text-white tracking-tighter">
+                            Quiz Reports <span className="text-[#0066FF]">Dashboard</span>
                         </h1>
-                        <p className="text-gray-500 font-medium mt-1">Track your progress and performance analytics</p>
+                        <p className="text-[#8E9AAF] font-medium mt-2">Track your progress and performance analytics</p>
                     </div>
 
-                    {/* User Summary Card */}
-                    <div className="bg-white rounded-3xl p-4 pr-8 border border-gray-100 shadow-xl shadow-gray-100/50 flex items-center gap-6 min-w-[320px]">
-                        <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl font-black shadow-lg shadow-blue-200">
-                            {user?.name?.split(' ').map(n => n[0]).join('') || 'JS'}
+                    {/* Identity Plate */}
+                    <div className="glass-card p-4 pr-10 border border-white/5 shadow-2xl flex items-center gap-6 min-w-[340px] relative overflow-hidden">
+                        <div className="relative w-16 h-16 bg-[#0066FF] text-white rounded-2xl flex items-center justify-center text-xl font-black shadow-lg">
+                            {user?.name?.split(' ').map(n => n[0]).join('') || 'KM'}
                         </div>
-                        <div className="flex-1">
-                            <h4 className="font-black text-gray-900 leading-tight">{user?.name || 'John Smith'}</h4>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                {user?.department || 'Computer Science'} • {user?.degree || 'SEM 4'}
+                        <div className="relative flex-1">
+                            <h4 className="font-black text-white leading-tight uppercase tracking-tight">{user?.name || 'Recruit'}</h4>
+                            <p className="text-[10px] font-bold text-[#8E9AAF] uppercase tracking-widest mt-1">
+                                {user?.department || 'COMPUTER SCIENCE'} • {user?.degree || 'SEM 4'}
                             </p>
                         </div>
-                        <div className="text-right border-l border-gray-100 pl-6">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Overall</p>
-                            <p className="text-2xl font-black text-blue-600 leading-none">{result.percentage?.toFixed(0)}%</p>
+                        <div className="relative text-right border-l border-white/10 pl-6">
+                            <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-widest mb-1 opacity-50">OVERALL</p>
+                            <p className="text-3xl font-black text-[#0066FF] tracking-tighter tabular-nums">{result.percentage?.toFixed(0)}%</p>
                         </div>
                     </div>
                 </div>
@@ -136,141 +151,140 @@ const QuizResults: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     {/* LEFT COLUMN - Statistics Overview */}
                     <div className="lg:col-span-8 space-y-10">
-                        {/* Main Report Card */}
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50 relative overflow-hidden">
-                            {/* Decorative elements */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-10 -mt-10 opacity-50"></div>
-
+                        {/* Main Performance Card (Match Image 2) */}
+                        <div className="glass-card rounded-[3rem] p-10 border border-white/5 shadow-2xl relative overflow-hidden bg-white/5">
                             <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] bg-blue-50 px-3 py-1.5 rounded-xl">Quiz Report</span>
-                                    <span className="text-gray-300">•</span>
-                                    <span className="text-xs font-bold text-gray-400">Completed: {result.completedDate}</span>
-                                </div>
-
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
-                                    <div>
-                                        <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-6">{result.courseTitle || 'Quiz Result'}</h2>
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-2">
+                                            <span className="px-3 py-1 rounded-full bg-[#0066FF11] border border-[#0066FF33] text-[#0066FF] text-[10px] font-black uppercase tracking-widest">
+                                                QUIZ REPORT
+                                            </span>
+                                            <span className="text-[#8E9AAF] text-xs">•</span>
+                                            <span className="text-[#8E9AAF] text-xs font-bold">Completed: {result.completedDate}</span>
+                                        </div>
+                                        <h2 className="text-5xl font-black text-white tracking-tighter leading-none">Quiz Result</h2>
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-sm border-2 ${result.passed ? 'border-green-100 bg-green-50/50 text-green-600' : 'border-red-100 bg-red-50/50 text-red-600'
+                                            <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] border ${result.passed
+                                                ? 'border-[#00C85333] bg-[#00C8530D] text-[#00C853]'
+                                                : 'border-[#FF3D0033] bg-[#FF3D000D] text-[#FF3D00]'
                                                 }`}>
                                                 <i className={`fas ${result.passed ? 'fa-check' : 'fa-times'}`}></i>
-                                                {result.passed ? 'Passed' : 'Failed'}
+                                                {result.passed ? 'PASSED' : 'FAILED'}
                                             </div>
-                                            <div className="flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-2xl font-black uppercase tracking-widest text-sm border-2 border-blue-100">
+                                            <div className="flex items-center gap-3 px-6 py-3 bg-[#0066FF0D] text-[#0066FF] border border-[#0066FF33] rounded-2xl font-black uppercase tracking-[0.2em] text-[10px]">
                                                 <i className="fas fa-layer-group"></i>
-                                                {result.percentage >= 80 ? 'Advanced Level' : result.percentage >= 60 ? 'Intermediate' : 'Beginner'}
+                                                {result.percentage >= 80 ? 'EXPERT' : result.percentage >= 60 ? 'INTERMEDIATE' : 'BEGINNER'}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="text-center md:text-right">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Total Score</p>
-                                        <p className="text-7xl font-black text-blue-600 leading-none">{result.percentage?.toFixed(0)}<span className="text-3xl">%</span></p>
-                                        {result.percentage >= 90 && (
-                                            <p className="text-emerald-500 font-black text-xs uppercase tracking-widest mt-3 flex items-center justify-center md:justify-end">
-                                                <i className="fas fa-arrow-up mr-2"></i> Top 10%
-                                            </p>
-                                        )}
+                                        <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-[0.3em] mb-3">TOTAL SCORE</p>
+                                        <div className="inline-flex items-baseline gap-2">
+                                            <span className="text-8xl font-black text-[#0066FF] tracking-tighter leading-none">{result.percentage?.toFixed(0)}</span>
+                                            <span className="text-3xl font-black text-[#0066FF]">%</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Stats Grid */}
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-10 border-t border-gray-50">
+                                {/* Quick Stats Grid (Match Image 2) */}
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-10 border-t border-white/5">
                                     {[
-                                        { label: 'Correct', val: result.correctAnswers, color: 'text-blue-600', bg: 'bg-blue-50/50' },
-                                        { label: 'Incorrect', val: result.incorrectAnswers, color: 'text-red-500', bg: 'bg-red-50/50' },
-                                        { label: 'Time Spent', val: result.timeSpent, color: 'text-orange-500', bg: 'bg-orange-50/50' },
-                                        { label: 'Percentile', val: result.percentile, color: 'text-emerald-500', bg: 'bg-emerald-50/50' },
+                                        { label: 'CORRECT', val: result.correctAnswers, color: 'text-[#00C853]', bg: 'bg-[#00C8530D]' },
+                                        { label: 'INCORRECT', val: result.incorrectAnswers, color: 'text-[#FF3D00]', bg: 'bg-[#FF3D000D]' },
+                                        { label: 'TIME SPENT', val: result.timeSpent, color: 'text-[#FF8F00]', bg: 'bg-[#FF8F000D]' },
+                                        { label: 'PERCENTILE', val: result.percentile, color: 'text-[#9D4EDD]', bg: 'bg-[#9D4EDD0D]' },
                                     ].map((stat, i) => (
-                                        <div key={i} className={`${stat.bg} p-6 rounded-3xl border border-transparent hover:border-white hover:shadow-lg transition-all`}>
-                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">{stat.label}</p>
-                                            <p className={`text-3xl font-black ${stat.color}`}>{stat.val}</p>
+                                        <div key={i} className={`${stat.bg} p-6 rounded-3xl border border-white/5 transition-all hover:scale-105`}>
+                                            <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-[0.2em] mb-4">{stat.label}</p>
+                                            <p className={`text-3xl font-black ${stat.color} tracking-tighter`}>{stat.val}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Chart Section */}
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50">
-                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-10">Time Per Question</h3>
+                        {/* Telemetry Stream (Chart) (Match Image 2) */}
+                        <div className="glass-card rounded-[3rem] p-10 border border-white/5 shadow-2xl relative bg-white/5">
+                            <div className="flex items-center justify-between mb-12">
+                                <h3 className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-[0.3em]">TIME PER QUESTION</h3>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse"></div>
+                                    <span className="text-[10px] font-black text-[#00E5FF] uppercase tracking-widest">LIVE ANALYSIS</span>
+                                </div>
+                            </div>
+
                             <div className="relative h-64 flex items-end justify-between px-4">
-                                {/* Grid lines */}
-                                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none border-b border-gray-100">
-                                    {[180, 160, 140, 120, 100, 80, 60, 40, 20, 0].map(val => (
-                                        <div key={val} className="flex items-center gap-4">
-                                            <span className="text-[8px] font-bold text-gray-300 w-6 text-right">{val}</span>
-                                            <div className="flex-1 border-t border-gray-50"></div>
+                                {/* Technical Grid */}
+                                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none mb-4">
+                                    {[180, 120, 60, 0].map(val => (
+                                        <div key={val} className="flex items-center gap-6">
+                                            <span className="text-[8px] font-bold text-[#8E9AAF] w-6 text-right tabular-nums">{val}s</span>
+                                            <div className="flex-1 border-t border-white/5"></div>
                                         </div>
                                     ))}
                                 </div>
 
-                                {/* Bars */}
-                                {result.timePerQuestion.map((time: number, i: number) => (
+                                {/* Neon Bars */}
+                                {result.timePerQuestion?.map((time: number, i: number) => (
                                     <div key={i} className="relative group flex flex-col items-center flex-1">
                                         <div
-                                            className="w-10 bg-blue-400/80 rounded-t-xl group-hover:bg-blue-600 transition-all cursor-pointer relative z-10"
-                                            style={{ height: `${(time / 180) * 100}%`, minHeight: '4px' }}
+                                            className="w-10 bg-white/10 rounded-t-lg group-hover:bg-[#0066FF] transition-all duration-500 relative z-10"
+                                            style={{ height: `${Math.min((time / 180) * 100, 100)}%`, minHeight: '4px' }}
                                         >
-                                            <div className="hidden group-hover:block absolute -top-16 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold px-4 py-2 rounded-xl whitespace-nowrap z-20 shadow-xl">
-                                                <p className="font-black mb-0.5">Q{i + 1}</p>
-                                                <p className="text-gray-400">Time: {time} seconds</p>
-                                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-gray-900"></div>
+                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-16 left-1/2 -translate-x-1/2 glass-card border-white/10 px-4 py-2 rounded-xl whitespace-nowrap z-20 pointer-events-none transition-opacity duration-300">
+                                                <p className="text-[10px] font-black text-white mb-0.5 uppercase tracking-widest">Q{i + 1}</p>
+                                                <p className="text-[10px] font-bold text-[#00E5FF] tabular-nums">{time}s</p>
                                             </div>
                                         </div>
-                                        <span className="text-[9px] font-black text-gray-400 uppercase mt-4">Q{i + 1}</span>
+                                        <span className="text-[9px] font-black text-[#8E9AAF] uppercase mt-4 tracking-tighter">Q{i + 1}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Question Analysis Section */}
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50">
-                            <div className="flex items-center gap-3 mb-10">
-                                <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xs">
+                        {/* Granular Analysis (Match Image 4) */}
+                        <div className="glass-card rounded-[3rem] p-10 border border-white/5 shadow-2xl bg-white/5">
+                            <div className="flex items-center gap-4 mb-12">
+                                <div className="w-10 h-10 bg-[#0066FF11] text-[#0066FF] rounded-2xl flex items-center justify-center text-sm border border-[#0066FF22]">
                                     <i className="fas fa-tasks"></i>
                                 </div>
-                                <h3 className="text-xl font-black text-gray-900 tracking-tight">Question Analysis</h3>
+                                <h3 className="text-xl font-black text-white tracking-tight uppercase tracking-tighter">Question Analysis</h3>
                             </div>
 
-                            <div className="space-y-6">
-                                {(showMore ? result.questions : result.questions.slice(0, 4)).map((q: any, i: number) => (
-                                    <div key={i} className={`p-8 rounded-[2rem] border-2 transition-all ${q.isCorrect ? 'border-green-50 bg-green-50/20' : 'border-red-50 bg-red-50/20'
-                                        }`}>
-                                        <div className="flex items-start gap-4 mb-6">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-1 ${q.isCorrect ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                                                }`}>
+                            <div className="space-y-8">
+                                {(showMore ? result.questions : result.questions?.slice(0, 4))?.map((q: any, i: number) => (
+                                    <div key={i} className="p-10 rounded-[2.5rem] border border-white/5 bg-white/2 hover:bg-white/5 transition-all duration-300">
+                                        <div className="flex items-center gap-4 mb-8">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm border ${q.isCorrect ? 'bg-[#00C85311] text-[#00C853] border-[#00C85322]' : 'bg-[#FF3D0011] text-[#FF3D00] border-[#FF3D0022]'}`}>
                                                 <i className={`fas ${q.isCorrect ? 'fa-check' : 'fa-times'}`}></i>
                                             </div>
-                                            <h4 className="text-lg font-bold text-gray-800 leading-relaxed">
-                                                Q{i + 1}: {q.text}
-                                            </h4>
+                                            <h4 className="text-xl font-bold text-white tracking-tight">Q{i + 1}: {q.text}</h4>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                                <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-3">Your Answer</p>
-                                                <p className={`font-bold ${q.isCorrect ? 'text-gray-800' : 'text-gray-900 underline decoration-red-200'}`}>
-                                                    {q.userAnswer}
-                                                </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-3">
+                                                <p className="text-[10px] font-black text-[#FF3D00] uppercase tracking-widest">YOUR ANSWER</p>
+                                                <p className="font-bold text-lg text-white">{q.userAnswer || 'Not Answered'}</p>
                                             </div>
-                                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                                <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-3">Correct Answer</p>
-                                                <p className="font-bold text-gray-800">
-                                                    {q.correctAnswer}
-                                                </p>
+                                            <div className="space-y-3">
+                                                <p className="text-[10px] font-black text-[#00C853] uppercase tracking-widest">CORRECT ANSWER</p>
+                                                <p className="font-bold text-lg text-white">{q.correctAnswer}</p>
                                             </div>
                                         </div>
 
-                                        {!q.isCorrect && (
-                                            <div className="mt-6 p-6 bg-blue-50/50 rounded-2xl border border-blue-100">
-                                                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3 flex items-center">
-                                                    <i className="fas fa-lightbulb mr-2"></i> Explanation
-                                                </p>
-                                                <p className="text-sm text-blue-700 font-medium leading-relaxed">
-                                                    {q.explanation || 'Review the core concepts related to this topic to understand why the correct answer is ' + q.correctAnswer + '.'}
-                                                </p>
+                                        {!q.isCorrect && q.explanation && (
+                                            <div className="mt-8 pt-8 border-t border-white/5">
+                                                <div className="flex gap-4 items-start">
+                                                    <div className="text-[#0066FF] mt-1">
+                                                        <i className="fas fa-lightbulb"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-black text-[#0066FF] uppercase tracking-widest mb-2">EXPLANATION</p>
+                                                        <p className="text-sm text-[#8E9AAF] font-medium leading-relaxed">{q.explanation}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -279,95 +293,90 @@ const QuizResults: React.FC = () => {
 
                             <button
                                 onClick={() => setShowMore(!showMore)}
-                                className="w-full mt-10 py-5 text-sm font-black text-blue-600 hover:text-blue-700 uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all"
+                                className="w-full mt-10 py-6 border border-white/5 rounded-3xl text-[10px] font-black text-[#0066FF] hover:bg-[#0066FF11] hover:border-[#0066FF33] uppercase tracking-[0.4em] flex items-center justify-center gap-4 transition-all duration-500"
                             >
-                                {showMore ? 'Show Less' : 'Show All Questions'}
-                                <i className={`fas fa-chevron-${showMore ? 'up' : 'down'} text-xs`}></i>
+                                {showMore ? 'SHOW LESS' : 'VIEW ALL QUESTIONS'}
+                                <i className={`fas fa-chevron-${showMore ? 'up' : 'down'} text-[10px]`}></i>
                             </button>
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN - SIDEBAR */}
+                    {/* RIGHT COLUMN - COMMAND CONTROLS */}
                     <div className="lg:col-span-4 space-y-10">
-                        {/* Engagement Rate Card */}
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50 relative overflow-hidden">
-                            <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xs">
+                        {/* Engagement Hub (Match Image 2) */}
+                        <div className="glass-card rounded-[3rem] p-10 border border-white/5 shadow-2xl relative overflow-hidden bg-white/5">
+                            <h3 className="text-xl font-black text-white mb-10 flex items-center gap-4 uppercase tracking-tighter">
+                                <div className="w-10 h-10 bg-[#0066FF11] text-[#0066FF] rounded-2xl flex items-center justify-center text-sm border border-[#0066FF22]">
                                     <i className="fas fa-chart-pie"></i>
                                 </div>
                                 Engagement Rate
                             </h3>
 
-                            <div className="space-y-10">
+                            <div className="space-y-12">
                                 <div>
                                     <div className="flex justify-between items-end mb-4">
-                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Quiz Engagement</p>
-                                        <p className="text-xl font-black text-indigo-600">65%</p>
+                                        <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-widest">QUIZ ENGAGEMENT</p>
+                                        <p className="text-2xl font-black text-[#0066FF] tabular-nums">65%</p>
                                     </div>
-                                    <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
-                                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-[65%] rounded-full shadow-lg shadow-blue-100"></div>
+                                    <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                        <div
+                                            className="bg-[#0066FF] h-full rounded-full transition-all duration-1000"
+                                            style={{ width: '65%' }}
+                                        ></div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-8">
-                                    {[
-                                        { label: 'Completion', val: '98%', icon: 'fa-check-circle', color: 'text-blue-600' },
-                                        { label: 'Avg. Score', val: `${result.correctAnswers}/${result.totalPoints / 10}`, icon: 'fa-star', color: 'text-emerald-500' },
-                                        { label: 'Attempts', val: result.attempts, icon: 'fa-history', color: 'text-orange-500' },
-                                        { label: 'Avg. Time', val: result.avgTime, icon: 'fa-clock', color: 'text-red-400' },
-                                    ].map((item, i) => (
-                                        <div key={i} className="space-y-4">
-                                            <div className="w-10 h-10 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center text-sm">
-                                                <i className={`fas ${item.icon} ${item.color}`}></i>
-                                            </div>
-                                            <div>
-                                                <p className="text-3xl font-black text-gray-900">{item.val}</p>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{item.label}</p>
-                                            </div>
+                                <div className="grid grid-cols-2 gap-10">
+                                    <div className="space-y-4">
+                                        <div className="w-10 h-10 bg-[#0066FF11] text-[#0066FF] rounded-full flex items-center justify-center">
+                                            <i className="fas fa-check-circle"></i>
                                         </div>
-                                    ))}
+                                        <div>
+                                            <p className="text-2xl font-black text-white tracking-tighter">98%</p>
+                                            <p className="text-[10px] font-bold text-[#8E9AAF] uppercase tracking-widest mt-1">COMPLETION</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="w-10 h-10 bg-[#00C85311] text-[#00C853] rounded-full flex items-center justify-center">
+                                            <i className="fas fa-star"></i>
+                                        </div>
+                                        <div>
+                                            <p className="text-2xl font-black text-white tracking-tighter">1/2</p>
+                                            <p className="text-[10px] font-bold text-[#8E9AAF] uppercase tracking-widest mt-1">AVG. SCORE</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleDownloadPDF}
-                                className="w-full mt-10 py-5 bg-gray-900 text-white font-black rounded-[1.5rem] hover:bg-gray-800 transition-all flex items-center justify-center gap-4 shadow-xl shadow-gray-200 uppercase tracking-widest text-xs"
+                                className="w-full mt-12 py-5 bg-[#030508] text-white border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-4 uppercase tracking-[0.2em] text-xs font-black"
                             >
                                 <i className="fas fa-download"></i>
-                                Download Report
+                                DOWNLOAD REPORT
                             </button>
                         </div>
 
-                        {/* Additional Info / CTA */}
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                                <i className="fas fa-rocket text-9xl"></i>
+                        {/* Next Challenge (Match Image 3) */}
+                        <div className="bg-gradient-to-br from-[#0066FF] to-[#004dc2] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12">
+                                <i className="fas fa-rocket text-8xl"></i>
                             </div>
 
                             <div className="relative z-10">
-                                <h3 className="text-2xl font-black mb-4">Ready for the next challenge?</h3>
-                                <p className="text-blue-100 text-sm font-medium mb-10 leading-relaxed opacity-80">
+                                <h3 className="text-3xl font-black mb-6 tracking-tighter">Ready for the next challenge?</h3>
+                                <p className="text-white/80 text-sm font-medium mb-12 leading-relaxed">
                                     Continue your learning journey by taking another quiz or exploring new courses.
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/dashboard')}
-                                    className="w-full py-5 bg-white text-blue-600 font-black rounded-2xl hover:bg-blue-50 transition-all shadow-xl shadow-blue-900/20 uppercase tracking-widest text-xs"
+                                    className="w-full py-6 bg-white text-[#0066FF] font-black rounded-3xl hover:scale-105 transition-all duration-300 shadow-xl uppercase tracking-[0.2em] text-xs"
                                 >
-                                    Back to Dashboard
+                                    BACK TO DASHBOARD
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Dashboard Footer */}
-                <div className="mt-20 pt-10 border-t border-gray-100 text-center">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">
-                        Quiz Report Dashboard • Student ID: {user?.id?.substring(0, 10).toUpperCase() || 'STU12345'} • Last updated: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                    </p>
-                    <p className="text-[10px] font-medium text-gray-300">
-                        All reports are generated automatically and can be downloaded for future reference.
-                    </p>
                 </div>
             </div>
         </StudentLayout>

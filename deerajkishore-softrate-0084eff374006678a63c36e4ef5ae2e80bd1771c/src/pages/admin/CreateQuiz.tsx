@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
-import ValidationModal from '../../components/common/ValidationModal';
 
 interface QuestionDraft {
     id: number;
@@ -15,10 +14,6 @@ interface QuestionDraft {
 
 const CreateQuiz: React.FC = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const editQuizId = searchParams.get('edit');
-    const isEditMode = !!editQuizId;
-
     const [loading, setLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -26,122 +21,39 @@ const CreateQuiz: React.FC = () => {
     const [quizTitle, setQuizTitle] = useState('');
     const [courseDescription, setCourseDescription] = useState('');
     const [courseTitle, setCourseTitle] = useState('');
+    // Removed selectedCourseId and availableCourses as we now allow free text entry
     const [numberOfQuestions, setNumberOfQuestions] = useState<number>(10);
     const [questions, setQuestions] = useState<QuestionDraft[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [durationMinutes, setDurationMinutes] = useState<number>(30);
-    const [scheduledDate, setScheduledDate] = useState('');
-    const [scheduledTime, setScheduledTime] = useState('');
-    const [expiryDate, setExpiryDate] = useState('');
-    const [expiryTime, setExpiryTime] = useState('');
-    const [originalCourseId, setOriginalCourseId] = useState<string>(''); // specific for updates
-
-    // Modal State
-    const [modalConfig, setModalConfig] = useState<{
-        isOpen: boolean;
-        title: string;
-        message: string;
-        type: 'error' | 'warning' | 'success';
-    }>({
-        isOpen: false,
-        title: '',
-        message: '',
-        type: 'error'
-    });
-
-    const showModal = (message: string, type: 'error' | 'warning' | 'success' = 'error', title?: string) => {
-        setModalConfig({
-            isOpen: true,
-            message,
-            type,
-            title: title || (type === 'error' ? 'Validation Error' : type === 'success' ? 'Success' : 'Warning')
-        });
-    };
-
-    const closeModal = () => {
-        setModalConfig(prev => ({ ...prev, isOpen: false }));
-    };
 
     useEffect(() => {
-        if (isEditMode && editQuizId) {
-            loadQuizData(editQuizId);
-        } else {
-            initializeQuestions();
-        }
-    }, [editQuizId]);
+        // loadCourses(); // No longer needed to fetch specific list for dropdown
+    }, []);
 
-    const loadQuizData = async (id: string) => {
-        setLoading(true);
-        try {
-            const quiz = await apiService.getAdminQuiz(id);
-            setQuizTitle(quiz.title);
-            setCourseTitle(quiz.courseTitle || '');
-            setCourseDescription(quiz.description || '');
-            setOriginalCourseId(quiz.courseId);
-            setDurationMinutes(quiz.durationMinutes);
-            setNumberOfQuestions(quiz.questions.length);
+    useEffect(() => {
+        // Initialize questions when numberOfQuestions changes
+        initializeQuestions();
+    }, [numberOfQuestions]);
 
-            // Map questions
-            const mappedQuestions: QuestionDraft[] = quiz.questions.map((q: any, index: number) => ({
-                id: index + 1,
-                text: q.text,
-                type: q.type === 'mcq' ? 'MCQ' : 'Aptitude', // Normalize casing if needed
-                options: q.options || (q.type === 'mcq' ? ['', '', '', ''] : undefined),
-                correctAnswer: q.correctAnswer,
-                points: q.points
-            }));
-            setQuestions(mappedQuestions);
 
-            if (quiz.scheduledAt) {
-                const date = new Date(quiz.scheduledAt);
-                setScheduledDate(date.toISOString().split('T')[0]);
-                setScheduledTime(date.toTimeString().slice(0, 5));
-            }
-            if (quiz.expiresAt) {
-                const date = new Date(quiz.expiresAt);
-                setExpiryDate(date.toISOString().split('T')[0]);
-                setExpiryTime(date.toTimeString().slice(0, 5));
-            }
 
-        } catch (err) {
-            console.error('Error loading quiz:', err);
-            showModal('Failed to load quiz details', 'error');
-            navigate('/admin/dashboard');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // removed useEffect for numberOfQuestions to prevent wiping data in edit mode
-    // We handle user manually changing number separately if needed, preventing auto-reset
-
-    // Keeping initializeQuestions for "Create New" flow or manual reset
     const initializeQuestions = () => {
-        // Only run if empty (initial load) or manual reset requested
-        // Implementation note: changing numberOfQuestions input will trigger logic below
-    };
+        const newQuestions: QuestionDraft[] = Array.from({ length: numberOfQuestions }, (_, i) => {
+            const id = i + 1;
+            // All questions default to MCQ
+            const type: 'MCQ' | 'Aptitude' = 'MCQ';
 
-    // Handler for number of questions change
-    const handleQuestionCountChange = (newCount: number) => {
-        setNumberOfQuestions(newCount);
-        if (newCount > questions.length) {
-            // Add more empty questions
-            const addedCount = newCount - questions.length;
-            const newQuestions: QuestionDraft[] = Array.from({ length: addedCount }, (_, i) => ({
-                id: questions.length + i + 1,
+            return {
+                id,
                 text: '',
-                type: 'MCQ',
-                options: ['', '', '', ''],
+                type,
+                options: type === 'MCQ' ? ['', '', '', ''] : undefined,
                 correctAnswer: '',
-                points: 10
-            }));
-            setQuestions([...questions, ...newQuestions]);
-        } else if (newCount < questions.length) {
-            // Trim questions? asking user confirmation would be better but simple logic for now
-            // Just warn or slice? Let's just update prompt to fill 10 but data has 12?
-            // Actually, best to just slice if user explicitly reduces it.
-            setQuestions(questions.slice(0, newCount));
-        }
+                points: 10,
+            };
+        });
+        setQuestions(newQuestions);
+        setCurrentQuestionIndex(0);
     };
 
     const updateQuestion = (index: number, updates: Partial<QuestionDraft>) => {
@@ -153,29 +65,32 @@ const CreateQuiz: React.FC = () => {
     const handleSubmit = async () => {
         // Validation
         if (!quizTitle || quizTitle.trim() === '') {
-            showModal('Please enter a quiz title');
+            alert('Please enter a quiz title');
             return;
         }
 
         if (!courseTitle || courseTitle.trim() === '') {
-            showModal('Please enter a course name');
+            alert('Please enter a course name');
             return;
         }
 
-        // Validate count
-        const currentCount = questions.length;
-        if (currentCount < 1) {
-            showModal('Quiz must have at least one question');
+        if (numberOfQuestions < 1) {
+            // We allow > 50 if they really want, or keep it per server rules. 
+            // Server might handle it, but basic check is good.
+            // User just said "input text box", removing strict max limit check if implied.
+            alert('Please enter a valid number of questions (at least 1)');
             return;
         }
 
-        // Use current questions length as truth
-        setNumberOfQuestions(currentCount);
+        if (questions.length === 0) {
+            alert('Please set the number of questions first');
+            return;
+        }
 
         // Validate all questions are filled
         const emptyQuestions = questions.filter(q => !q.text || q.text.trim() === '');
         if (emptyQuestions.length > 0) {
-            showModal(`Please fill all questions. ${emptyQuestions.length} question(s) are still empty.`);
+            alert(`Please fill all ${numberOfQuestions} questions. ${emptyQuestions.length} question(s) are still empty.`);
             return;
         }
 
@@ -183,30 +98,17 @@ const CreateQuiz: React.FC = () => {
         for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
             if (q.type === 'MCQ') {
-                const filledOptions = q.options?.filter(opt => opt && opt.trim() !== '') || [];
-
-                if (filledOptions.length < 2) {
-                    showModal(`Question ${i + 1} (MCQ) must have at least 2 options filled along with correct answer`);
+                if (!q.options || q.options.some(opt => !opt || opt.trim() === '')) {
+                    alert(`Question ${i + 1} (MCQ) must have all 4 options filled`);
                     return;
                 }
-
                 if (!q.correctAnswer || q.correctAnswer.trim() === '') {
-                    showModal(`Question ${i + 1} (MCQ) must have a correct answer selected`);
+                    alert(`Question ${i + 1} (MCQ) must have a correct answer selected`);
                     return;
                 }
-
-                // Ensure the correct answer corresponds to a filled option
-                if (['A', 'B', 'C', 'D'].includes(q.correctAnswer)) {
-                    const idx = ['A', 'B', 'C', 'D'].indexOf(q.correctAnswer);
-                    if (!q.options || !q.options[idx] || q.options[idx].trim() === '') {
-                        showModal(`For Question ${i + 1}, you selected Option ${q.correctAnswer} as correct, but that option is empty.`);
-                        return;
-                    }
-                }
-
             } else if (q.type === 'Aptitude') {
                 if (!q.correctAnswer || q.correctAnswer.trim() === '') {
-                    showModal(`Question ${i + 1} (Aptitude) must have a correct answer`);
+                    alert(`Question ${i + 1} (Aptitude) must have a correct answer`);
                     return;
                 }
             }
@@ -227,31 +129,39 @@ const CreateQuiz: React.FC = () => {
             return {
                 text: q.text.trim(),
                 type: q.type === 'MCQ' ? 'mcq' : 'aptitude',
-                options: q.type === 'MCQ' ? q.options?.filter(opt => opt && opt.trim() !== '') : undefined,
+                options: q.type === 'MCQ' ? q.options?.map(opt => opt.trim()) : undefined,
                 correctAnswer: correctAnswer.trim(),
                 points: q.points || 10,
             };
         });
 
+        // Warn if count mismatches but proceed if user edited questions manually? 
+        // Logic relies on 'questions' array length. numberOfQuestions input might be changed without re-init.
+        // We should explicitly use questions.length as the truth.
+        // But let's check basic consistency.
+        if (validQuestions.length !== questions.length) {
+            // This case is rare unless bug.
+            alert('Error processing questions. Please try again.');
+            return;
+        }
+
+
         setLoading(true);
         try {
-            let courseId = originalCourseId;
+            let courseId = '';
 
-            // Handle course resolution
-            // If editing and title changed, or creating...
-            // If we are editing, we might keep the same course ID unless user wants to move it?
-            // Actually, user enters text. We check if text matches existing course.
-
+            // Try to find existing course by title or create it
             try {
                 const existingCourses = await apiService.getCourses();
                 const cleanTitle = courseTitle.trim();
+                // Case insensitive match
                 const existingCourse = existingCourses.find((c: any) => c.title.toLowerCase() === cleanTitle.toLowerCase());
 
                 if (existingCourse) {
                     courseId = existingCourse.id;
                 } else {
-                    // Create the course if it doesn't exist (works for both edit and create)
-                    console.log(`Creating/Resolving course: ${cleanTitle}`);
+                    // Create the course if it doesn't exist
+                    console.log(`Creating new course: ${cleanTitle}`);
                     const newCourse = await apiService.createCourse({
                         title: cleanTitle,
                         instructor: 'Admin',
@@ -261,52 +171,63 @@ const CreateQuiz: React.FC = () => {
                 }
             } catch (err: any) {
                 console.error('Error handling course:', err);
-                alert('Course Error: Failed to resolve course.');
+                const errorMsg = err?.response?.data?.message || err?.message || 'Failed to create or find course';
+                alert(`Course Error: ${errorMsg}. Please try again.`);
                 setLoading(false);
                 return;
             }
 
-            let scheduledAt: string | undefined = undefined;
-            if (scheduledDate && scheduledTime) {
-                scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+            // Validate courseId is present
+            if (!courseId) {
+                alert('Failed to obtain a valid Course ID. Please try again.');
+                setLoading(false);
+                return;
             }
 
-            let expiresAt: string | undefined = undefined;
-            if (expiryDate && expiryTime) {
-                expiresAt = new Date(`${expiryDate}T${expiryTime}`).toISOString();
-
-                if (scheduledAt && new Date(expiresAt) <= new Date(scheduledAt)) {
-                    showModal('End time must be after start time');
-                    setLoading(false);
-                    return;
-                }
+            // Validate courseId format (should be MongoDB ObjectId format - 24 hex characters)
+            const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+            if (!objectIdRegex.test(courseId)) {
+                alert('Invalid course ID format. Please select a valid course.');
+                setLoading(false);
+                return;
             }
 
-            const payload = {
+            console.log('Creating quiz with data:', {
+                title: quizTitle,
+                courseId,
+                description: courseDescription,
+                questionsCount: validQuestions.length,
+                durationMinutes: 30
+            });
+
+            const result = await apiService.createQuiz({
                 title: quizTitle,
                 courseId,
                 description: courseDescription,
                 questions: validQuestions,
-                durationMinutes,
-                scheduledAt,
-                expiresAt
-            };
+                durationMinutes: 30
+            });
 
-            if (isEditMode && editQuizId) {
-                await apiService.updateQuiz(editQuizId, payload);
-                console.log('Quiz updated successfully');
-            } else {
-                await apiService.createQuiz(payload);
-                console.log('Quiz created successfully');
-            }
-
+            console.log('Quiz created successfully:', result);
             setShowSuccess(true);
         } catch (err: any) {
-            console.error('Error saving quiz:', err);
-            const errorMessage = err?.response?.data?.message || err?.message || 'Failed to save quiz.';
-            showModal(`Quiz Save Failed: ${errorMessage}`);
+            console.error('Error creating quiz:', err);
+            const errorMessage = err?.response?.data?.message ||
+                err?.message ||
+                'Failed to create quiz. Please check the console for details.';
+            alert(`Quiz Creation Failed: ${errorMessage}`);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleReset = () => {
+        if (window.confirm('Are you sure you want to reset the form? All progress will be lost.')) {
+            setQuizTitle('');
+            setCourseTitle('');
+            setCourseDescription('');
+            setNumberOfQuestions(10);
+            initializeQuestions();
         }
     };
 
@@ -321,13 +242,9 @@ const CreateQuiz: React.FC = () => {
                             <i className="fas fa-check"></i>
                         </div>
                         <div className="space-y-3">
-                            <h2 className="text-4xl font-black text-gray-900 tracking-tight">
-                                {isEditMode ? 'Quiz Updated Successfully!' : 'Quiz Created Successfully!'}
-                            </h2>
+                            <h2 className="text-4xl font-black text-gray-900 tracking-tight">Quiz Created Successfully!</h2>
                             <p className="text-gray-500 font-medium px-4 leading-relaxed">
-                                {isEditMode
-                                    ? 'Your changes have been saved.'
-                                    : 'Your quiz has been created and saved. Students can now access this quiz from the course dashboard.'}
+                                Your quiz has been created and saved. Students can now access this quiz from the course dashboard.
                             </p>
                         </div>
 
@@ -357,11 +274,6 @@ const CreateQuiz: React.FC = () => {
                                     setQuizTitle('');
                                     setCourseDescription('');
                                     setNumberOfQuestions(10);
-                                    setDurationMinutes(30);
-                                    setScheduledDate('');
-                                    setScheduledTime('');
-                                    setExpiryDate('');
-                                    setExpiryTime('');
                                     initializeQuestions();
                                 }}
                                 className="w-full bg-white text-gray-500 font-black py-5 rounded-2xl border-2 border-gray-100 hover:bg-gray-50 transition-all hover:border-gray-200"
@@ -377,336 +289,293 @@ const CreateQuiz: React.FC = () => {
 
     return (
         <AdminLayout>
-            <ValidationModal
-                isOpen={modalConfig.isOpen}
-                onClose={closeModal}
-                title={modalConfig.title}
-                message={modalConfig.message}
-                type={modalConfig.type}
-            />
-            <div className="max-w-5xl mx-auto pb-20">
-                {/* Header (matching image 0) */}
-                <div className="flex items-center justify-between mb-12 py-4">
+            <div className="max-w-6xl mx-auto pb-24 animate-fade-in">
+                {/* Tactical Header */}
+                <div className="flex items-center justify-between mb-12 py-6 border-b border-white/5">
                     <button
                         onClick={() => navigate(-1)}
-                        className="w-12 h-12 flex items-center justify-center bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition"
+                        className="w-14 h-14 flex items-center justify-center bg-white/2 rounded-2xl border border-white/10 text-gray-400 hover:text-white hover:border-[#FFD70044] hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] transition-all duration-300 group"
                     >
-                        <i className="fas fa-chevron-left text-gray-600"></i>
+                        <i className="fas fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
                     </button>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                        {isEditMode ? 'Edit Course Quiz' : 'Create Course Quiz'}
-                    </h1>
-                    <div className="w-12"></div> {/* Spacer for symmetry */}
+                    <div className="text-center">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                            <span className="w-2 h-2 rounded-full bg-[#FFD700] animate-pulse"></span>
+                            <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.4em]">Quiz Management</span>
+                        </div>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Create <span className="text-[#FFD700]">Course Quiz</span></h1>
+                    </div>
+                    <div className="w-14"></div>
                 </div>
 
-                <div className="space-y-10">
-                    {/* Course Details Section (matching image 0) */}
-                    <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50 space-y-8">
-                        <div>
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Course/Subject *</label>
-                            <input
-                                type="text"
-                                placeholder="Enter course name (e.g., JavaScript Fundamentals)"
-                                value={courseTitle}
-                                onChange={(e) => setCourseTitle(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"
-                            />
-                            <p className="text-xs text-gray-400 mb-4 mt-2">Enter the name of the course for this quiz</p>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Left Column: Mission Parameters */}
+                    <div className="lg:col-span-4 space-y-8">
+                        <div className="glass-card p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFD70005] rounded-bl-full -mr-16 -mt-16"></div>
+                            <h3 className="text-xs font-black text-[#FFD700] uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                                <i className="fas fa-sliders-h"></i> Quiz Details
+                            </h3>
 
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Number of Questions *</label>
-                            <input
-                                type="number"
-                                placeholder="Enter number of questions"
-                                value={numberOfQuestions}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    const count = parseInt(value);
-                                    if (value === '') {
-                                        setNumberOfQuestions(0);
-                                    } else if (!isNaN(count)) {
-                                        handleQuestionCountChange(count);
-                                    }
-                                }}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"
-                            />
-                            <p className="text-xs text-gray-400 mt-2">This quiz will have {numberOfQuestions || 0} question{(numberOfQuestions || 0) !== 1 ? 's' : ''}</p>
-
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight mt-6">Quiz Title *</label>
-                            <input
-                                type="text"
-                                placeholder="Enter quiz title (e.g., JavaScript Basics Quiz)"
-                                value={quizTitle}
-                                onChange={(e) => setQuizTitle(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Course Description</label>
-                            <textarea
-                                rows={4}
-                                placeholder="Enter course description"
-                                value={courseDescription}
-                                onChange={(e) => setCourseDescription(e.target.value)}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none mb-6"
-                            />
-
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Quiz Duration (Minutes)</label>
-                            <input
-                                type="number"
-                                placeholder="Enter duration in minutes"
-                                value={durationMinutes}
-                                onChange={(e) => {
-                                    const val = parseInt(e.target.value);
-                                    if (!isNaN(val) && val > 0) setDurationMinutes(val);
-                                    else if (e.target.value === '') setDurationMinutes(0);
-                                }}
-                                className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium mb-6"
-                            />
-
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Schedule Quiz (Optional)</label>
-                            <div className="flex gap-4">
-                                <input
-                                    type="date"
-                                    value={scheduledDate}
-                                    min={new Date().toISOString().split('T')[0]}
-                                    onChange={(e) => setScheduledDate(e.target.value)}
-                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
-                                />
-                                <input
-                                    type="time"
-                                    value={scheduledTime}
-                                    onChange={(e) => setScheduledTime(e.target.value)}
-                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
-                                />
-                            </div>
-                            <p className="text-xs text-gray-400 mt-2 mb-6">Leave blank to make quiz available immediately</p>
-
-                            <label className="block text-sm font-black text-gray-800 mb-3 ml-1 tracking-tight">Quiz Ends At (Optional)</label>
-                            <div className="flex gap-4">
-                                <input
-                                    type="date"
-                                    value={expiryDate}
-                                    min={scheduledDate || new Date().toISOString().split('T')[0]}
-                                    onChange={(e) => setExpiryDate(e.target.value)}
-                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
-                                />
-                                <input
-                                    type="time"
-                                    value={expiryTime}
-                                    onChange={(e) => setExpiryTime(e.target.value)}
-                                    className="flex-1 px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-medium text-gray-600"
-                                />
-                            </div>
-                            <p className="text-xs text-gray-400 mt-2">Leave blank for no expiration</p>
-
-                        </div>
-                    </div>
-
-                    {/* Progress Info (matching image 1) */}
-                    {questions.length > 0 && currentQuestion && (
-                        <div className="space-y-4 px-2">
-                            <div className="flex justify-between items-end">
-                                <span className="text-sm font-black text-gray-400 tracking-tight uppercase">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                                <span className={`text-xs px-4 py-1.5 rounded-xl font-black uppercase tracking-widest ${currentQuestion.type === 'MCQ' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                                    }`}>
-                                    {currentQuestion.type === 'MCQ' ? 'MCQ' : 'APTITUDE'}
-                                </span>
-                            </div>
-                            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                <div
-                                    className="bg-blue-600 h-full transition-all duration-700 ease-out"
-                                    style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-                                ></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Question Editor Card (matching image 1 & 2) */}
-                    {questions.length > 0 && currentQuestion && (
-                        <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-100/50">
-                            <div className="flex justify-between items-center mb-10">
-                                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Question {currentQuestion.id}</h3>
-                                <span className={`text-[10px] px-3 py-1 rounded-lg font-black uppercase tracking-widest ${currentQuestion.type === 'MCQ' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                                    }`}>
-                                    {currentQuestion.type === 'MCQ' ? 'MCQ' : 'APTITUDE'}
-                                </span>
-                            </div>
-
-                            <div className="space-y-8">
-                                {/* Question Type Selector (Available for ALL questions) */}
+                            <div className="space-y-6">
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 mb-4 uppercase tracking-widest">Question Type *</label>
-                                    <div className="flex space-x-10">
-                                        <label className="flex items-center cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                className="hidden"
-                                                checked={currentQuestion.type === 'MCQ'}
-                                                onChange={() => {
-                                                    updateQuestion(currentQuestionIndex, {
-                                                        type: 'MCQ',
-                                                        options: ['', '', '', ''],
-                                                        correctAnswer: ''
-                                                    });
-                                                }}
-                                            />
-                                            <div className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center transition-all ${currentQuestion.type === 'MCQ' ? 'border-blue-600 bg-blue-600' : 'border-gray-200 group-hover:border-gray-300'}`}>
-                                                {currentQuestion.type === 'MCQ' && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                                            </div>
-                                            <span className={`text-sm font-bold ${currentQuestion.type === 'MCQ' ? 'text-gray-900' : 'text-gray-500'}`}>MCQ Type</span>
-                                        </label>
-                                        <label className="flex items-center cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                className="hidden"
-                                                checked={currentQuestion.type === 'Aptitude'}
-                                                onChange={() => {
-                                                    updateQuestion(currentQuestionIndex, {
-                                                        type: 'Aptitude',
-                                                        options: undefined,
-                                                        correctAnswer: ''
-                                                    });
-                                                }}
-                                            />
-                                            <div className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center transition-all ${currentQuestion.type === 'Aptitude' ? 'border-blue-600 bg-blue-600' : 'border-gray-200 group-hover:border-gray-300'}`}>
-                                                {currentQuestion.type === 'Aptitude' && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                                            </div>
-                                            <span className={`text-sm font-bold ${currentQuestion.type === 'Aptitude' ? 'text-gray-900' : 'text-gray-500'}`}>Aptitude Type</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-black text-gray-800 mb-3 tracking-tight">Question *</label>
-                                    <textarea
-                                        rows={4}
-                                        placeholder="Enter your question here..."
-                                        value={currentQuestion.text}
-                                        onChange={(e) => updateQuestion(currentQuestionIndex, { text: e.target.value })}
-                                        className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none shadow-sm"
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Course / Subject</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter course name (e.g., JavaScript Fundamentals)"
+                                        value={courseTitle}
+                                        onChange={(e) => setCourseTitle(e.target.value)}
+                                        className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white placeholder:text-gray-700 font-bold transition-all"
                                     />
                                 </div>
 
-                                {/* Conditional Rendering based on Type */}
-                                {currentQuestion.type === 'MCQ' && (
-                                    <>
-                                        <div className="space-y-4">
-                                            <label className="block text-sm font-black text-gray-800 mb-4 tracking-tight">Options *</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                {['A', 'B', 'C', 'D'].map((letter, idx) => (
-                                                    <div key={letter} className="relative group">
-                                                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-gray-400 font-black text-sm">{letter}.</span>
-                                                        <input
-                                                            type="text"
-                                                            placeholder={`Option ${letter}`}
-                                                            value={currentQuestion.options?.[idx] || ''}
-                                                            onChange={(e) => {
-                                                                const newOptions = [...(currentQuestion.options || [])];
-                                                                newOptions[idx] = e.target.value;
-                                                                updateQuestion(currentQuestionIndex, { options: newOptions });
-                                                            }}
-                                                            className="w-full pl-14 pr-8 py-5 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300"
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Quiz Title</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter quiz title (e.g., JavaScript Basics Quiz)"
+                                        value={quizTitle}
+                                        onChange={(e) => setQuizTitle(e.target.value)}
+                                        className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white placeholder:text-gray-700 font-bold transition-all"
+                                    />
+                                </div>
 
-                                        <div>
-                                            <label className="block text-sm font-black text-gray-800 mb-3 tracking-tight">Correct Answer *</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={currentQuestion.correctAnswer}
-                                                    onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
-                                                    className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none cursor-pointer appearance-none font-bold text-gray-700"
-                                                >
-                                                    <option value="">Select correct answer</option>
-                                                    <option value="A">Option A</option>
-                                                    <option value="B">Option B</option>
-                                                    <option value="C">Option C</option>
-                                                    <option value="D">Option D</option>
-                                                </select>
-                                                <i className="fas fa-chevron-down absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                {currentQuestion.type === 'Aptitude' && (
-                                    <div>
-                                        <label className="block text-sm font-black text-gray-800 mb-3 tracking-tight">Approximate Correct Answer *</label>
-                                        <textarea
-                                            rows={4}
-                                            placeholder="Enter the approximate correct answer or key points..."
-                                            value={currentQuestion.correctAnswer}
-                                            onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
-                                            className="w-full px-8 py-5 bg-white border-2 border-gray-100 rounded-[1.25rem] focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300 font-medium resize-none shadow-sm"
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Total Questions</label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            value={numberOfQuestions}
+                                            onChange={(e) => setNumberOfQuestions(parseInt(e.target.value) || 0)}
+                                            className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white font-black tabular-nums transition-all"
                                         />
-                                        <p className="text-xs text-gray-400 mt-4 italic font-medium">Provide key points or the approximate answer for evaluation</p>
+                                        <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-600 uppercase tracking-widest">Questions</span>
                                     </div>
-                                )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Quiz Description</label>
+                                    <textarea
+                                        rows={3}
+                                        placeholder="Enter quiz description"
+                                        value={courseDescription}
+                                        onChange={(e) => setCourseDescription(e.target.value)}
+                                        className="w-full px-6 py-4 bg-white/2 border border-white/10 rounded-xl focus:border-[#FFD70044] focus:ring-1 focus:ring-[#FFD70022] outline-none text-white placeholder:text-gray-700 font-medium transition-all resize-none"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    )}
 
-                    {/* Navigation Buttons (matching image 1 & 2) */}
-                    {questions.length > 0 && (
-                        <div className="grid grid-cols-2 gap-6">
-                            <button
-                                onClick={() => {
-                                    if (currentQuestionIndex > 0) {
-                                        setCurrentQuestionIndex(currentQuestionIndex - 1);
-                                    }
-                                }}
-                                disabled={currentQuestionIndex === 0}
-                                className={`py-5 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center transition-all ${currentQuestionIndex === 0
-                                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                    }`}
-                            >
-                                <i className="fas fa-chevron-left mr-3"></i> Previous
-                            </button>
-                            <button
-                                onClick={() => {
-                                    if (currentQuestionIndex < questions.length - 1) {
-                                        setCurrentQuestionIndex(currentQuestionIndex + 1);
-                                    }
-                                }}
-                                className={`py-5 font-black rounded-2xl transition shadow-xl shadow-blue-100 uppercase tracking-widest flex items-center justify-center ${currentQuestionIndex === questions.length - 1
-                                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                                    }`}
-                                disabled={currentQuestionIndex === questions.length - 1}
-                            >
-                                Next <i className="fas fa-chevron-right ml-3 text-sm"></i>
-                            </button>
-                        </div>
-                    )}
+                    </div>
 
-                    {/* Bottom Action Buttons (matching image 2) */}
-                    {questions.length > 0 && (
-                        <div className="flex flex-col sm:flex-row gap-6 pt-10 border-t border-gray-100">
-                            <button
-                                className="flex-1 py-5 bg-white text-blue-600 border-2 border-blue-600 font-black rounded-2xl hover:bg-blue-50 transition-all flex items-center justify-center uppercase tracking-widest"
-                            >
-                                <i className="far fa-save mr-3"></i> Save Draft
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="flex-1 py-5 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 transition-all flex items-center justify-center shadow-xl shadow-emerald-100 disabled:opacity-50 uppercase tracking-widest"
-                            >
-                                {loading ? (
-                                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <><i className="fas fa-check mr-3"></i> Submit Quiz</>
-                                )}
-                            </button>
-                        </div>
-                    )}
+                    {/* Right Column: Question Constructor */}
+                    <div className="lg:col-span-8 space-y-8">
+                        {questions.length > 0 && currentQuestion ? (
+                            <div className="space-y-8">
+                                {/* Navigation & Type Pulse */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex gap-2">
+                                        {questions.map((_, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setCurrentQuestionIndex(idx)}
+                                                className={`w-10 h-10 rounded-lg font-black text-[10px] transition-all border ${currentQuestionIndex === idx
+                                                    ? 'bg-[#FFD70011] text-[#FFD700] border-[#FFD70033] shadow-[0_0_15px_#FFD70022]'
+                                                    : questions[idx].text.trim() !== ''
+                                                        ? 'bg-white/5 text-white border-white/10'
+                                                        : 'bg-transparent text-gray-700 border-white/5 hover:border-white/20'
+                                                    }`}
+                                            >
+                                                {idx + 1}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border ${currentQuestion.type === 'MCQ' ? 'bg-[#00E5FF0D] text-[#00E5FF] border-[#00E5FF22]' : 'bg-[#9D4EDD0D] text-[#9D4EDD] border-[#9D4EDD22]'
+                                            }`}>
+                                            {currentQuestion.type} Mode
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Main Editor Card */}
+                                <div className="glass-card p-12 border border-white/5 shadow-2xl relative">
+                                    <div className="absolute top-12 right-12 text-[#FFD700] opacity-10 text-6xl font-black">
+                                        0{currentQuestionIndex + 1}
+                                    </div>
+
+                                    <div className="space-y-10 relative z-10">
+                                        <div>
+                                            <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-8">Edit Question</h3>
+
+                                            <div className="flex gap-8 mb-10 p-1 bg-white/2 rounded-2xl w-fit border border-white/5">
+                                                <button
+                                                    onClick={() => updateQuestion(currentQuestionIndex, { type: 'MCQ', options: ['', '', '', ''], correctAnswer: '' })}
+                                                    className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentQuestion.type === 'MCQ' ? 'bg-[#FFD70011] text-[#FFD700] shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                                                >
+                                                    Multiple Choice
+                                                </button>
+                                                <button
+                                                    onClick={() => updateQuestion(currentQuestionIndex, { type: 'Aptitude', options: undefined, correctAnswer: '' })}
+                                                    className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentQuestion.type === 'Aptitude' ? 'bg-[#FFD70011] text-[#FFD700] shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}
+                                                >
+                                                    Aptitude
+                                                </button>
+                                            </div>
+
+                                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 ml-1">Question Text</label>
+                                            <textarea
+                                                rows={5}
+                                                placeholder="Enter question text..."
+                                                value={currentQuestion.text}
+                                                onChange={(e) => updateQuestion(currentQuestionIndex, { text: e.target.value })}
+                                                className="w-full px-8 py-6 bg-white/2 border border-white/10 rounded-2xl focus:border-[#FFD70044] outline-none text-xl font-medium text-white placeholder:text-gray-800 transition-all resize-none shadow-2xl"
+                                            />
+                                        </div>
+
+                                        {currentQuestion.type === 'MCQ' && (
+                                            <div className="space-y-8">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    {['A', 'B', 'C', 'D'].map((letter, idx) => (
+                                                        <div key={letter} className="relative group">
+                                                            <div className={`absolute left-0 top-0 bottom-0 w-12 bg-white/2 border-r border-white/5 rounded-l-xl flex items-center justify-center font-black text-xs transition-colors ${currentQuestion.correctAnswer === letter ? 'bg-[#FFD70022] text-[#FFD700] border-[#FFD70033]' : 'text-gray-600 group-hover:text-gray-400'}`}>
+                                                                {letter}
+                                                            </div>
+                                                            <input
+                                                                type="text"
+                                                                placeholder={`Option ${letter}...`}
+                                                                value={currentQuestion.options?.[idx] || ''}
+                                                                onChange={(e) => {
+                                                                    const opt = [...(currentQuestion.options || [])];
+                                                                    opt[idx] = e.target.value;
+                                                                    updateQuestion(currentQuestionIndex, { options: opt });
+                                                                }}
+                                                                className={`w-full pl-16 pr-6 py-4 bg-white/1 border border-white/5 rounded-xl focus:border-[#FFD70044] outline-none text-white font-bold transition-all ${currentQuestion.correctAnswer === letter ? 'border-[#FFD70044] bg-[#FFD70005]' : 'group-hover:bg-white/2'}`}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <div className="flex items-center gap-6 p-6 bg-white/2 rounded-2xl border border-white/5">
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Correct Answer:</span>
+                                                    <div className="flex gap-4">
+                                                        {['A', 'B', 'C', 'D'].map(l => (
+                                                            <button
+                                                                key={l}
+                                                                onClick={() => updateQuestion(currentQuestionIndex, { correctAnswer: l })}
+                                                                className={`w-10 h-10 rounded-lg font-black text-xs transition-all border ${currentQuestion.correctAnswer === l ? 'bg-[#FFD700] text-[#030508] border-[#FFD700]' : 'bg-white/5 text-gray-500 border-white/10 hover:border-white/20'}`}
+                                                            >
+                                                                {l}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {currentQuestion.type === 'Aptitude' && (
+                                            <div className="animate-fade-in">
+                                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 ml-1">Correct Answer</label>
+                                                <textarea
+                                                    rows={4}
+                                                    placeholder="Enter the correct answer..."
+                                                    value={currentQuestion.correctAnswer}
+                                                    onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
+                                                    className="w-full px-8 py-6 bg-white/2 border border-white/10 rounded-2xl focus:border-[#FFD70044] outline-none text-white font-medium transition-all resize-none shadow-2xl"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Step Navigation */}
+                                <div className="flex flex-col gap-6">
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <button
+                                            onClick={() => currentQuestionIndex > 0 && setCurrentQuestionIndex(currentQuestionIndex - 1)}
+                                            disabled={currentQuestionIndex === 0}
+                                            className="py-5 bg-white/2 text-gray-500 font-black rounded-2xl hover:bg-white/5 border border-white/5 disabled:opacity-20 uppercase tracking-[0.3em] text-[10px] transition-all"
+                                        >
+                                            <i className="fas fa-chevron-left mr-3"></i> Previous
+                                        </button>
+                                        <button
+                                            onClick={() => currentQuestionIndex < questions.length - 1 && setCurrentQuestionIndex(currentQuestionIndex + 1)}
+                                            disabled={currentQuestionIndex === questions.length - 1}
+                                            className="py-5 bg-[#FFD70011] text-[#FFD700] font-black rounded-2xl border border-[#FFD70033] hover:bg-[#FFD70022] disabled:opacity-20 uppercase tracking-[0.3em] text-[10px] transition-all shadow-[0_0_30px_#FFD70008]"
+                                        >
+                                            Next <i className="fas fa-chevron-right ml-3 text-[8px]"></i>
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
+                                        <button
+                                            onClick={handleReset}
+                                            disabled={loading}
+                                            className="py-5 bg-red-500/10 text-red-500 font-black rounded-2xl border border-red-500/30 hover:bg-red-500/20 uppercase tracking-[0.3em] text-[10px] transition-all"
+                                        >
+                                            <i className="fas fa-undo mr-3 text-[8px]"></i> Reset Form
+                                        </button>
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={loading}
+                                            className="py-5 bg-white text-[#030508] font-black rounded-2xl hover:bg-gray-200 disabled:opacity-50 uppercase tracking-[0.3em] text-[10px] transition-all shadow-2xl shadow-white/5"
+                                        >
+                                            {loading ? (
+                                                <i className="fas fa-circle-notch animate-spin"></i>
+                                            ) : (
+                                                <>Submit Quiz <i className="fas fa-upload ml-3 text-[8px]"></i></>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center p-20 glass-card border border-white/5 border-dashed">
+                                <div className="w-20 h-20 bg-white/2 rounded-full flex items-center justify-center mb-8 text-gray-700 border border-white/5">
+                                    <i className="fas fa-microchip text-3xl"></i>
+                                </div>
+                                <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-xs">Waiting for payload initialization</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        </AdminLayout >
+
+            {/* Success Overlay */}
+            {showSuccess && (
+                <div className="fixed inset-0 bg-[#030508CC] backdrop-blur-3xl flex items-center justify-center z-[100] p-6 animate-fade-in">
+                    <div className="glass-card max-w-xl w-full p-16 border border-[#00FF4133] shadow-[0_0_100px_#00FF410D] text-center space-y-10 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00FF41] to-transparent"></div>
+
+                        <div className="w-24 h-24 bg-[#00FF4111] text-[#00FF41] rounded-[2rem] flex items-center justify-center mx-auto text-4xl border border-[#00FF4133] shadow-[0_0_30px_#00FF4122]">
+                            <i className="fas fa-check-double scale-125"></i>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h2 className="text-5xl font-black text-white tracking-tighter uppercase leading-none">Quiz <span className="text-[#00FF41]">Created Successfully</span></h2>
+                            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs leading-relaxed max-w-sm mx-auto">
+                                Your quiz has been successfully created and is now available for students in the {courseTitle} course.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-4 pt-6">
+                            <button
+                                onClick={() => navigate('/admin/dashboard')}
+                                className="w-full bg-[#00FF41] text-[#030508] font-black py-6 rounded-2xl hover:brightness-110 transition-all uppercase tracking-[0.3em] text-xs shadow-[0_0_30px_#00FF4133] group"
+                            >
+                                Go to Dashboard <i className="fas fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform"></i>
+                            </button>
+                            <button
+                                onClick={() => { setShowSuccess(false); setQuizTitle(''); navigate(0); }}
+                                className="w-full bg-white/5 text-gray-400 font-black py-6 rounded-2xl border border-white/5 hover:bg-white/10 hover:text-white transition-all uppercase tracking-[0.3em] text-xs"
+                            >
+                                Create Another Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </AdminLayout>
     );
 };
 

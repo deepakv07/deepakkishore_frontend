@@ -33,13 +33,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
-
     const handleLogout = () => {
-        setShowLogoutConfirm(true);
-    };
-
-    const confirmLogout = () => {
         logout();
         navigate('/');
     };
@@ -52,112 +46,102 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     ];
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen bg-[#030508] text-gray-300 font-sans selection:bg-[#FFD70033] selection:text-[#FFD700]">
             {/* Overlay for mobile */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+                    className="fixed inset-0 bg-[#00000088] backdrop-blur-md z-40 lg:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar */}
-            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl lg:shadow-xl flex flex-col transform transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
+            {/* Sidebar - Tactical Control Panel */}
+            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-80 bg-[#0A0E14CC] backdrop-blur-2xl border-r border-white/5 flex flex-col transform transition-all duration-500 ease-in-out shadow-[20px_0_50px_rgba(0,0,0,0.5)] ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
                 }`}>
-                <div className="p-8 border-b border-gray-50 flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-200">
+                <div className="p-10 border-b border-white/5 flex items-center space-x-5 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FFD70005] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <div className="w-14 h-14 bg-[#FFD70011] border border-[#FFD70033] rounded-2xl flex items-center justify-center text-[#FFD700] font-black text-2xl shadow-[0_0_20px_rgba(255,215,0,0.1)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.2)] transition-all duration-500">
                         SB
                     </div>
                     <div>
-                        <span className="text-xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent block">
+                        <span className="text-2xl font-black text-white tracking-tighter block group-hover:text-[#FFD700] transition-colors">
                             SkillBuilder
                         </span>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Admin Portal</span>
+                        <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.4em] opacity-70">ADMIN PORTAL</span>
                     </div>
                 </div>
 
-                <nav className="flex-1 p-6 space-y-3">
+                <nav className="flex-1 p-8 space-y-4">
                     {navItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `flex items-center space-x-4 p-4 rounded-2xl transition-all ${isActive
-                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-200'
-                                    : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'
+                                `flex items-center space-x-5 p-5 rounded-2xl transition-all duration-300 group ${isActive
+                                    ? 'bg-[#FFD70011] text-white border border-[#FFD70033] shadow-[0_0_30px_rgba(255,215,0,0.05)]'
+                                    : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
                                 }`
                             }
                         >
-                            <i className={`${item.icon} text-lg w-6`}></i>
-                            <span className="font-extrabold text-sm uppercase tracking-wider">{item.label}</span>
+                            <div className={`p-2 rounded-xl transition-colors duration-300 ${location.pathname === item.path ? 'bg-[#FFD70022] text-[#FFD700]' : 'group-hover:text-gray-300'}`}>
+                                <i className={`${item.icon} text-lg`}></i>
+                            </div>
+                            <span className="font-black text-xs uppercase tracking-[0.2em]">{item.label}</span>
+                            {location.pathname === item.path && (
+                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#FFD700] shadow-[0_0_10px_#FFD700]"></div>
+                            )}
                         </NavLink>
                     ))}
                 </nav>
 
-                <div className="p-6 border-t border-gray-50">
-                    <div className="flex items-center space-x-4 p-4 mb-4 bg-gray-50 rounded-2xl">
-                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
-                            <i className="fas fa-user-shield text-blue-600"></i>
+                <div className="p-8 border-t border-white/5 space-y-6">
+                    <div className="flex items-center space-x-5 p-5 bg-white/2 rounded-2xl border border-white/5 group hover:border-[#FFD70022] transition-colors duration-500">
+                        <div className="w-12 h-12 bg-[#FFD70011] border border-[#FFD70033] rounded-xl flex items-center justify-center text-[#FFD700] transition-transform group-hover:scale-110 duration-500 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+                            <i className="fas fa-user-shield text-xl"></i>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-sm font-black text-gray-900 truncate">{user?.name || 'Administrator'}</p>
-                            <p className="text-[10px] font-bold text-gray-400 truncate uppercase tracking-tighter">{user?.email}</p>
+                            <p className="text-sm font-black text-white truncate tracking-tight uppercase">{user?.name || 'Admin'}</p>
+                            <p className="text-[10px] font-bold text-gray-500 truncate uppercase tracking-widest">{user?.email}</p>
                         </div>
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-center space-x-3 py-4 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-all font-black text-xs uppercase tracking-widest border border-red-100/50"
+                        className="w-full flex items-center justify-center space-x-4 py-5 bg-[#FF3D000D] text-[#FF3D00] rounded-2xl hover:bg-[#FF3D001A] transition-all duration-300 font-black text-[10px] uppercase tracking-[0.3em] border border-[#FF3D0022] hover:border-[#FF3D0044] hover:shadow-[0_0_30px_rgba(255,61,0,0.1)] group"
                     >
-                        <i className="fas fa-sign-out-alt"></i>
-                        <span>Logout Account</span>
+                        <i className="fas fa-power-off group-hover:rotate-90 transition-transform duration-500"></i>
+                        <span>LOGOUT ACCOUNT</span>
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0">
-                <header className="px-6 py-4 flex items-center bg-transparent sticky top-0 z-30">
+            <main className="flex-1 flex flex-col min-w-0 relative">
+                {/* Background Grid Pattern */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none"></div>
+
+                <header className="px-10 py-6 flex items-center bg-transparent sticky top-0 z-30">
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100 text-gray-600 hover:text-blue-600 hover:border-blue-100 transition-all group"
-                        title={isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+                        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/2 backdrop-blur-xl border border-white/10 text-gray-400 hover:text-white hover:border-[#FFD70044] hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] transition-all duration-300 group"
+                        title={isSidebarOpen ? 'Retract Panel' : 'Expand Panel'}
                     >
-                        <i className={`fas ${isSidebarOpen ? 'fa-indent rotate-180' : 'fa-outdent'} text-lg transition-transform group-hover:scale-110`}></i>
+                        <i className={`fas ${isSidebarOpen ? 'fa-align-right' : 'fa-align-left'} text-lg transition-transform group-hover:scale-110`}></i>
                     </button>
+
+                    <div className="ml-auto flex items-center gap-6">
+                        <div className="hidden md:flex flex-col items-end text-right">
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Administrator Session</span>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+                            <i className="fas fa-bell"></i>
+                        </div>
+                    </div>
                 </header>
-                <div className="flex-1 overflow-auto p-4 lg:p-10 pt-2 lg:pt-0">
+
+                <div className="flex-1 overflow-auto p-6 lg:p-12 pt-2 lg:pt-0 relative z-10">
                     {children}
                 </div>
             </main>
-            {/* Logout Confirmation Modal */}
-            {showLogoutConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl transform transition-all scale-100 border border-gray-100">
-                        <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg shadow-red-50">
-                                <i className="fas fa-sign-out-alt"></i>
-                            </div>
-                            <h3 className="text-xl font-black text-gray-900 mb-2">Logout?</h3>
-                            <p className="text-gray-500 font-medium text-sm">Are you sure you want to end your session?</p>
-                        </div>
-
-                        <div className="flex space-x-3">
-                            <button
-                                onClick={() => setShowLogoutConfirm(false)}
-                                className="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmLogout}
-                                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
-                            >
-                                Yes, Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

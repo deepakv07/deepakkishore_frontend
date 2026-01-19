@@ -16,9 +16,7 @@ import type {
 } from '../types';
 
 // API Configuration - MongoDB backend
-// API Configuration - MongoDB backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/v1';
-const AI_API_URL = 'http://localhost:8000';
 
 class APIService {
     private api: AxiosInstance;
@@ -250,7 +248,10 @@ class APIService {
     async submitQuiz(submission: QuizSubmission): Promise<QuizResult> {
         const response = await this.api.post<APIResponse<QuizResult>>(
             `/quiz/${submission.quizId}/submit`,
-            { answers: submission.answers }
+            {
+                answers: submission.answers,
+                questionTimings: submission.questionTimings
+            }
         );
         return response.data.data;
     }
@@ -276,46 +277,9 @@ class APIService {
         return response.data.data;
     }
 
-    // ========== AI Quiz APIs ==========
-
-    async startAIQuiz(userId: string, quizId: string, quizTitle: string = "Quiz") {
-        try {
-            const response = await axios.post(`${AI_API_URL}/start_quiz`, {
-                user_id: userId,
-                quiz_id: quizId,
-                quiz_title: quizTitle
-            });
-            return response.data;
-        } catch (error) {
-            console.error('AI Start Quiz Error:', error);
-            throw error;
-        }
-    }
-
-    async submitAIAnswer(sessionData: any) {
-        try {
-            // Updated endpoint for interactive flow
-            const response = await axios.post(`${AI_API_URL}/submit_answer`, sessionData);
-            return response.data;
-        } catch (error) {
-            console.error('AI Submit Answer Error:', error);
-            throw error;
-        }
-    }
-
-    // Keep legacy one just in case, or rename/remove if unused. 
-    // The previous code called submitAIQuiz to /submit_quiz - we might still need that if we revert?
-    // But the new plan is /submit_answer. Let's keep both for safety but use submitAIAnswer in new flow.
-    async submitAIQuiz(sessionData: any) {
-        try {
-            const response = await axios.post(`${AI_API_URL}/submit_quiz`, {
-                session_data: sessionData
-            });
-            return response.data;
-        } catch (error) {
-            console.error('AI Submit Quiz Error:', error);
-            throw error;
-        }
+    async deleteQuiz(quizId: number | string) {
+        const response = await this.api.delete(`/admin/quizzes/${quizId}`);
+        return response.data.data;
     }
 
     // ========== Admin APIs ==========
@@ -383,21 +347,6 @@ class APIService {
 
     async getAdminQuizzes() {
         const response = await this.api.get('/admin/quizzes');
-        return response.data.data;
-    }
-
-    async deleteQuiz(quizId: string) {
-        const response = await this.api.delete(`/admin/quizzes/${quizId}`);
-        return response.data;
-    }
-
-    async getAdminQuiz(quizId: string) {
-        const response = await this.api.get(`/admin/quizzes/${quizId}`);
-        return response.data.data;
-    }
-
-    async updateQuiz(quizId: string, data: any) {
-        const response = await this.api.put(`/admin/quizzes/${quizId}`, data);
         return response.data.data;
     }
 }

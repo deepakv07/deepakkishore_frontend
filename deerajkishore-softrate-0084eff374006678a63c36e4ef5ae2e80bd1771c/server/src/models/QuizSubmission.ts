@@ -15,6 +15,7 @@ export interface IQuizSubmission extends Document {
     passed: boolean;
     correctAnswers: number;
     incorrectAnswers: number;
+    questionTimings?: Record<string, number>;
     submittedAt: Date;
     createdAt: Date;
     updatedAt: Date;
@@ -71,6 +72,11 @@ const QuizSubmissionSchema: Schema = new Schema(
         incorrectAnswers: {
             type: Number,
             default: 0,
+        },
+        questionTimings: {
+            type: Map,
+            of: Number,
+            default: {},
         },
         submittedAt: {
             type: Date,

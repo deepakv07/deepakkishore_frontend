@@ -46,7 +46,7 @@ const GoogleCallback: React.FC = () => {
                         code,
                         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
                         client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-                        redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI || 'http://localhost:5173/auth/callback',
+                        redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/callback`,
                         grant_type: 'authorization_code',
                     }),
                 });
@@ -130,7 +130,6 @@ const GoogleCallback: React.FC = () => {
                             onClick={() => {
                                 setError('');
                                 setLoading(true);
-                                setProcessed(false);
                                 // Retry by going back to login and trying again
                                 navigate('/student/login');
                             }}

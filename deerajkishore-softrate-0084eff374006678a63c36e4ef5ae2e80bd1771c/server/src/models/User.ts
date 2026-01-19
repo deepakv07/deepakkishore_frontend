@@ -12,7 +12,7 @@ export interface IUser extends Document {
     department?: string;
     yearOfStudy?: string;
     degree?: string;
-    grade?: string;
+
     enrolledCourses?: number;
     permissions?: string[];
     createdAt: Date;
@@ -69,9 +69,7 @@ const UserSchema: Schema = new Schema(
             type: String,
             trim: true,
         },
-        grade: {
-            type: String,
-        },
+
         enrolledCourses: {
             type: Number,
             default: 0,
