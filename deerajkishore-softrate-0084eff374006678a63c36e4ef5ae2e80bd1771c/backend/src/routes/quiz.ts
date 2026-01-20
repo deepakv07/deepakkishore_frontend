@@ -140,7 +140,8 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                 answers: answers
             };
 
-            const aiResponse = await fetch('http://localhost:8000/submit_quiz_bulk', {
+            const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+            const aiResponse = await fetch(`${aiServiceUrl}/submit_quiz_bulk`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(aiPayload)

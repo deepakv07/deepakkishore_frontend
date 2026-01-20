@@ -87,6 +87,6 @@ export const authService = {
     }
 };
 
-export const GOOGLE_REDIRECT_URI = 'http://localhost:5173/auth/callback';
+export const GOOGLE_REDIRECT_URI = `${window.location.origin}/auth/callback`;
 
 export default authService;
