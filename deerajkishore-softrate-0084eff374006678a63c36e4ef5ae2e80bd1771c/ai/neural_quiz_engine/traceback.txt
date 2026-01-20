@@ -1,0 +1,136 @@
+Traceback (most recent 
+call last):
+  File "G:\Softrate\SKI
+LLBUILDER_AI(2.0)\neura
+l_quiz_engine\main.py",
+ line 279, in 
+run_comprehensive_quiz
+    self.knowledge_brai
+n.update_knowledge(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~^
+        
+user_id=user_id,
+        
+^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        
+time_efficiency=1.0 - 
+(time_taken / 120)
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^
+    )
+    ^
+  File "G:\Softrate\SKI
+LLBUILDER_AI(2.0)\neura
+l_quiz_engine\knowledge
+_state.py", line 92, 
+in update_knowledge
+    self.optimizer.appl
+y_gradients(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~^
+        zip(grads, self
+.topic_networks[topic_i
+dx].trainable_variables
+)
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^
+    )
+    ^
+  File "C:\Users\savio\
+AppData\Local\Programs\
+Python\Python313\Lib\si
+te-packages\keras\src\o
+ptimizers\base_optimize
+r.py", line 462, in 
+apply_gradients
+    self.apply(grads, 
+trainable_variables)
+    ~~~~~~~~~~^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\savio\
+AppData\Local\Programs\
+Python\Python313\Lib\si
+te-packages\keras\src\o
+ptimizers\base_optimize
+r.py", line 503, in 
+apply
+    self._check_variabl
+es_are_known(trainable_
+variables)
+    ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~^^^^^^^^^^^
+^^^^^^^^^^
+  File "C:\Users\savio\
+AppData\Local\Programs\
+Python\Python313\Lib\si
+te-packages\keras\src\o
+ptimizers\base_optimize
+r.py", line 408, in _ch
+eck_variables_are_known
+    raise ValueError(
+    ...<4 lines>...
+    )
+ValueError: Unknown 
+variable: <Variable pat
+h=sequential_13/dense_4
+1/kernel, shape=(4, 
+16), dtype=float32, 
+value=[[ 0.5326705  
+-0.30698097  
+0.19926858  0.37338704 
+ 0.3299319   0.53532994
+   0.46124065  
+0.52341485 -0.35419163 
+-0.17354548 
+-0.18364823  0.5019243
+  -0.17021158 
+-0.36031696  
+0.17969954 -0.37429827]
+ [-0.1262789  
+-0.14299095  
+0.30491692  0.51588905 
+ 0.08207202  0.01187706
+   0.01711291  
+0.2494685   0.27322388 
+-0.2973457   
+0.16649795  0.2362864
+   0.23392105 
+-0.26067916  
+0.00624299  0.14642864]
+ [ 0.13847041  
+0.51021147 -0.11425129 
+-0.41307223 
+-0.21126443 -0.37595832
+   0.17102593  
+0.46299922 -0.4139118  
+-0.19914216 
+-0.46697643  0.45828092
+   0.53513324 
+-0.18922523 
+-0.11506277 -0.1589436 
+]
+ [-0.4218362  
+-0.13529387 
+-0.11722124  
+0.27424836  0.40057898 
+-0.22010675
+  -0.3017897   
+0.20074785 -0.51933646 
+ 0.26121992  
+0.10389352  0.1944806
+   0.21533889  
+0.43784922 -0.09080842 
+-0.3830714 ]]>. This 
+optimizer can only be 
+called for the 
+variables it was 
+originally built with. 
+When working with a 
+new set of variables, 
+you should recreate a 
+new optimizer instance.

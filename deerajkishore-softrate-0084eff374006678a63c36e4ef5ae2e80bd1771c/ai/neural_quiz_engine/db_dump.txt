@@ -1,0 +1,9 @@
+=== REPORTS ===
+ID: 696dcbc0df5e8ab1dacc0ad1 | User: 696dcbaf64cdeb3a8fd56314 | Date: 2026-01-19T11:44:24.037402
+ID: 696dca61c2a384d11f274fa6 | User: 696dc7e1c11b059d0e026c0f | Date: 2026-01-19T11:38:33.915653
+ID: 696dc7131d7ab7d9bc2c3573 | User: 696dc6f6c11b059d0e026bbb | Date: 2026-01-19T11:24:27.278368
+
+=== SUBMISSIONS ===
+ID: 696dcbc064cdeb3a8fd56345 | Quiz: 696a265d27189f7d399ac667 | AI: True | Report: 696dcbc0df5e8ab1dacc0ad1 | Score: 0
+ID: 696dca6264cdeb3a8fd5624b | Quiz: 696a265d27189f7d399ac667 | AI: True | Report: 696dca61c2a384d11f274fa6 | Score: 0
+ID: 696dc713c11b059d0e026bec | Quiz: 696a265d27189f7d399ac667 | AI: True | Report: 696dc7131d7ab7d9bc2c3573 | Score: 0
