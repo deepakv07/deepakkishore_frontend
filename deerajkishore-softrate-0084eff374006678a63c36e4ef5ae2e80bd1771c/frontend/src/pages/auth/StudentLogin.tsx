@@ -46,8 +46,8 @@ const StudentLogin: React.FC = () => {
 
             <div className="max-w-md w-full relative z-10 px-4 animate-fade-in">
                 <div className="text-center mb-12 space-y-4">
-                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-slate-900 font-extrabold text-3xl mx-auto mb-8 shadow-2xl shadow-slate-200/50">
-                        SB
+                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-slate-200/50 overflow-hidden p-3">
+                        <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder" />
                     </div>
                     <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                         {isLogin ? 'Welcome Back' : 'Get Started'}

@@ -41,6 +41,8 @@ router.get('/:id/questions', async (req: AuthRequest, res: Response) => {
                 description: quiz.description,
                 questions,
                 durationMinutes: quiz.durationMinutes,
+                scheduledAt: quiz.scheduledAt,
+                expiresAt: quiz.expiresAt,
             },
         });
     } catch (error: any) {

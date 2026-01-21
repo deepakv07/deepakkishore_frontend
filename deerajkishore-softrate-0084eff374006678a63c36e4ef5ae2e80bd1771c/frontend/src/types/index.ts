@@ -62,6 +62,8 @@ export interface Quiz {
     passed?: boolean;
     courseTitle?: string;
     completedAt?: string;
+    scheduledAt?: string;
+    expiresAt?: string;
 }
 
 export interface Course {

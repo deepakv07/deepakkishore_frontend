@@ -15,8 +15,8 @@ const Landing: React.FC = () => {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-pastel-blue/30 rounded-full blur-[150px]" />
 
             <div className="text-center space-y-8 relative z-10 px-6 max-w-4xl animate-fade-in">
-                <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl shadow-slate-200/50 mb-10 active:scale-95">
-                    <span className="text-slate-900 text-4xl md:text-5xl font-extrabold tracking-tighter">SB</span>
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl shadow-slate-200/50 mb-10 active:scale-95 overflow-hidden p-4">
+                    <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder Logo" />
                 </div>
 
                 <div className="space-y-4">

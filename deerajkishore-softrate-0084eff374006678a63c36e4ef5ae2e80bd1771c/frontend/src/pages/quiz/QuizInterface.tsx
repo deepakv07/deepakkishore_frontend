@@ -174,8 +174,15 @@ const QuizInterface: React.FC = () => {
             // Reset timing when quiz loads
             setLastSwitchTime(Date.now());
             setQuestionTimings({});
-            setTimeLeft((quizData.durationMinutes || 30) * 60);
-            console.log('Quiz loaded, timer started at:', new Date().toISOString());
+
+            // Calculate duration: if both scheduledAt and expiresAt exist, use as duration
+            // Otherwise use durationMinutes field
+            const duration = quizData.scheduledAt && quizData.expiresAt
+                ? Math.round((new Date(quizData.expiresAt).getTime() - new Date(quizData.scheduledAt).getTime()) / 60000)
+                : quizData.durationMinutes || 30;
+
+            setTimeLeft(duration * 60);
+            console.log('Quiz loaded, timer started at:', new Date().toISOString(), `Duration: ${duration} mins`);
         } catch (err) {
             console.error('Error loading quiz:', err);
             setError('Failed to load quiz. Please try again.');

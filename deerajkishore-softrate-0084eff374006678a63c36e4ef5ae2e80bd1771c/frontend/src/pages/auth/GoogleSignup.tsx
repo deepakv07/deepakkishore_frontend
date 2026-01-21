@@ -13,7 +13,7 @@ const GoogleSignup: React.FC = () => {
     useEffect(() => {
         const emailParam = searchParams.get('email');
         const nameParam = searchParams.get('name');
-        
+
         if (emailParam && nameParam) {
             setEmail(emailParam);
             setName(nameParam);
@@ -34,7 +34,7 @@ const GoogleSignup: React.FC = () => {
         try {
             const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/v1';
             const response = await axios.post(`${API_BASE_URL}/auth/google/signup`, { email, name });
-            
+
             if (response.data.success) {
                 // Store token and user data
                 localStorage.setItem('student_auth_token', response.data.data.token);
@@ -65,8 +65,8 @@ const GoogleSignup: React.FC = () => {
         <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-6">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 sm:p-12">
                 <div className="flex justify-center mb-8">
-                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl">
-                        SB
+                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-2">
+                        <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder" />
                     </div>
                 </div>
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
+import ValidationModal from '../../components/common/ValidationModal';
 
 interface QuestionDraft {
     id: number;
@@ -27,6 +28,22 @@ const CreateQuiz: React.FC = () => {
     const [endDate, setEndDate] = useState('');
     const [questions, setQuestions] = useState<QuestionDraft[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+    // Modal State
+    const [modalConfig, setModalConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        type: 'error' | 'warning' | 'success';
+        onConfirm?: () => void;
+        confirmLabel?: string;
+        showCancel?: boolean;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'error'
+    });
 
     useEffect(() => {
         // loadCourses(); // No longer needed to fetch specific list for dropdown
@@ -67,32 +84,53 @@ const CreateQuiz: React.FC = () => {
     const handleSubmit = async () => {
         // Validation
         if (!quizTitle || quizTitle.trim() === '') {
-            alert('Please enter a quiz title');
+            setModalConfig({
+                isOpen: true,
+                title: 'Data Required',
+                message: 'A valid assessment title must be provided to initialize the module.',
+                type: 'error'
+            });
             return;
         }
 
         if (!courseTitle || courseTitle.trim() === '') {
-            alert('Please enter a course name');
+            setModalConfig({
+                isOpen: true,
+                title: 'Mapping Error',
+                message: 'Please specify a course or subject name for this assessment.',
+                type: 'error'
+            });
             return;
         }
 
         if (numberOfQuestions < 1) {
-            // We allow > 50 if they really want, or keep it per server rules. 
-            // Server might handle it, but basic check is good.
-            // User just said "input text box", removing strict max limit check if implied.
-            alert('Please enter a valid number of questions (at least 1)');
+            setModalConfig({
+                isOpen: true,
+                title: 'Quantity Conflict',
+                message: 'The assessment framework requires at least one entity to be initialized.',
+                type: 'error'
+            });
             return;
         }
 
         if (questions.length === 0) {
-            alert('Please set the number of questions first');
+            setModalConfig({
+                isOpen: true,
+                title: 'Buffer Empty',
+                message: 'Please define the number of assessment entities before Proceeding.',
+                type: 'error'
+            });
             return;
         }
 
-        // Validate all questions are filled
         const emptyQuestions = questions.filter(q => !q.text || q.text.trim() === '');
         if (emptyQuestions.length > 0) {
-            alert(`Please fill all ${numberOfQuestions} questions. ${emptyQuestions.length} question(s) are still empty.`);
+            setModalConfig({
+                isOpen: true,
+                title: 'Incomplete Modules',
+                message: `Please finalize all ${numberOfQuestions} entities. ${emptyQuestions.length} modules are still pending definition.`,
+                type: 'error'
+            });
             return;
         }
 
@@ -101,16 +139,31 @@ const CreateQuiz: React.FC = () => {
             const q = questions[i];
             if (q.type === 'MCQ') {
                 if (!q.options || q.options.some(opt => !opt || opt.trim() === '')) {
-                    alert(`Question ${i + 1} (MCQ) must have all 4 options filled`);
+                    setModalConfig({
+                        isOpen: true,
+                        title: 'MCQ Integrity Error',
+                        message: `Entity ${i + 1} must have all 4 operational parameters (options) defined.`,
+                        type: 'error'
+                    });
                     return;
                 }
                 if (!q.correctAnswer || q.correctAnswer.trim() === '') {
-                    alert(`Question ${i + 1} (MCQ) must have a correct answer selected`);
+                    setModalConfig({
+                        isOpen: true,
+                        title: 'Verification Missing',
+                        message: `Please specify the validated answer for Entity ${i + 1}.`,
+                        type: 'error'
+                    });
                     return;
                 }
             } else if (q.type === 'Aptitude') {
                 if (!q.correctAnswer || q.correctAnswer.trim() === '') {
-                    alert(`Question ${i + 1} (Aptitude) must have a correct answer`);
+                    setModalConfig({
+                        isOpen: true,
+                        title: 'Verification Missing',
+                        message: `Aptitude Entity ${i + 1} requires a validated response string.`,
+                        type: 'error'
+                    });
                     return;
                 }
             }
@@ -226,15 +279,24 @@ const CreateQuiz: React.FC = () => {
     };
 
     const handleReset = () => {
-        if (window.confirm('Are you sure you want to reset the form? All progress will be lost.')) {
-            setQuizTitle('');
-            setCourseTitle('');
-            setCourseDescription('');
-            setNumberOfQuestions(10);
-            setStartDate('');
-            setEndDate('');
-            initializeQuestions();
-        }
+        setModalConfig({
+            isOpen: true,
+            title: 'Reset Module?',
+            message: 'Caution: You are about to clear all progress in this session. All current entity data will be purged.',
+            type: 'warning',
+            showCancel: true,
+            confirmLabel: 'Purge Progress',
+            onConfirm: () => {
+                setQuizTitle('');
+                setCourseTitle('');
+                setCourseDescription('');
+                setNumberOfQuestions(10);
+                setStartDate('');
+                setEndDate('');
+                initializeQuestions();
+                setModalConfig({ ...modalConfig, isOpen: false });
+            }
+        });
     };
 
     const currentQuestion = questions[currentQuestionIndex];
@@ -583,6 +645,17 @@ const CreateQuiz: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            <ValidationModal
+                isOpen={modalConfig.isOpen}
+                onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                type={modalConfig.type}
+                onConfirm={modalConfig.onConfirm}
+                confirmLabel={modalConfig.confirmLabel}
+                showCancel={modalConfig.showCancel}
+            />
         </AdminLayout>
     );
 };

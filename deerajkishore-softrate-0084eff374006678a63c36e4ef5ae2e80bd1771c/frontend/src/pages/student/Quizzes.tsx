@@ -81,11 +81,24 @@ const StudentQuizzes: React.FC = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                         {filteredQuizzes.map((quiz, idx) => {
-                            const isExpired = !quiz.isCompleted && quiz.isExpired;
+                            const isExpired = !quiz.isCompleted && quiz.expiresAt && new Date(quiz.expiresAt) < new Date();
                             const isFaded = quiz.isCompleted || isExpired;
 
                             const banners = ['bg-indigo-900', 'bg-slate-800', 'bg-indigo-700', 'bg-slate-900', 'bg-indigo-800'];
                             const bannerColor = banners[idx % banners.length];
+
+                            const formatTimeSimple = (dateStr: string | undefined) => {
+                                if (!dateStr) return 'N/A';
+                                try {
+                                    return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                                } catch (e) {
+                                    return 'N/A';
+                                }
+                            };
+
+                            const duration = quiz.scheduledAt && quiz.expiresAt
+                                ? Math.round((new Date(quiz.expiresAt).getTime() - new Date(quiz.scheduledAt).getTime()) / 60000)
+                                : quiz.durationMinutes || 30;
 
                             return (
                                 <div key={quiz.id} className={`flex flex-col h-full relative overflow-hidden bg-white rounded-[3.5rem] border border-slate-100 shadow-sm ${isFaded ? 'opacity-95' : ''}`}>
@@ -114,23 +127,29 @@ const StudentQuizzes: React.FC = () => {
                                         <div className="bg-slate-50 p-4 md:p-6 rounded-[1.2rem] md:rounded-[1.5rem] border border-slate-100 mb-6 md:mb-8 flex justify-between">
                                             <div className="text-center flex-1">
                                                 <p className="text-[8px] font-black text-slate-400 tracking-[0.2rem] uppercase mb-1">START TIME</p>
-                                                <p className="text-xs font-black text-emerald-600">N/A</p>
+                                                <p className="text-xs font-black text-emerald-600">{formatTimeSimple(quiz.scheduledAt)}</p>
                                             </div>
                                             <div className="w-px bg-slate-200"></div>
                                             <div className="text-center flex-1">
                                                 <p className="text-[8px] font-black text-slate-400 tracking-[0.2rem] uppercase mb-1">END TIME</p>
-                                                <p className="text-xs font-black text-emerald-600">N/A</p>
+                                                <p className="text-xs font-black text-emerald-600">{formatTimeSimple(quiz.expiresAt)}</p>
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 mb-12">
                                             <div className="bg-white/50 p-5 rounded-2xl border border-slate-100">
-                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">SCORE: {quiz.percentage || 0}%</p>
-                                                <p className="text-xs font-black text-indigo-600 uppercase">{quiz.durationMinutes || 30} MINS</p>
+                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">SCORE: {quiz.score !== null ? Math.round(quiz.score) : 0}%</p>
+                                                <p className="text-xs font-black text-indigo-600 uppercase">{duration} MINS</p>
                                             </div>
                                             <div className="bg-white/50 p-5 rounded-2xl border border-slate-100 text-right">
                                                 <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">{quiz.totalQuestions || 0} QUESTIONS</p>
-                                                <p className="text-xs font-black text-rose-600 uppercase">X FAILED</p>
+                                                {quiz.isCompleted ? (
+                                                    <p className={`text-xs font-black uppercase ${quiz.score >= 60 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                        {quiz.score >= 60 ? 'PASSED' : 'FAILED'}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-xs font-black text-slate-400 uppercase">PENDING</p>
+                                                )}
                                             </div>
                                         </div>
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
 import { Link } from 'react-router-dom';
+import ValidationModal from '../../components/common/ValidationModal';
 
 const AdminCourses: React.FC = () => {
     const [quizzes, setQuizzes] = useState<any[]>([]);
@@ -150,41 +151,16 @@ const AdminCourses: React.FC = () => {
                     </div>
                 )}
 
-                {/* Confirm Deletion Hub */}
-                {deleteQuizId && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/10 backdrop-blur-xl">
-                        <div className="bg-white max-w-lg w-full p-14 rounded-[4rem] border border-white shadow-3xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-bl-[4rem]"></div>
-
-                            <div className="relative z-10 text-center">
-                                <div className="w-24 h-24 bg-red-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-red-100 shadow-sm">
-                                    <i className="fas fa-triangle-exclamation text-4xl text-red-500"></i>
-                                </div>
-
-                                <h3 className="text-4xl font-black text-slate-900 tracking-tighter mb-4 uppercase">Decommission Asset?</h3>
-                                <p className="text-slate-700 text-sm font-bold uppercase tracking-widest mb-12 leading-relaxed">
-                                    You are about to permanently purge this assessment module.<br />
-                                    <span className="text-red-700 underline decoration-2 underline-offset-4">This operation is irreversible.</span>
-                                </p>
-
-                                <div className="flex gap-6">
-                                    <button
-                                        onClick={() => setDeleteQuizId(null)}
-                                        className="flex-1 py-6 rounded-[2rem] bg-slate-50 border border-slate-200 text-slate-700 font-black uppercase tracking-[0.3em] text-[10px] shadow-sm"
-                                    >
-                                        Abandon
-                                    </button>
-                                    <button
-                                        onClick={confirmDelete}
-                                        className="flex-1 py-6 rounded-[2rem] bg-red-600 text-white font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl shadow-red-500/30"
-                                    >
-                                        Purge Record
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <ValidationModal
+                    isOpen={!!deleteQuizId}
+                    onClose={() => setDeleteQuizId(null)}
+                    title="Decommission Asset?"
+                    message={`You are about to permanently purge the assessment module: ${quizzes.find(q => q.id === deleteQuizId)?.title || 'Selected Module'}`}
+                    type="warning"
+                    showCancel={true}
+                    confirmLabel="Purge Record"
+                    onConfirm={confirmDelete}
+                />
             </div>
         </AdminLayout>
     );

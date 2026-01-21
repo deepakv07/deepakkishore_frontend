@@ -108,7 +108,9 @@ const QuizDetails: React.FC = () => {
                                     {
                                         title: 'Total Duration',
                                         desc: 'Absolute time limit',
-                                        val: quiz?.durationMinutes?.toString() || '30',
+                                        val: (quiz?.scheduledAt && quiz?.expiresAt
+                                            ? Math.round((new Date(quiz.expiresAt).getTime() - new Date(quiz.scheduledAt).getTime()) / 60000)
+                                            : quiz?.durationMinutes || 30).toString(),
                                         icon: 'fa-clock',
                                         color: 'text-indigo-900',
                                         bg: 'bg-pastel-lavender',

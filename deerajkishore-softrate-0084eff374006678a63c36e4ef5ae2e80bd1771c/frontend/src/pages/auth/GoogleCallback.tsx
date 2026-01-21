@@ -108,9 +108,12 @@ const GoogleCallback: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-6">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-white font-medium">Authenticating with Google...</p>
+                <div className="text-center flex flex-col items-center">
+                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl mb-8 overflow-hidden p-3 animate-pulse">
+                        <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder" />
+                    </div>
+                    <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+                    <p className="text-white font-black uppercase tracking-[0.2em] text-xs">Authenticating...</p>
                 </div>
             </div>
         );
@@ -119,11 +122,14 @@ const GoogleCallback: React.FC = () => {
     if (error) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-6">
-                <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center">
-                    <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <div className="max-w-md w-full bg-white rounded-[3rem] shadow-2xl p-10 md:p-14 text-center">
+                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg mx-auto mb-10 overflow-hidden p-3">
+                        <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder" />
+                    </div>
+                    <div className="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
                         <i className="fas fa-exclamation-triangle"></i>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Failed</h2>
+                    <h2 className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tight">Auth Failure</h2>
                     <p className="text-gray-600 mb-6">{error}</p>
                     <div className="space-y-3">
                         <button

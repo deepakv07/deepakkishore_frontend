@@ -72,11 +72,11 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
             <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-border-color flex flex-col transform transition-all duration-500 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
                 }`}>
                 <div className="p-10 flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-pastel-blue rounded-[1.2rem] flex items-center justify-center text-blue-600 font-black text-xl shadow-sm">
-                        SB
+                    <div className="w-12 h-12 bg-white rounded-[1.2rem] flex items-center justify-center shadow-sm overflow-hidden p-2 border border-slate-100">
+                        <img src="/logo.png" className="w-full h-full object-contain" alt="Logo" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-black tracking-tighter leading-none">SkillBuilder</h2>
+                        <h2 className="text-xl font-black tracking-tighter leading-none">Skill Builder</h2>
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">Student Portal</span>
                     </div>
                 </div>
