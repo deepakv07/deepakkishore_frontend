@@ -47,131 +47,130 @@ const QuizDetails: React.FC = () => {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-40">
                         <div className="relative w-24 h-24">
-                            <div className="absolute inset-0 border-4 border-[#00E5FF22] rounded-full"></div>
-                            <div className="absolute inset-0 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin"></div>
-                            <div className="absolute inset-4 border-2 border-[#9D4EDD] border-b-transparent rounded-full animate-spin-slow"></div>
+                            <div className="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                         </div>
-                        <p className="mt-8 text-[#00E5FF] font-black uppercase tracking-[0.3em] text-sm animate-pulse">Initializing Assessment...</p>
+                        <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-sm animate-pulse italic">Initializing Assessment...</p>
                     </div>
                 ) : (
                     <div className="space-y-12">
-                        {/* Header & Stats (Match Image 3) */}
+                        {/* Header & Stats */}
                         <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-black text-white tracking-tight">Assessment Details</h2>
-                            <div className="text-6xl font-black text-white tracking-tighter">
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">Assessment Details</h2>
+                            <div className="text-8xl font-black text-indigo-600 tracking-tighter italic tabular-nums leading-none">
                                 {quiz?.questions?.length || 0}
                             </div>
-                            <p className="text-[#8E9AAF] font-bold text-sm">
+                            <p className="text-slate-700 font-bold text-lg italic uppercase tracking-widest mt-4">
                                 {quiz?.title || 'Details'}
                             </p>
 
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-12 pb-12">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 pb-12">
                                 {[
-                                    { label: 'QUESTIONS', val: quiz?.questions?.length?.toString() || '0', color: 'text-[#0066FF]' },
-                                    { label: 'DURATION', val: quiz?.durationMinutes?.toString() || '30', color: 'text-[#00C853]' },
-                                    { label: 'TOTAL POINTS', val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0', color: 'text-[#9D4EDD]' },
-                                    { label: 'TYPE', val: quiz?.questions?.every(q => q.type === 'mcq') ? 'MCQ' : 'MIXED', color: 'text-[#FF3D00]' },
+                                    { label: 'QUESTIONS', val: quiz?.questions?.length?.toString() || '0', color: 'text-blue-900', bg: 'bg-pastel-blue' },
+                                    { label: 'DURATION', val: quiz?.durationMinutes?.toString() || '30', color: 'text-teal-900', bg: 'bg-pastel-mint' },
+                                    { label: 'TOTAL POINTS', val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0', color: 'text-indigo-900', bg: 'bg-pastel-lavender' },
+                                    { label: 'TYPE', val: quiz?.questions?.every(q => q.type === 'mcq') ? 'MCQ' : 'MIXED', color: 'text-amber-900', bg: 'bg-pastel-orange' },
                                 ].map((stat, i) => (
-                                    <div key={i} className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col items-center justify-center transform transition-transform hover:scale-105">
-                                        <div className={`text-3xl font-black ${stat.color} mb-1`}>
+                                    <div key={i} className={`${stat.bg} rounded-[2rem] p-10 shadow-sm border border-white flex flex-col items-center justify-center`}>
+                                        <div className={`text-4xl font-black ${stat.color} mb-1 italic tabular-nums`}>
                                             {stat.val}
                                         </div>
-                                        <div className="text-[#8E9AAF] font-black text-[10px] uppercase tracking-widest">{stat.label}</div>
+                                        <div className="text-slate-800 font-black text-[10px] uppercase tracking-widest italic">{stat.label}</div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Breakdown (Match Image 4) */}
+                        {/* Breakdown */}
                         <div className="space-y-8">
-                            <h2 className="text-center text-sm font-black text-white tracking-[0.2em] uppercase">STRUCTURE BREAKDOWN</h2>
+                            <h2 className="text-center text-sm font-black text-slate-900 tracking-[0.3em] uppercase italic underline decoration-indigo-200 underline-offset-8">Structure Breakdown</h2>
 
-                            <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 space-y-4">
+                            <div className="bg-white rounded-[3rem] p-6 shadow-sm border border-slate-100 space-y-4">
                                 {[
                                     {
                                         title: 'Multiple Choice',
                                         desc: 'Standard MCQ questions',
                                         val: quiz?.questions?.filter(q => q.type === 'mcq').length.toString() || '0',
                                         icon: 'fa-list-ul',
-                                        color: 'text-[#0066FF]',
-                                        bg: 'bg-[#E3EBFF]',
-                                        unit: 'MARKS/QTY'
+                                        color: 'text-blue-900',
+                                        bg: 'bg-pastel-blue',
+                                        unit: 'QTY'
                                     },
                                     {
                                         title: 'Points Per Question',
-                                        desc: 'Average points',
+                                        desc: 'Average points per entity',
                                         val: quiz?.questions?.length ? (quiz.questions.reduce((sum, q) => sum + (q.points || 0), 0) / quiz.questions.length).toFixed(0) : '0',
                                         icon: 'fa-brain',
-                                        color: 'text-[#00C853]',
-                                        bg: 'bg-[#E8F5E9]',
-                                        unit: 'MARKS/QTY'
+                                        color: 'text-teal-900',
+                                        bg: 'bg-pastel-mint',
+                                        unit: 'AVG MARKS'
                                     },
                                     {
                                         title: 'Total Duration',
-                                        desc: 'In minutes',
+                                        desc: 'Absolute time limit',
                                         val: quiz?.durationMinutes?.toString() || '30',
                                         icon: 'fa-clock',
-                                        color: 'text-[#9D4EDD]',
-                                        bg: 'bg-[#F3E5F5]',
-                                        unit: 'MINS'
+                                        color: 'text-indigo-900',
+                                        bg: 'bg-pastel-lavender',
+                                        unit: 'MINUTES'
                                     },
                                     {
                                         title: 'Total Possible Score',
-                                        desc: 'Sum of all sections',
+                                        desc: 'Maximum attainable points',
                                         val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0',
                                         icon: 'fa-trophy',
-                                        color: 'text-[#0066FF]',
-                                        bg: 'bg-[#E3EBFF]',
-                                        unit: 'MARKS/QTY',
+                                        color: 'text-amber-900',
+                                        bg: 'bg-pastel-orange',
+                                        unit: 'TOTAL MARKS',
                                         isHighlighted: true
                                     },
                                 ].map((item, i) => (
-                                    <div key={i} className={`flex items-center justify-between p-6 rounded-3xl transition-all duration-300 ${item.isHighlighted ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}>
+                                    <div key={i} className={`flex items-center justify-between p-8 rounded-[2.5rem] ${item.isHighlighted ? 'bg-amber-50/30 border border-amber-100' : 'bg-slate-50/50 border border-slate-50'}`}>
                                         <div className="flex items-center space-x-6">
-                                            <div className={`w-14 h-14 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center text-xl`}>
+                                            <div className={`w-14 h-14 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center text-xl border border-white shadow-sm`}>
                                                 <i className={`fas ${item.icon}`}></i>
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-[#030508] text-base">{item.title}</h3>
-                                                <p className="text-xs text-[#8E9AAF] font-medium">{item.desc}</p>
+                                                <h3 className="font-black text-slate-900 text-base uppercase italic">{item.title}</h3>
+                                                <p className="text-xs text-slate-600 font-bold italic">{item.desc}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-3xl font-black text-[#030508]">{item.val}</div>
-                                            <div className="text-[8px] font-black text-[#8E9AAF] tracking-widest uppercase">{item.unit}</div>
+                                            <div className="text-3xl font-black text-slate-900 italic tabular-nums">{item.val}</div>
+                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase italic">{item.unit}</div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Directives Section (Restored from previous) */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#FF3D0033]"></div>
-                                <h2 className="text-sm font-black text-[#FF3D00] tracking-[0.3em] uppercase">Directives</h2>
-                                <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#FF3D0033]"></div>
+                        {/* Directives Section */}
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-6">
+                                <div className="h-px flex-1 bg-slate-200"></div>
+                                <h2 className="text-xs font-black text-slate-900 tracking-[0.4em] uppercase italic">Assessment Directives</h2>
+                                <div className="h-px flex-1 bg-slate-200"></div>
                             </div>
 
-                            <div className="glass-card rounded-[2.5rem] p-8 border border-white/5 space-y-8">
+                            <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-sm space-y-10">
                                 {[
-                                    { title: 'Anti-Cheat Protcols', text: 'Screen tracking is active. Leaving the browser window will trigger a terminal warning.', icon: 'fa-shield-alt', color: 'text-[#FF3D00]' },
-                                    { title: 'Data Persistence', text: "Progress is saved per objective. Do not refresh current session.", icon: 'fa-database', color: 'text-[#00E5FF]' },
-                                    { title: 'Execution Window', text: 'The timer is absolute. System will auto-terminate upon expiration.', icon: 'fa-hourglass-start', color: 'text-[#9D4EDD]' },
+                                    { title: 'Anti-Cheat Protocols', text: 'Screen tracking is active. Unauthorized window shifts will be logged.', icon: 'fa-shield-alt', color: 'text-red-700' },
+                                    { title: 'Data Persistence', text: "Progress is recorded dynamically. Do not refresh or close the browser.", icon: 'fa-database', color: 'text-blue-700' },
+                                    { title: 'Execution Window', text: 'Timer is absolute. System termination occurs upon expiration.', icon: 'fa-hourglass-start', color: 'text-indigo-700' },
                                 ].map((rule, i) => (
                                     <div key={i} className="flex gap-6">
-                                        <div className={`${rule.color} text-xl pt-1`}>
+                                        <div className={`${rule.color} text-2xl pt-1`}>
                                             <i className={`fas ${rule.icon}`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-white mb-1 text-sm">{rule.title}</h3>
-                                            <p className="text-xs text-gray-400 font-medium leading-relaxed">{rule.text}</p>
+                                            <h3 className="font-black text-slate-900 mb-1 text-base uppercase italic leading-none">{rule.title}</h3>
+                                            <p className="text-sm text-slate-700 font-bold italic leading-relaxed">{rule.text}</p>
                                         </div>
                                     </div>
                                 ))}
 
-                                <div className="pt-4 border-t border-white/5">
-                                    <label className="flex items-start space-x-4 cursor-pointer group">
+                                <div className="pt-8 border-t border-slate-100">
+                                    <label className="flex items-start space-x-6 cursor-pointer group">
                                         <div className="relative mt-1">
                                             <input
                                                 type="checkbox"
@@ -179,12 +178,12 @@ const QuizDetails: React.FC = () => {
                                                 checked={agreed}
                                                 onChange={() => setAgreed(!agreed)}
                                             />
-                                            <div className="w-5 h-5 border-2 border-white/10 rounded-md peer-checked:bg-[#00E5FF] peer-checked:border-[#00E5FF] transition-all flex items-center justify-center">
-                                                <i className="fas fa-check text-[#030508] text-[8px] opacity-0 peer-checked:opacity-100"></i>
+                                            <div className="w-6 h-6 border-2 border-slate-200 rounded-lg peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-all flex items-center justify-center shadow-sm">
+                                                <i className="fas fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i>
                                             </div>
                                         </div>
-                                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed group-hover:text-gray-400 transition-colors">
-                                            I acknowledge the mission directives and agree to proceed under elite protocols.
+                                        <span className="text-[10px] text-slate-800 font-black uppercase tracking-widest leading-relaxed italic">
+                                            I acknowledge the mission directives and agree to proceed under these standardized protocols.
                                         </span>
                                     </label>
                                 </div>
@@ -195,7 +194,7 @@ const QuizDetails: React.FC = () => {
                         <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-12">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="w-full md:w-auto px-12 py-5 text-gray-500 font-black tracking-[0.2em] uppercase rounded-2xl border border-white/5 hover:bg-white/5 hover:text-white transition-all duration-300"
+                                className="w-full md:w-auto px-12 py-6 text-slate-700 font-black tracking-[0.3em] uppercase rounded-2xl border border-slate-200 bg-white shadow-sm italic"
                             >
                                 <i className="fas fa-arrow-left mr-3"></i> Abort
                             </button>
@@ -210,11 +209,11 @@ const QuizDetails: React.FC = () => {
                                     }
                                 }}
                                 disabled={(!agreed && !quiz?.isCompleted) || loading}
-                                className={`w-full md:w-auto px-16 py-5 rounded-2xl font-black tracking-[0.2em] uppercase shadow-2xl transition-all duration-500 flex items-center justify-center group ${quiz?.isCompleted
-                                    ? 'bg-[#00E5FF] text-[#030508] shadow-[#00E5FF44] hover:scale-105'
+                                className={`w-full md:w-auto px-20 py-6 rounded-2xl font-black tracking-[0.3em] uppercase shadow-lg transition-all flex items-center justify-center italic ${quiz?.isCompleted
+                                    ? 'bg-indigo-600 text-white shadow-indigo-100'
                                     : agreed && !loading
-                                        ? 'bg-[#00E5FF] text-[#030508] shadow-[#00E5FF44] hover:scale-105 hover:shadow-[#00E5FF66] active:scale-95'
-                                        : 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
+                                        ? 'bg-indigo-600 text-white shadow-indigo-200 active:scale-95'
+                                        : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                                     }`}
                             >
                                 {quiz?.isCompleted ? (
@@ -223,7 +222,7 @@ const QuizDetails: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <i className="fas fa-bolt mr-3 group-hover:animate-pulse"></i> {loading ? 'Syncing...' : 'Initiate Sequence'}
+                                        <i className="fas fa-bolt mr-3"></i> {loading ? 'Syncing...' : 'Initiate Sequence'}
                                     </>
                                 )}
                             </button>

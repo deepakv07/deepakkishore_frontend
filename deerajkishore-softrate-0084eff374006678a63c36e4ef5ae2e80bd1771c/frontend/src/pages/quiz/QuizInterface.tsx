@@ -261,200 +261,239 @@ const QuizInterface: React.FC = () => {
 
     return (
         <StudentLayout hideNavbar={true}>
-            <div className="min-h-screen bg-[#030508] text-white flex flex-col font-mono">
-                {/* Clean Header - Match Image 0/1 */}
-                <div className="h-20 border-b border-white/5 bg-white/2 backdrop-blur-xl flex items-center justify-between px-10 sticky top-0 z-40">
-                    <div className="flex items-center gap-4">
-                        <span className="text-xl font-black text-white tracking-widest uppercase">{quiz?.title || 'ASSESSMENT'}</span>
+            <div className="min-h-screen bg-[var(--bg-main)] text-slate-900 flex flex-col font-sans">
+                {/* Modern Header */}
+                <div className="h-24 bg-white border-b border-slate-100 flex items-center justify-between px-6 md:px-12 sticky top-0 z-40">
+                    <div className="flex items-center gap-6">
+                        <button
+                            onClick={() => navigate('/student/quizzes')}
+                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-100 text-slate-900"
+                        >
+                            <i className="fas fa-chevron-left"></i>
+                        </button>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] leading-none">Assessment Session</span>
+                            <span className="text-xs font-bold text-slate-900 uppercase tracking-widest mt-1">{quiz?.title || 'Loading...'}</span>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-10">
-                        <div className="flex items-center gap-4">
-                            <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em]">TIME REMAINING</span>
-                            <div className="text-2xl font-black text-[#00E5FF] tabular-nums tracking-wider">
+                    <div className="flex items-center gap-4">
+                        <div className="relative w-16 h-16 flex items-center justify-center">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="28"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="transparent"
+                                    className="text-slate-100"
+                                />
+                                <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="28"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="transparent"
+                                    strokeDasharray={175}
+                                    strokeDashoffset={175 - (175 * (timeLeft || 0)) / ((quiz?.durationMinutes || 30) * 60)}
+                                    className="text-indigo-600 transition-all duration-1000"
+                                />
+                            </svg>
+                            <span className="absolute text-[10px] font-bold text-slate-900 tabular-nums">
                                 {timeLeft !== null ? formatTime(timeLeft) : '--:--'}
-                            </div>
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                {/* Main Content Area - Centered Card */}
-                <div className="flex-1 flex items-center justify-center p-6 bg-grid-white/[0.02]">
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col items-center py-12 px-6 overflow-y-auto">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center">
-                            <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin"></div>
-                            <p className="mt-8 text-[#00E5FF] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">Syncing Mission Data...</p>
+                        <div className="flex-1 flex flex-col items-center justify-center">
+                            <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                            <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-xs italic">Syncing Entities...</p>
                         </div>
                     ) : error ? (
-                        <div className="text-center space-y-8">
-                            <i className="fas fa-exclamation-triangle text-5xl text-red-500 animate-pulse"></i>
-                            <h3 className="text-2xl font-black uppercase tracking-tighter">System Error Detected</h3>
-                            <p className="text-gray-500 font-medium">{error}</p>
-                            <button onClick={() => navigate('/student/quizzes')} className="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/10">Reboot Session</button>
+                        <div className="flex-1 flex flex-col items-center justify-center text-center">
+                            <div className="w-24 h-24 bg-red-50 text-red-600 rounded-[2rem] flex items-center justify-center mb-8 text-3xl border border-red-100">
+                                <i className="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic">Sync Failure</h3>
+                            <p className="text-slate-700 max-w-sm mb-10 font-bold italic">{error}</p>
+                            <button onClick={() => navigate('/student/quizzes')} className="elite-button !px-12 bg-slate-900 text-white italic uppercase">Return to Lobby</button>
                         </div>
                     ) : (
-                        <div className="max-w-4xl w-full">
-                            {/* Question Card - Match Image 0/1 */}
-                            <div className="glass-card p-12 rounded-[3rem] border border-white/5 shadow-2xl space-y-10 relative overflow-hidden bg-white/5 transition-all">
-                                <div className="space-y-4">
-                                    <p className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-[0.3em]">
-                                        QUESTION {currentQuestionIndex + 1} / {totalQuestions}
-                                    </p>
-                                    <h2 className="text-3xl font-black text-white leading-tight tracking-tight">
-                                        {currentQuestion?.text}
-                                    </h2>
+                        <div className="max-w-3xl w-full space-y-10">
+                            {/* Question Progress Tracker */}
+                            <div className="space-y-6">
+                                <div className="flex items-end justify-between">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Question</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-4xl font-extrabold text-slate-900 leading-none">{currentQuestionIndex + 1}</span>
+                                            <span className="text-xl font-bold text-slate-300">/{totalQuestions}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Completion Status</span>
+                                        <p className="text-base font-bold text-indigo-600 mt-1 leading-none">{Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}%</p>
+                                    </div>
                                 </div>
+                                <div className="h-3 w-full bg-white rounded-full overflow-hidden p-1 border border-slate-100 shadow-sm">
+                                    <div
+                                        className="h-full bg-indigo-600 rounded-full transition-all duration-500"
+                                        style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
+                                    ></div>
+                                </div>
+                            </div>
 
-                                {/* Options List */}
-                                <div className="space-y-4">
-                                    {(currentQuestion?.options || []).map((option, idx) => {
+                            {/* Question Section */}
+                            <div className="bg-white p-10 md:p-14 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-lavender opacity-30 rounded-bl-[4rem]"></div>
+                                <h2 className="text-xl md:text-2xl font-bold text-slate-900 leading-snug text-center relative z-10 uppercase">
+                                    {currentQuestion?.text}
+                                </h2>
+                            </div>
+
+                            {/* Options List or Descriptive Input */}
+                            <div className="grid grid-cols-1 gap-5">
+                                {currentQuestion?.options && currentQuestion.options.length > 0 ? (
+                                    (currentQuestion.options).map((option, idx) => {
                                         const qId = currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`;
                                         const isSelected = selectedAnswers[qId] === option;
+                                        const letter = String.fromCharCode(65 + idx); // A, B, C, D
 
                                         return (
                                             <button
                                                 key={idx}
                                                 onClick={() => handleAnswerSelect(qId, option)}
-                                                className={`w-full flex items-center p-6 rounded-2xl border transition-all duration-300 ${isSelected
-                                                    ? 'bg-[#00E5FF11] border-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.1)]'
-                                                    : 'bg-white/2 border-white/5 hover:bg-white/5 hover:border-white/20'
+                                                className={`w-full flex items-center p-5 rounded-[1.5rem] border-2 transition-all duration-200 ${isSelected
+                                                    ? 'bg-pastel-blue/40 border-indigo-600 shadow-sm'
+                                                    : 'bg-white border-slate-100'
                                                     }`}
                                             >
-                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-[#00E5FF] bg-[#00E5FF]' : 'border-white/10 bg-white/5'
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs border-2 ${isSelected
+                                                    ? 'bg-indigo-600 border-indigo-600 text-white'
+                                                    : 'bg-slate-50 border-slate-100 text-slate-900'
                                                     }`}>
-                                                    {isSelected && <div className="w-2 h-2 rounded-full bg-[#030508]"></div>}
+                                                    {letter}
                                                 </div>
-                                                <span className={`ml-6 text-lg font-medium transition-all ${isSelected ? 'text-[#00E5FF]' : 'text-gray-400'}`}>
+                                                <span className={`ml-6 text-base font-bold uppercase transition-all ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
                                                     {option}
                                                 </span>
+                                                {isSelected && (
+                                                    <div className="ml-auto text-indigo-600">
+                                                        <i className="fas fa-check-circle text-lg"></i>
+                                                    </div>
+                                                )}
                                             </button>
                                         );
-                                    })}
-                                </div>
+                                    })
+                                ) : (
+                                    <div className="space-y-4">
+                                        <textarea
+                                            value={selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || ''}
+                                            onChange={(e) => handleAnswerSelect(currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`, e.target.value)}
+                                            placeholder="Type your descriptive answer here..."
+                                            className="w-full h-80 p-8 rounded-[2.5rem] border-2 border-slate-100 bg-white focus:border-indigo-600 focus:ring-0 transition-all font-semibold text-base text-slate-800 resize-none outline-none shadow-sm"
+                                        />
+                                        <div className="flex justify-between items-center px-8">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Character Count: {(selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || '').length}</span>
+                                            <span className="text-[10px] font-black text-indigo-600/40 uppercase tracking-widest italic animate-pulse">Auto-saving...</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                                {/* Navigation Actions */}
-                                <div className="flex items-center justify-between pt-10 border-t border-white/5">
+                            {/* Action Area */}
+                            <div className="pt-12 flex flex-col items-center gap-6">
+                                <button
+                                    onClick={currentQuestionIndex === totalQuestions - 1 ? confirmSubmit : handleNext}
+                                    className="elite-button !w-full !py-5 !text-lg !rounded-[1.5rem] bg-indigo-600 shadow-xl shadow-indigo-100 uppercase"
+                                >
+                                    {currentQuestionIndex === totalQuestions - 1 ? 'Submit Quiz' : 'Next Question'}
+                                </button>
+
+                                {currentQuestionIndex > 0 && (
                                     <button
                                         onClick={handlePrevious}
-                                        disabled={currentQuestionIndex === 0}
-                                        className="px-8 py-4 rounded-2xl bg-white/5 text-[#8E9AAF] border border-white/10 hover:bg-white/10 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed font-black text-xs uppercase tracking-widest flex items-center gap-3"
+                                        className="text-[10px] font-bold text-slate-700 tracking-[0.2em] uppercase underline underline-offset-4"
                                     >
-                                        <i className="fas fa-arrow-left"></i>
-                                        Previous
+                                        Previous Question
                                     </button>
-
-                                    <div className="flex flex-col items-end gap-6">
-                                        {selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] && (
-                                            <button
-                                                onClick={() => {
-                                                    const qId = currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`;
-                                                    setSelectedAnswers(prev => {
-                                                        const n = { ...prev };
-                                                        delete n[qId];
-                                                        return n;
-                                                    });
-                                                }}
-                                                className="text-[10px] text-gray-500 font-black uppercase tracking-widest hover:text-[#00E5FF] transition-colors flex items-center gap-2"
-                                            >
-                                                <i className="fas fa-times-circle"></i>
-                                                Clear Selection
-                                            </button>
-                                        )}
-
-                                        <button
-                                            onClick={handleNext}
-                                            disabled={currentQuestionIndex === totalQuestions - 1}
-                                            className="px-10 py-4 rounded-2xl bg-[#030508] text-white border border-white/10 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed font-black text-xs uppercase tracking-widest flex items-center gap-3"
-                                        >
-                                            Next
-                                            <i className="fas fa-arrow-right"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Submit Button - Highlighted at the bottom of the card */}
-                                <div className="pt-6">
-                                    <button
-                                        onClick={confirmSubmit}
-                                        className="w-full py-5 bg-[#0066FF] text-white rounded-3xl font-black uppercase tracking-[0.3em] text-sm shadow-2xl shadow-[#0066FF44] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                    >
-                                        Submit Quiz
-                                    </button>
-                                </div>
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* Modals */}
+                {/* Refined Modals */}
                 {(showConfirmation || showWarningModal || showViolationModal || showSuccessModal) && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#030508]/80 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 transition-all">
                         {showConfirmation && (
-                            <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-white/10 text-center animate-scale-up">
-                                <div className="w-20 h-20 bg-[#00E5FF11] text-[#00E5FF] rounded-3xl flex items-center justify-center mx-auto mb-8 text-3xl border border-[#00E5FF33]">
-                                    <i className="fas fa-upload"></i>
+                            <div className="bg-white w-full max-w-md p-10 md:p-14 rounded-[3.5rem] shadow-2xl text-center border border-slate-100">
+                                <div className="w-20 h-20 bg-pastel-blue text-blue-900 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-white shadow-sm">
+                                    <i className="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <h3 className="text-2xl font-black text-white mb-2 tracking-tighter uppercase">Final Submission?</h3>
-                                <p className="text-gray-500 font-medium mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
-                                    {Object.keys(selectedAnswers).length} of {totalQuestions} objectives secured. <br />
-                                    This action cannot be undone.
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">Confirm Submission</h3>
+                                <p className="text-slate-700 mb-12 font-bold italic text-sm">
+                                    You have completed {Object.keys(selectedAnswers).length} out of {totalQuestions} entities. All data will be finalized.
                                 </p>
                                 <div className="space-y-4">
-                                    <button onClick={() => handleSubmitQuiz()} className="w-full py-5 bg-[#00E5FF] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#00E5FF22] hover:scale-105 active:scale-95 transition-all">EXECUTE UPLOAD</button>
-                                    <button onClick={() => setShowConfirmation(false)} className="w-full py-5 text-gray-500 font-black uppercase tracking-[0.2em] hover:text-white transition-colors">ABORT</button>
+                                    <button onClick={() => handleSubmitQuiz()} className="elite-button !w-full !py-5 bg-indigo-600 italic">SUBMIT</button>
+                                    <button onClick={() => setShowConfirmation(false)} className="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em] italic">CANCEL</button>
                                 </div>
                             </div>
                         )}
 
                         {showWarningModal && (
-                            <div className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl text-center transform animate-scale-up">
-                                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
-                                    <i className="fas fa-exclamation-triangle"></i>
+                            <div className="bg-white rounded-[3.5rem] p-10 md:p-14 max-w-md w-full shadow-2xl text-center border border-slate-100">
+                                <div className="w-20 h-20 bg-pastel-orange text-amber-900 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-white shadow-sm">
+                                    <i className="fas fa-exclamation-circle"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Warning!</h3>
-                                <p className="text-gray-600 font-medium mb-10 leading-relaxed">
-                                    You have deviated from the quiz window. This is your <span className="text-red-500 font-bold">final warning</span>. <br />
-                                    Next time, your test will be <span className="text-red-500 font-bold">auto-submitted</span>.
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">Protocol Violation</h3>
+                                <p className="text-slate-700 mb-10 font-bold italic text-sm leading-relaxed">
+                                    Unauthorized shift detected. Maintain focus on the assessment window to avoid <span className="text-red-600 font-black">SYSTEM TERMINATION</span>.
                                 </p>
                                 <button
                                     onClick={() => { setShowWarningModal(false); if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { }); }}
-                                    className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-red-200"
+                                    className="elite-button !w-full !py-5 bg-slate-900 italic"
                                 >
-                                    OK, I Understand
+                                    RESTORE SESSION
                                 </button>
                             </div>
                         )}
 
                         {showViolationModal && (
-                            <div className="bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl text-center transform animate-scale-up border-2 border-red-500">
-                                <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                                    <i className="fas fa-ban"></i>
+                            <div className="bg-white rounded-[3.5rem] p-10 md:p-14 max-w-md w-full shadow-2xl text-center border border-slate-100">
+                                <div className="w-20 h-20 bg-red-50 text-red-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-red-100">
+                                    <i className="fas fa-user-shield"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Quiz Terminated</h3>
-                                <p className="text-gray-600 font-medium mb-10 leading-relaxed">
-                                    Multiple violations detected. Your quiz has been <br />
-                                    <span className="text-red-500 font-bold">automatically submitted</span>.
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">AUTO-TERMINATED</h3>
+                                <p className="text-slate-700 mb-10 font-bold italic text-sm leading-relaxed">
+                                    Multiple proctoring deviations logged. Session has been force-closed and data committed for review.
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/dashboard')}
-                                    className="w-full py-4 bg-[#1A1F26] hover:bg-[#2D343D] text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl"
+                                    className="elite-button !w-full !py-5 bg-slate-900 italic"
                                 >
-                                    Return to Dashboard
+                                    DISMISS TERMINATION
                                 </button>
                             </div>
                         )}
 
                         {showSuccessModal && (
-                            <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-[#00E5FF33] text-center animate-scale-up">
-                                <div className="w-24 h-24 bg-[#00E5FF22] text-[#00E5FF] rounded-full flex items-center justify-center mx-auto mb-8 text-4xl border border-[#00E5FF44] shadow-[0_0_40px_rgba(0,229,255,0.2)]">
-                                    <i className="fas fa-satellite-dish animate-bounce"></i>
+                            <div className="bg-white w-full max-w-md p-10 md:p-14 rounded-[3.5rem] shadow-2xl text-center border border-slate-100">
+                                <div className="w-24 h-24 bg-pastel-mint text-teal-900 rounded-full flex items-center justify-center mx-auto mb-8 text-4xl border border-white shadow-sm">
+                                    <i className="fas fa-check-circle"></i>
                                 </div>
-                                <h3 className="text-2xl font-black text-[#00E5FF] mb-2 tracking-tighter uppercase">Transmission Success</h3>
-                                <p className="text-gray-500 font-medium mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
-                                    All data packets secured. <br />
-                                    Proceed to results and analysis.
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">Transmission Success</h3>
+                                <p className="text-slate-700 mb-12 font-bold italic text-sm">
+                                    Your quiz has been submitted successfully.
                                 </p>
-                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="w-full py-5 bg-[#00E5FF] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#00E5FF22] hover:scale-105 active:scale-95 transition-all">VIEW RESULTS</button>
+                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="elite-button !w-full !py-6 bg-teal-600 shadow-xl shadow-teal-100 italic">VIEW RESULTS</button>
                             </div>
                         )}
                     </div>
@@ -462,21 +501,20 @@ const QuizInterface: React.FC = () => {
 
                 {/* Time Warning Modal */}
                 {showOneMinuteWarning && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#030508]/80 backdrop-blur-md animate-fade-in">
-                        <div className="glass-card w-full max-w-md p-10 rounded-[3rem] border border-[#FFD70033] text-center animate-scale-up">
-                            <div className="w-24 h-24 bg-[#FFD70022] text-[#FFD700] rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-4xl border border-[#FFD70044] shadow-[0_0_40px_rgba(255,215,0,0.2)]">
-                                <i className="fas fa-hourglass-half animate-pulse"></i>
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 transition-all">
+                        <div className="bg-white w-full max-w-sm p-10 rounded-[3rem] shadow-2xl text-center border border-slate-100">
+                            <div className="w-16 h-16 bg-pastel-orange text-amber-900 rounded-[1.2rem] flex items-center justify-center mx-auto mb-6 text-2xl border border-white shadow-sm">
+                                <i className="fas fa-hourglass-half"></i>
                             </div>
-                            <h3 className="text-3xl font-black text-[#FFD700] mb-2 tracking-tighter uppercase leading-none">Time Critical</h3>
-                            <p className="text-gray-400 font-bold mb-10 text-[10px] uppercase tracking-widest leading-relaxed">
-                                Only <span className="text-white">1 minute remaining</span>.<br />
-                                Wrap up your mission objectives immediately.
+                            <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase italic leading-none">Critical Threshold</h3>
+                            <p className="text-slate-700 mb-8 font-bold italic text-sm">
+                                Internal timer entering final minute. Expedite your selections.
                             </p>
                             <button
                                 onClick={() => setShowOneMinuteWarning(false)}
-                                className="w-full py-5 bg-[#FFD700] text-[#030508] rounded-2xl font-black uppercase tracking-[0.2em] shadow-lg shadow-[#FFD70022] hover:scale-105 active:scale-95 transition-all text-xs"
+                                className="elite-button !w-full bg-amber-600 italic"
                             >
-                                Acknowledge
+                                ACKNOWLEDGED
                             </button>
                         </div>
                     </div>

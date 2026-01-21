@@ -97,10 +97,11 @@ router.post('/courses', async (req: AuthRequest, res: Response) => {
         const { title, instructor, description, thumbnail } = req.body;
 
         if (!title || !instructor) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'Title and instructor are required',
             });
+            return;
         }
 
         const course = new Course({
@@ -146,49 +147,55 @@ router.post('/quizzes', async (req: AuthRequest, res: Response) => {
         });
 
         if (!title || !courseId || !questions || !Array.isArray(questions)) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'Title, courseId, and questions array are required',
             });
+            return;
         }
 
         // Validate course exists
         const course = await Course.findById(courseId);
         if (!course) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: `Course with ID ${courseId} not found. Please create the course first.`,
             });
+            return;
         }
 
         // Validate questions array
         if (questions.length === 0) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'At least one question is required',
             });
+            return;
         }
 
         // Validate each question
         for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
             if (!q.text || !q.type) {
-                return res.status(400).json({
+                res.status(400).json({
                     success: false,
                     message: `Question ${i + 1} is missing required fields (text, type)`,
                 });
+                return;
             }
             if (q.type === 'mcq' && (!q.options || q.options.length === 0)) {
-                return res.status(400).json({
+                res.status(400).json({
                     success: false,
                     message: `Question ${i + 1} (MCQ) must have options`,
                 });
+                return;
             }
             if (!q.correctAnswer) {
-                return res.status(400).json({
+                res.status(400).json({
                     success: false,
                     message: `Question ${i + 1} must have a correct answer`,
                 });
+                return;
             }
         }
 
@@ -251,10 +258,11 @@ router.delete('/quizzes/:id', async (req: AuthRequest, res: Response) => {
         // Find quiz first to get course ID
         const quiz = await Quiz.findById(id);
         if (!quiz) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz not found',
             });
+            return;
         }
 
         // 1. Delete the quiz
@@ -384,10 +392,11 @@ router.get('/quizzes/:quizId/submissions', async (req: AuthRequest, res: Respons
 
         const quiz = await Quiz.findById(quizId).populate('courseId', 'title');
         if (!quiz) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz not found',
             });
+            return;
         }
 
         const submissions = await QuizSubmission.find({ quizId })
@@ -474,10 +483,11 @@ router.get('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
 
         const quiz = await Quiz.findById(quizId).populate('courseId', 'title instructor');
         if (!quiz) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz not found',
             });
+            return;
         }
 
         const submissions = await QuizSubmission.find({ quizId });
@@ -524,10 +534,11 @@ router.delete('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
 
         const quiz = await Quiz.findById(quizId);
         if (!quiz) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz not found',
             });
+            return;
         }
 
         // Delete the quiz
@@ -561,7 +572,8 @@ router.put('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
 
         const quiz = await Quiz.findById(quizId);
         if (!quiz) {
-            return res.status(404).json({ success: false, message: 'Quiz not found' });
+            res.status(404).json({ success: false, message: 'Quiz not found' });
+            return;
         }
 
         // Check if course needs updating (if courseId changed, though usually tied to creation)
@@ -579,7 +591,8 @@ router.put('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
                 const q = questions[i];
                 // basic validation
                 if (!q.text || !q.type || !q.correctAnswer) {
-                    return res.status(400).json({ success: false, message: `Invalid question data at index ${i + 1}` });
+                    res.status(400).json({ success: false, message: `Invalid question data at index ${i + 1}` });
+                    return;
                 }
             }
             quiz.questions = questions;
@@ -619,10 +632,11 @@ router.get('/students/:studentId/results', async (req: AuthRequest, res: Respons
 
         const student = await User.findById(studentId);
         if (!student) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Student not found',
             });
+            return;
         }
 
         const submissions = await QuizSubmission.find({ studentId })

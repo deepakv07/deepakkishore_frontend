@@ -17,10 +17,11 @@ router.get('/:id/questions', async (req: AuthRequest, res: Response) => {
         const quiz = await Quiz.findById(req.params.id);
 
         if (!quiz) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz not found',
             });
+            return;
         }
 
         // Return questions without correct answers for security
@@ -124,10 +125,11 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
 
         const quiz = await Quiz.findById(quizId);
         if (!quiz) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz not found',
             });
+            return;
         }
 
         // --- STRICT AI SERVICE HANDOFF ---
@@ -201,7 +203,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                     });
                     await activity.save();
 
-                    return res.json({
+                    res.json({
                         success: true,
                         data: {
                             quizId: submission.quizId.toString(),
@@ -213,6 +215,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                             incorrectAnswers: submission.incorrectAnswers,
                         },
                     });
+                    return;
                 }
             } else {
                 console.warn(`⚠️ AI Service returned ${aiResponse.status}, falling back to local logic.`);
@@ -280,6 +283,13 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                         const correctAnswer = question.correctAnswer.trim().toLowerCase();
                         const studentAnswer = answer.answer.trim().toLowerCase();
                         isCorrect = correctAnswer === studentAnswer;
+                    }
+                } else if (question.type === 'descriptive') {
+                    // For descriptive questions in local fallback
+                    if (question.correctAnswer && answer.answer) {
+                        const correctAnswer = question.correctAnswer.trim().toLowerCase();
+                        const studentAnswer = answer.answer.trim().toLowerCase();
+                        isCorrect = studentAnswer.includes(correctAnswer) || correctAnswer.includes(studentAnswer);
                     }
                 }
 
@@ -358,10 +368,11 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
         const submission = await QuizSubmission.findOne({ quizId, studentId });
 
         if (!quiz || !submission) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: 'Quiz or submission not found',
             });
+            return;
         }
 
         const user = await import('../models/User').then((m) => m.default.findById(studentId));
@@ -386,12 +397,15 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
         // Calculate section breakdown based on actual question types
         const mcqQuestions = quiz.questions.filter(q => q.type === 'mcq');
         const aptitudeQuestions = quiz.questions.filter(q => q.type === 'aptitude');
+        const descriptiveQuestions = quiz.questions.filter(q => q.type === 'descriptive');
 
         // Calculate correct/incorrect for each section based on answers
         let mcqCorrect = 0;
         let mcqTotal = mcqQuestions.length;
         let aptitudeCorrect = 0;
         let aptitudeTotal = aptitudeQuestions.length;
+        let descriptiveCorrect = 0;
+        let descriptiveTotal = descriptiveQuestions.length;
 
         // Calculate time spent per question array
         // Initialize with 0s for all questions
@@ -430,12 +444,18 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                     if (question.correctAnswer && answer.answer) {
                         isCorrect = question.correctAnswer.trim().toLowerCase() === answer.answer.trim().toLowerCase();
                     }
+                } else if (question.type === 'descriptive') {
+                    if (question.correctAnswer && answer.answer) {
+                        isCorrect = answer.answer.trim().toLowerCase().includes(question.correctAnswer.trim().toLowerCase());
+                    }
                 }
 
                 if (question.type === 'mcq') {
                     if (isCorrect) mcqCorrect++;
                 } else if (question.type === 'aptitude') {
                     if (isCorrect) aptitudeCorrect++;
+                } else if (question.type === 'descriptive') {
+                    if (isCorrect) descriptiveCorrect++;
                 }
             }
         });
@@ -456,6 +476,14 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                 correct: aptitudeCorrect,
                 total: aptitudeTotal,
                 color: 'bg-indigo-500',
+            });
+        }
+        if (descriptiveTotal > 0) {
+            sectionBreakdown.push({
+                name: 'Descriptive',
+                correct: descriptiveCorrect,
+                total: descriptiveTotal,
+                color: 'bg-teal-500',
             });
         }
 
@@ -541,6 +569,15 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
             }
         }
 
+        if (descriptiveTotal > 0) {
+            const descriptivePercentage = (descriptiveCorrect / descriptiveTotal) * 100;
+            if (descriptivePercentage >= 70) {
+                strongAreas.push('Descriptive Questions');
+            } else {
+                toImprove.push('Descriptive Questions');
+            }
+        }
+
         // Use AI Report Strength/Weakness if available
         if (aiReportData && aiReportData.topic_analysis) {
             if (aiReportData.topic_analysis.strengths && aiReportData.topic_analysis.strengths.length > 0) {
@@ -606,6 +643,10 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                         } else if (q.type === 'aptitude') {
                             if (q.correctAnswer && answer.answer) {
                                 isCorrect = q.correctAnswer.trim().toLowerCase() === answer.answer.trim().toLowerCase();
+                            }
+                        } else if (q.type === 'descriptive') {
+                            if (q.correctAnswer && answer.answer) {
+                                isCorrect = answer.answer.trim().toLowerCase().includes(q.correctAnswer.trim().toLowerCase());
                             }
                         }
                     }

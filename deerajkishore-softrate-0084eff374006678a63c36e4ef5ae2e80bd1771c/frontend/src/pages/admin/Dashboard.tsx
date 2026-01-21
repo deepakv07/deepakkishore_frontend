@@ -62,143 +62,148 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <AdminLayout>
-            <div className="animate-fade-in space-y-8 md:space-y-12">
+            <div className="animate-fade-in space-y-10 md:space-y-14 pb-10">
                 {/* Strategic Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-8 text-center md:text-left">
-                    <div className="w-full md:w-auto">
-                        <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                            <span className="px-3 py-1 rounded-full bg-[#FFD70011] border border-[#B8860B33] dark:border-[#FFD70033] text-[#B8860B] dark:text-[#FFD700] text-[10px] font-black uppercase tracking-[0.3em]">
-                                ADMIN DASHBOARD
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <span className="px-4 py-1.5 rounded-full bg-pastel-orange text-amber-900 text-[10px] font-bold uppercase tracking-widest border border-white">
+                                Central Intelligence
                             </span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter leading-tight">
-                            Dashboard <span className="text-[#B8860B] dark:text-[#FFD700]">Overview</span>
+                        <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                            Management <br /><span className="text-amber-600/40">Dashboard</span>
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-500 mt-2 md:mt-4 text-xs md:text-sm font-bold uppercase tracking-widest">Welcome back, Administrator</p>
+                        <p className="text-slate-700 text-base font-semibold">Strategic oversight of all platform activity</p>
                     </div>
 
-                    <div className="flex items-center justify-center w-full md:w-auto gap-4">
+                    <div className="w-full md:w-auto">
                         <Link
                             to="/create-quiz"
-                            className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 bg-gray-900 text-white dark:bg-white dark:text-[#030508] font-black rounded-xl md:rounded-2xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center shadow-2xl shadow-black/5 dark:shadow-white/5 uppercase tracking-[0.2em] text-[10px]"
+                            className="elite-button !rounded-[1.5rem] !py-4 !px-8 shadow-2xl shadow-amber-200/50 bg-amber-600"
                         >
-                            <i className="fas fa-plus mr-3 text-xs"></i> Create Quiz
+                            <i className="fas fa-plus-circle text-xs"></i>
+                            <span className="font-bold">Construct Quiz</span>
                         </Link>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                    {stats.map((stat) => (
-                        <div key={stat.label} className="glass-card p-6 md:p-8 border border-border-color shadow-2xl relative overflow-hidden group hover:border-[#FFD70033] transition-all duration-500">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/2 rounded-bl-full -mr-16 -mt-16 group-hover:bg-[#FFD70008] transition-colors duration-500"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {stats.map((stat, i) => {
+                        const colors = [
+                            { bg: 'bg-pastel-blue', text: 'text-blue-900' },
+                            { bg: 'bg-pastel-lavender', text: 'text-indigo-900' },
+                            { bg: 'bg-pastel-orange', text: 'text-amber-900' },
+                            { bg: 'bg-pastel-mint', text: 'text-teal-900' },
+                        ];
+                        const theme = colors[i % colors.length];
 
-                            <div className="relative z-10 text-center md:text-left">
-                                <div className="w-12 h-12 bg-black/5 dark:bg-white/5 text-gray-400 rounded-xl flex items-center justify-center mb-4 md:mb-6 text-lg border border-border-color group-hover:bg-[#FFD70011] group-hover:text-[#FFD700] group-hover:border-[#FFD70022] mx-auto md:mx-0 transition-all duration-500 shadow-lg">
-                                    <i className={stat.icon}></i>
-                                </div>
-                                <p className="text-[10px] font-black text-gray-600 dark:text-gray-500 mb-2 uppercase tracking-[0.2em]">{stat.label}</p>
-                                <p className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter tabular-nums">{stat.value}</p>
-                                <div className="mt-4 flex items-center gap-2">
-                                    <div className="flex-1 h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-gray-700 to-gray-500 w-2/3 group-hover:from-[#FFD700] group-hover:to-[#FFD70088] transition-all duration-700"></div>
+                        return (
+                            <div key={stat.label} className={`${theme.bg} rounded-[2.5rem] p-10 relative overflow-hidden shadow-sm border border-white`}>
+                                <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+
+                                <div className="relative z-10 space-y-8">
+                                    <div className={`w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-xl shadow-sm ${theme.text}`}>
+                                        <i className={stat.icon}></i>
                                     </div>
-                                    <span className="text-[8px] font-black text-gray-600 group-hover:text-[#FFD700] transition-colors uppercase tracking-widest">Active</span>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-slate-800 mb-2 uppercase tracking-widest">{stat.label}</p>
+                                        <p className="text-3xl font-bold text-slate-900 tracking-tight leading-none tabular-nums">{stat.value}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Recent Quizzes Feed */}
-                <div className="glass-card rounded-[2.5rem] border border-border-color shadow-2xl relative overflow-hidden">
-                    <div className="p-10 border-b border-border-color flex flex-col md:flex-row justify-between items-center gap-6 bg-black/5 dark:bg-white/1">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-[#FFD70011] text-[#FFD700] rounded-2xl flex items-center justify-center border border-[#FFD70022]">
-                                <i className="fas fa-list"></i>
+                <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="p-10 md:p-14 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-8 bg-slate-50/50">
+                        <div className="flex items-center gap-6">
+                            <div className="w-14 h-14 bg-pastel-orange rounded-2xl flex items-center justify-center text-amber-900 border border-white shadow-sm">
+                                <i className="fas fa-layer-group text-xl"></i>
                             </div>
                             <div>
-                                <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Recent Quizzes</h2>
-                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Manage your submitted quizzes</p>
+                                <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight leading-none uppercase">Assessment Records</h2>
+                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-1">Live platform activity monitoring</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button className="px-5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-border-color text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 dark:hover:text-white hover:border-black/20 dark:hover:border-white/20 transition-all">Filter</button>
-                            <button className="px-5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-border-color text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 dark:hover:text-white hover:border-black/20 dark:hover:border-white/20 transition-all">Export</button>
+                        <div className="flex items-center gap-4">
+                            <button className="px-6 py-3 rounded-2xl bg-white border border-slate-200 text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] shadow-sm italic">Filter</button>
+                            <button className="px-6 py-3 rounded-2xl bg-white border border-slate-200 text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] shadow-sm italic">Export</button>
                         </div>
                     </div>
 
                     <div className="p-2">
                         {quizzesLoading ? (
-                            <div className="flex items-center justify-center py-24">
-                                <div className="w-12 h-12 border-4 border-[#FFD70033] border-t-[#FFD700] rounded-full animate-spin shadow-[0_0_20px_rgba(255,215,0,0.1)]"></div>
+                            <div className="flex items-center justify-center py-32">
+                                <div className="w-16 h-16 border-4 border-pastel-orange border-t-amber-500 rounded-full animate-spin"></div>
                             </div>
                         ) : quizzes.length === 0 ? (
-                            <div className="text-center py-24 relative overflow-hidden group">
-                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFD70005] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                            <div className="text-center py-32 relative group">
                                 <div className="relative z-10 flex flex-col items-center">
-                                    <div className="w-20 h-20 bg-black/5 dark:bg-white/2 rounded-full flex items-center justify-center mb-6 border border-border-color text-gray-600 group-hover:text-[#FFD700] group-hover:border-[#FFD70022] transition-all duration-700">
-                                        <i className="fas fa-clipboard-list text-3xl"></i>
+                                    <div className="w-24 h-24 bg-pastel-orange/40 rounded-full flex items-center justify-center mb-8 border border-white text-amber-800">
+                                        <i className="fas fa-ghost text-4xl"></i>
                                     </div>
-                                    <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-xs">No active quizzes found</p>
+                                    <p className="text-2xl font-black italic text-slate-900 tracking-tighter uppercase">No assessments deployed</p>
+                                    <p className="text-slate-600 text-xs font-bold uppercase tracking-widest mt-2 italic text-center">Initiate a new module to begin tracking</p>
                                     <Link
-                                        to="/admin/courses/create"
-                                        className="mt-8 px-10 py-4 bg-[#FFD70011] text-[#FFD700] font-black rounded-2xl hover:bg-[#FFD70022] border border-[#FFD70033] transition-all uppercase tracking-[0.2em] text-[10px] shadow-2xl"
+                                        to="/create-quiz"
+                                        className="mt-10 elite-button !rounded-full !py-4 !px-12 bg-amber-600 shadow-xl shadow-amber-200/50 italic"
                                     >
-                                        Create First Quiz
+                                        Create Quiz Module
                                     </Link>
                                 </div>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full border-separate border-spacing-y-2 px-8">
+                            <div className="overflow-x-auto pb-8">
+                                <table className="w-full px-10">
                                     <thead>
-                                        <tr className="text-[#FFD700] opacity-50 uppercase tracking-[0.3em] text-[10px] font-black">
-                                            <th className="px-6 py-6 text-left font-black">QUIZ TITLE</th>
-                                            <th className="px-6 py-6 text-left font-black">COURSE</th>
-                                            <th className="px-6 py-6 text-center font-black">QUESTIONS</th>
-                                            <th className="px-6 py-6 text-center font-black">SUBMISSIONS</th>
-                                            <th className="px-6 py-6 text-center font-black">AVG SCORE</th>
-                                            <th className="px-6 py-6 text-right font-black">CREATED</th>
+                                        <tr className="text-slate-600 uppercase tracking-[0.4em] text-[10px] font-black italic">
+                                            <th className="px-10 py-10 text-left">Entity Title</th>
+                                            <th className="px-6 py-10 text-left">Sector</th>
+                                            <th className="px-6 py-10 text-center">Modules</th>
+                                            <th className="px-6 py-10 text-center">Responses</th>
+                                            <th className="px-6 py-10 text-center">Efficiency</th>
+                                            <th className="px-6 py-10 text-right">Registered</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y-0">
                                         {quizzes.slice(0, 10).map((quiz) => (
-                                            <tr key={quiz.id} className="group hover:bg-[#FFD70008] transition-all duration-300">
-                                                <td className="px-6 py-8 rounded-l-[1.5rem] border-y border-l border-border-color group-hover:border-[#FFD70011]">
-                                                    <div className="font-black text-gray-900 dark:text-white text-base tracking-tight uppercase group-hover:text-[#FFD700] transition-colors">{quiz.title}</div>
-                                                    {quiz.description && (
-                                                        <div className="text-[10px] text-gray-600 mt-2 truncate max-w-xs font-bold uppercase tracking-widest group-hover:text-gray-500">
-                                                            ID: {quiz.id.toString().substring(0, 8).toUpperCase()} • {quiz.description}
-                                                        </div>
-                                                    )}
+                                            <tr key={quiz.id} className="transition-all">
+                                                <td className="px-10 py-10 rounded-l-[2rem]">
+                                                    <div className="font-black text-2xl text-slate-900 tracking-tighter italic leading-none uppercase group-hover:text-amber-600 transition-colors">{quiz.title}</div>
+                                                    <div className="text-[10px] text-slate-600 mt-2 font-bold uppercase tracking-[0.3em] italic">
+                                                        REF_{quiz.id.toString().substring(0, 6).toUpperCase()}
+                                                    </div>
                                                 </td>
-                                                <td className="px-6 py-8 border-y border-border-color group-hover:border-[#FFD70011]">
-                                                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] bg-black/5 dark:bg-white/2 px-3 py-1.5 rounded-lg border border-border-color group-hover:border-[#FFD70011] group-hover:text-gray-300">
-                                                        {quiz.courseTitle || 'UNASSIGNED'}
+                                                <td className="px-6 py-10">
+                                                    <span className="text-[10px] font-black text-amber-900 uppercase tracking-[0.2em] bg-pastel-orange px-5 py-2.5 rounded-full border border-white italic">
+                                                        {quiz.courseTitle || 'GENERAL'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-8 text-center border-y border-border-color group-hover:border-[#FFD70011]">
-                                                    <div className="flex flex-col items-center gap-1">
-                                                        <span className="text-sm font-black text-gray-900 dark:text-white tabular-nums">{quiz.totalQuestions}</span>
+                                                <td className="px-6 py-10 text-center">
+                                                    <span className="text-xl font-black text-slate-900 tabular-nums italic">{quiz.totalQuestions}</span>
+                                                </td>
+                                                <td className="px-6 py-10 text-center">
+                                                    <div className="flex items-center justify-center gap-3">
+                                                        <div className="w-2 h-2 rounded-full bg-teal-500 shadow-[0_0_10px_#4ade80]"></div>
+                                                        <span className="text-xl font-black text-slate-900 tabular-nums italic">{quiz.totalSubmissions || 0}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-8 text-center border-y border-border-color group-hover:border-[#FFD70011]">
-                                                    <div className="flex items-center justify-center gap-2">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41] shadow-[0_0_8px_#00FF41]"></div>
-                                                        <span className="text-sm font-black text-gray-900 dark:text-white tabular-nums">{quiz.totalSubmissions || 0}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-8 text-center border-y border-border-color group-hover:border-[#FFD70011]">
-                                                    <div className="inline-flex items-end gap-1">
-                                                        <span className={`text-xl font-black tabular-nums tracking-tighter ${quiz.averageScore >= 70 ? 'text-[#00FF41]' : quiz.averageScore >= 50 ? 'text-[#FFD700]' : 'text-[#FF3D00]'}`}>
-                                                            {quiz.averageScore ? `${quiz.averageScore.toFixed(0)}` : '0'}
+                                                <td className="px-6 py-10 text-center">
+                                                    <div className="flex flex-col items-center">
+                                                        <span className={`text-3xl font-black italic tracking-tighter tabular-nums ${quiz.averageScore >= 70 ? 'text-teal-600' : quiz.averageScore >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
+                                                            {quiz.averageScore ? `${quiz.averageScore.toFixed(0)}%` : '0%'}
                                                         </span>
-                                                        <span className="text-[10px] font-black text-gray-600 mb-1">%</span>
+                                                        <div className="w-12 h-1 bg-slate-100 mt-1 rounded-full overflow-hidden">
+                                                            <div className={`h-full ${quiz.averageScore >= 70 ? 'bg-teal-500' : 'bg-amber-600'}`} style={{ width: `${quiz.averageScore || 0}%` }}></div>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-8 text-right rounded-r-[1.5rem] border-y border-r border-border-color group-hover:border-[#FFD70011]">
-                                                    <span className="text-[10px] font-black text-gray-600 group-hover:text-gray-400 uppercase tracking-widest tabular-nums">
-                                                        {new Date(quiz.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                                                <td className="px-10 py-10 text-right rounded-r-[2rem]">
+                                                    <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest tabular-nums italic">
+                                                        {new Date(quiz.createdAt).toLocaleDateString()}
                                                     </span>
                                                 </td>
                                             </tr>
@@ -206,12 +211,12 @@ const AdminDashboard: React.FC = () => {
                                     </tbody>
                                 </table>
                                 {quizzes.length > 10 && (
-                                    <div className="mt-10 mb-8 text-center">
+                                    <div className="mt-14 mb-10 text-center">
                                         <Link
                                             to="/admin/courses"
-                                            className="px-10 py-5 bg-white/2 border border-white/5 rounded-2xl text-[10px] font-black text-[#FFD700] hover:bg-[#FFD7000D] hover:border-[#FFD70033] uppercase tracking-[0.4em] transition-all duration-300 shadow-2xl"
+                                            className="px-14 py-6 bg-slate-50 border border-slate-200 rounded-[2rem] text-[10px] font-black text-slate-700 hover:text-amber-900 hover:bg-pastel-orange/40 uppercase tracking-[0.4em] transition-all italic"
                                         >
-                                            View All Quizzes ({quizzes.length})
+                                            Access Full Archive ({quizzes.length})
                                         </Link>
                                     </div>
                                 )}

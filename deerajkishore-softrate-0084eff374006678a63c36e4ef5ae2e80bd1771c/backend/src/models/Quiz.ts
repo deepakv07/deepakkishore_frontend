@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IQuestion {
     _id?: mongoose.Types.ObjectId;
     text: string;
-    type: 'mcq' | 'aptitude';
+    type: 'mcq' | 'aptitude' | 'descriptive';
     options?: string[];
     correctAnswer?: string;
     points: number;
@@ -30,7 +30,7 @@ const QuestionSchema: Schema = new Schema(
         },
         type: {
             type: String,
-            enum: ['mcq', 'aptitude'],
+            enum: ['mcq', 'aptitude', 'descriptive'],
             required: true,
         },
         options: {

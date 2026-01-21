@@ -11,21 +11,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        const saved = localStorage.getItem('theme');
-        return saved ? saved === 'dark' : true;
-    });
 
+    // Force light theme and clean up legacy classes
     useEffect(() => {
-        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-        if (!isDarkMode) {
-            document.body.classList.add('light-theme');
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.body.classList.remove('light-theme');
-            document.documentElement.classList.add('dark');
-        }
-    }, [isDarkMode]);
+        document.body.classList.remove('light-theme');
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    }, []);
 
     // Close sidebar on mobile when navigating
     useEffect(() => {
@@ -61,118 +53,123 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     ];
 
     return (
-        <div className="flex min-h-screen bg-bg-main text-text-main font-sans selection:bg-[#FFD70033] selection:text-[#FFD700] transition-colors duration-300">
-            {/* Overlay for mobile */}
+        <div className="flex min-h-screen bg-bg-main text-text-main font-inter transition-all duration-500">
+            {/* Overlay for mobile sidebar */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-[#00000088] backdrop-blur-md z-40 lg:hidden"
+                    className="fixed inset-0 bg-slate-900/10 backdrop-blur-sm z-40 lg:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar - Tactical Control Panel */}
-            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-80 bg-card-bg backdrop-blur-2xl border-r border-border-color flex flex-col transform transition-all duration-500 ease-in-out shadow-[20px_0_50px_rgba(0,0,0,0.5)] ${isSidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
+            {/* Sidebar */}
+            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-border-color flex flex-col transform transition-all duration-500 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
                 }`}>
-                <div className="p-10 border-b border-border-color flex items-center space-x-5 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FFD70005] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    <div className="w-14 h-14 bg-[#FFD70011] border border-[#FFD70033] rounded-2xl flex items-center justify-center text-[#FFD700] font-black text-2xl shadow-[0_0_20px_rgba(255,215,0,0.1)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.2)] transition-all duration-500">
+                <div className="p-10 flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-pastel-orange rounded-[1.2rem] flex items-center justify-center text-amber-600 font-black text-xl shadow-sm">
                         SB
                     </div>
                     <div>
-                        <span className="text-2xl font-black text-text-main tracking-tighter block group-hover:text-[#FFD700] transition-colors">
-                            SkillBuilder
-                        </span>
-                        <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.4em] opacity-70">ADMIN PORTAL</span>
+                        <h2 className="text-xl font-black italic tracking-tighter leading-none">SkillBuilder</h2>
+                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">Admin Portal</span>
                     </div>
                 </div>
 
-                <nav className="flex-1 p-8 space-y-4">
+                <nav className="flex-1 px-6 space-y-2">
                     {navItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `flex items-center space-x-5 p-5 rounded-2xl transition-all duration-300 group ${isActive
-                                    ? `bg-[#FFD70011] ${isDarkMode ? 'text-white' : 'text-[#B8860B]'} border border-[#FFD70033] shadow-[0_0_30px_rgba(255,215,0,0.05)]`
-                                    : 'text-gray-500 hover:text-text-main hover:bg-card-bg border border-transparent'
+                                `flex items-center space-x-4 p-4 rounded-[1.5rem] transition-all duration-300 group ${isActive
+                                    ? 'bg-pastel-orange text-amber-600 shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
                                 }`
                             }
                         >
-                            <div className={`p-2 rounded-xl transition-colors duration-300 ${location.pathname === item.path ? `bg-[#FFD70022] ${isDarkMode ? 'text-[#FFD700]' : 'text-[#B8860B]'}` : 'group-hover:text-gray-300'}`}>
-                                <i className={`${item.icon} text-lg`}></i>
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg">
+                                <i className={item.icon}></i>
                             </div>
-                            <span className="font-black text-xs uppercase tracking-[0.2em]">{item.label}</span>
-                            {location.pathname === item.path && (
-                                <div className={`ml-auto w-1.5 h-1.5 rounded-full ${isDarkMode ? 'bg-[#FFD700]' : 'bg-[#B8860B]'} shadow-[0_0_10px_#FFD700]`}></div>
-                            )}
+                            <span className="font-bold text-sm tracking-tight">{item.label}</span>
                         </NavLink>
                     ))}
                 </nav>
 
-                <div className="p-8 border-t border-border-color space-y-6">
-                    <div className="flex items-center space-x-5 p-5 bg-card-bg rounded-2xl border border-border-color group hover:border-[#FFD70022] transition-colors duration-500">
-                        <div className="w-12 h-12 bg-[#FFD70011] border border-[#FFD70033] rounded-xl flex items-center justify-center text-[#FFD700] transition-transform group-hover:scale-110 duration-500 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
-                            <i className="fas fa-user-shield text-xl"></i>
+                <div className="p-8 space-y-4">
+                    <div className="p-4 bg-slate-50 rounded-[2rem] flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                            <i className="fas fa-user-shield"></i>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-sm font-black text-text-main truncate tracking-tight uppercase">{user?.name || 'Admin'}</p>
-                            <p className="text-[10px] font-bold text-gray-500 truncate uppercase tracking-widest">{user?.email}</p>
+                            <p className="text-xs font-black italic truncate">{user?.name || 'Admin'}</p>
+                            <p className="text-[9px] font-medium text-slate-400 truncate tracking-wide">{user?.email}</p>
                         </div>
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-center space-x-4 py-5 bg-[#FF3D000D] text-[#FF3D00] rounded-2xl hover:bg-[#FF3D001A] transition-all duration-300 font-black text-[10px] uppercase tracking-[0.3em] border border-[#FF3D0022] hover:border-[#FF3D0044] hover:shadow-[0_0_30px_rgba(255,61,0,0.1)] group"
+                        className="w-full flex items-center justify-center space-x-3 py-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-[1.5rem] transition-all font-bold text-[10px] uppercase tracking-widest border border-red-100/50"
                     >
-                        <i className="fas fa-power-off group-hover:rotate-90 transition-transform duration-500"></i>
-                        <span>LOGOUT ACCOUNT</span>
+                        <i className="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 relative">
-                {/* Background Grid Pattern */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none"></div>
-
-                <header className="px-4 md:px-10 py-4 md:py-6 flex items-center bg-transparent sticky top-0 z-30">
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl md:rounded-2xl bg-card-bg backdrop-blur-xl border border-border-color text-gray-400 hover:text-white hover:border-[#FFD70044] hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] transition-all duration-300 group mr-4 md:mr-6"
-                        title={isSidebarOpen ? 'Retract Panel' : 'Expand Panel'}
-                    >
-                        <i className={`fas ${isSidebarOpen ? 'fa-align-right' : 'fa-align-left'} text-base md:text-lg transition-transform group-hover:scale-110`}></i>
-                    </button>
-
-                    <div className="flex items-center space-x-3 md:space-x-5 relative overflow-hidden group mr-auto lg:hidden">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-[#FFD70011] border border-[#FFD70033] rounded-xl md:rounded-2xl flex items-center justify-center text-[#FFD700] font-black text-lg md:text-xl shadow-[0_0_20px_rgba(255,215,0,0.1)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.2)] transition-all duration-500">
-                            SB
-                        </div>
-                        <div className="sm:block">
-                            <span className="text-lg md:text-xl font-black text-text-main tracking-tighter block group-hover:text-[#FFD700] transition-colors leading-none">
-                                SkillBuilder
-                            </span>
-                            <span className="text-[7px] md:text-[8px] font-black text-[#FFD700] uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-70">ADMIN PORTAL</span>
-                        </div>
+            <main className="flex-1 flex flex-col min-w-0 pb-24 lg:pb-0">
+                <header className="px-6 md:px-12 py-6 flex items-center justify-between sticky top-0 bg-bg-main/80 backdrop-blur-md z-30">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="w-12 h-12 hidden lg:flex items-center justify-center rounded-2xl bg-white border border-border-color text-slate-400 hover:text-slate-900 shadow-sm transition-all"
+                        >
+                            <i className={`fas ${isSidebarOpen ? 'fa-indent' : 'fa-outdent'}`}></i>
+                        </button>
+                        <h1 className="text-2xl md:text-3xl font-black italic tracking-tighter text-slate-900">
+                            {navItems.find(item => location.pathname.includes(item.path))?.label || 'Dashboard'}
+                        </h1>
                     </div>
 
-                    <div className="ml-auto flex items-center gap-3 md:gap-6">
-                        <div className="hidden lg:flex flex-col items-end text-right">
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Administrator Session</span>
+                    <div className="flex items-center gap-3">
+                        <div className="hidden sm:flex flex-col items-end">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Administrator</span>
                         </div>
-                        <button
-                            onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-card-bg border border-border-color flex items-center justify-center hover:bg-white/10 transition-colors group"
-                            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                        >
-                            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-sm md:text-base text-[#8E9AAF] group-hover:text-[#FFD700]`}></i>
-                        </button>
+                        <div className="w-10 h-10 bg-pastel-orange rounded-xl flex items-center justify-center text-amber-600 shadow-sm">
+                            <i className="fas fa-shield-alt text-xs"></i>
+                        </div>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-auto p-6 lg:p-12 pt-2 lg:pt-0 relative z-10">
+                <div className="flex-1 p-6 md:p-12 pt-0">
                     {children}
                 </div>
             </main>
+
+            {/* Mobile Bottom Navigation Bar */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] lg:hidden bg-white/80 backdrop-blur-xl border border-white p-2 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex items-center gap-2">
+                {navItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ${isActive ? 'text-white' : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                        >
+                            {isActive && (
+                                <div className="absolute inset-0 bg-slate-900 rounded-full animate-scale-in"></div>
+                            )}
+                            <i className={`${item.icon} text-lg relative z-10`}></i>
+                        </NavLink>
+                    );
+                })}
+                <button
+                    onClick={handleLogout}
+                    className="w-14 h-14 rounded-full flex items-center justify-center text-red-400 hover:text-red-600 transition-all"
+                >
+                    <i className="fas fa-power-off text-lg"></i>
+                </button>
+            </div>
         </div>
     );
 };

@@ -28,69 +28,54 @@ const RoleSelection: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#030508] relative overflow-hidden flex items-center justify-center p-6">
-            {/* Background Glows */}
-            <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#9D4EDD]/10 rounded-full blur-[150px]" />
-            <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#00E5FF]/10 rounded-full blur-[150px]" />
+        <div className="min-h-screen bg-bg-main relative overflow-hidden flex items-center justify-center p-6">
+            {/* Soft Pastel Accents */}
+            <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-pastel-lavender/40 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-pastel-mint/40 rounded-full blur-[120px]" />
 
-            <div className="max-w-4xl w-full relative z-10 px-4">
-                <div className="text-center mb-8 md:mb-16 space-y-4">
-                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white">Welcome to <span className="neon-text-cyan">Skill Builder</span></h2>
-                    <p className="text-[#8E9AAF] text-base md:text-lg">Please select your role to continue</p>
+            <div className="max-w-4xl w-full relative z-10 px-6 animate-fade-in">
+                <div className="text-center mb-16 space-y-4">
+                    <h2 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight">
+                        Choose Your <br /><span className="text-slate-900/30">Access</span>
+                    </h2>
+                    <p className="text-slate-700 text-fluid-body font-semibold">Ready to continue your journey?</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-                    {roles.map((role) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
+                    {roles.map((role, idx) => (
                         <div
                             key={role.title}
                             onClick={() => navigate(role.path)}
-                            className="glass-card glass-card-hover group p-6 md:p-10 cursor-pointer text-left relative overflow-hidden"
+                            className="glass-card group p-10 md:p-14 cursor-pointer text-left relative overflow-hidden border-white"
                         >
-                            {/* Card Accent Glow */}
                             <div
-                                className="absolute -top-10 -right-10 w-32 h-32 blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"
-                                style={{ backgroundColor: role.color }}
-                            />
-
-                            <div
-                                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center text-2xl md:text-3xl mb-6 md:mb-8 border transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3"
-                                style={{
-                                    backgroundColor: `${role.color}11`,
-                                    borderColor: `${role.color}33`,
-                                    color: role.color,
-                                    boxShadow: `0 0 20px ${role.color}11`
-                                }}
+                                className={`w-20 h-20 md:w-28 md:h-28 rounded-[2rem] flex items-center justify-center text-4xl md:text-6xl mb-10 shadow-sm ${idx === 0 ? 'bg-pastel-blue' : 'bg-pastel-orange'
+                                    }`}
                             >
                                 <i className={role.icon}></i>
                             </div>
 
-                            <h3 className="text-2xl md:text-3xl font-black text-white mb-3 md:mb-4 tracking-tight group-hover:text-white transition-colors">
+                            <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">
                                 {role.title}
                             </h3>
-                            <p className="text-[#8E9AAF] mb-8 md:mb-10 leading-relaxed text-sm md:text-lg group-hover:text-white/80 transition-colors">
+                            <p className="text-slate-600 mb-10 leading-relaxed text-base font-medium">
                                 {role.description}
                             </p>
 
-                            <div
-                                className="w-full py-3 md:py-4 rounded-xl font-black uppercase tracking-widest text-xs md:text-sm border-2 text-center transition-all duration-300"
-                                style={{
-                                    borderColor: `${role.color}44`,
-                                    color: role.color,
-                                    backgroundColor: 'transparent'
-                                }}
-                            >
-                                Select {role.title}
+                            <div className="elite-button !rounded-[1.5rem] !py-6 shadow-xl">
+                                <span>Go to {role.title}</span>
+                                <i className="fas fa-chevron-right text-[10px] opacity-50"></i>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                <div className="mt-16 text-center">
+                <div className="mt-20 text-center">
                     <button
                         onClick={() => navigate('/')}
-                        className="text-[#8E9AAF] hover:text-[#00E5FF] font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-3 mx-auto group"
+                        className="text-slate-900/60 hover:text-slate-900 font-bold uppercase tracking-[0.4em] text-[10px] transition-all flex items-center justify-center gap-4 mx-auto group"
                     >
-                        <i className="fas fa-arrow-left group-hover:-translate-x-1 transition-transform duration-300"></i> Back to Landing
+                        <i className="fas fa-arrow-left"></i> Back to start
                     </button>
                 </div>
             </div>

@@ -21,7 +21,6 @@ const StudentQuizzes: React.FC = () => {
             setQuizzes(quizzesArray);
         } catch (err: any) {
             console.error('Error loading quizzes:', err);
-            // Check if error is related to casting (often meaning deleted resource or bad ID)
             if (err.response?.data?.message?.includes('Cast to ObjectId') || err.message?.includes('Cast to ObjectId')) {
                 setError('The quiz you are trying to access has been deleted by the admin.');
             } else {
@@ -36,7 +35,7 @@ const StudentQuizzes: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center py-40">
-                    <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#00E5FF55]"></div>
+                    <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </StudentLayout>
         );
@@ -50,18 +49,20 @@ const StudentQuizzes: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="space-y-10 animate-fade-in">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-12 pb-12">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-black tracking-tighter mt-1 text-center md:text-left">Available <span className="neon-text-cyan">Quizzes</span></h1>
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight uppercase">
+                            Available <br /><span className="text-slate-400">Quizzes</span>
+                        </h1>
                     </div>
 
-                    <div className="glass-card p-1 flex gap-1 md:gap-2 w-full md:w-auto">
+                    <div className="bg-white p-2 rounded-[2rem] flex gap-3 border border-slate-100 shadow-sm w-full md:w-auto overflow-x-auto no-scrollbar">
                         {['all', 'pending', 'completed'].map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`flex-1 md:flex-none px-3 md:px-6 py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black tracking-widest uppercase transition-all duration-300 ${filter === f ? 'bg-[#00E5FF] text-black shadow-[0_0_15px_#00E5FF55]' : 'text-[#8E9AAF] hover:text-white hover:bg-white/5'}`}
+                                className={`px-8 py-3 rounded-[1.2rem] text-[10px] font-bold tracking-[0.1em] uppercase transition-all ${filter === f ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'}`}
                             >
                                 {f}
                             </button>
@@ -70,82 +71,82 @@ const StudentQuizzes: React.FC = () => {
                 </div>
 
                 {quizzes.length === 0 ? (
-                    <div className="glass-card p-10 md:p-20 text-center">
-                        <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i className="fas fa-satellite-dish text-[#8E9AAF] text-xl md:text-2xl"></i>
+                    <div className="bg-white rounded-[3rem] p-24 text-center border border-slate-100 shadow-sm">
+                        <div className="w-20 h-20 bg-slate-50 rounded-[1.8rem] flex items-center justify-center mx-auto mb-10 border border-slate-100">
+                            <i className="fas fa-box-open text-slate-300 text-2xl"></i>
                         </div>
-                        <p className="text-[#8E9AAF] font-bold tracking-widest uppercase text-[10px] md:text-xs">NO quizz is yet assingned</p>
-                        <p className="text-white/40 text-[9px] md:text-[10px] mt-2 italic px-4 md:px-10">Check back later for new mission assignments in this sector.</p>
+                        <p className="text-slate-900 font-extrabold text-2xl mb-4 uppercase tracking-tight">No Quizzes Available</p>
+                        <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Check back in a bit for new quizzes.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                        {filteredQuizzes.map((quiz) => {
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                        {filteredQuizzes.map((quiz, idx) => {
                             const isExpired = !quiz.isCompleted && quiz.isExpired;
                             const isFaded = quiz.isCompleted || isExpired;
+
+                            const banners = ['bg-indigo-900', 'bg-slate-800', 'bg-indigo-700', 'bg-slate-900', 'bg-indigo-800'];
+                            const bannerColor = banners[idx % banners.length];
+
                             return (
-                                <div key={quiz.id} className={`glass-card group flex flex-col relative overflow-hidden transition-all duration-500 ${isFaded ? 'opacity-60 grayscale-[0.4] hover:grayscale-0 hover:opacity-100' : ''}`}>
+                                <div key={quiz.id} className={`flex flex-col h-full relative overflow-hidden bg-white rounded-[3.5rem] border border-slate-100 shadow-sm ${isFaded ? 'opacity-95' : ''}`}>
                                     {/* Top Banner Area */}
-                                    <div className={`h-24 md:h-32 w-full ${isExpired ? 'bg-[#FFEDED]' : 'bg-[#E3EBFF]'}`}></div>
-
-                                    <div className="p-6 md:p-8 flex flex-col h-full">
-                                        {/* Header Info */}
-                                        <div className="mb-4 md:mb-6 text-center md:text-left">
-                                            <h3 className="text-xl md:text-2xl font-black tracking-tighter mb-1 leading-tight">{quiz.title}</h3>
-                                            <p className="text-[10px] md:text-xs font-bold text-[#8E9AAF] tracking-widest uppercase">{quiz.courseTitle || 'Course Quiz'}</p>
-                                        </div>
-
-                                        {/* Timestamps */}
-                                        <div className="grid grid-cols-2 gap-2 md:gap-4 mb-6 md:mb-8 bg-black/20 p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/5">
-                                            <div className="space-y-1">
-                                                <p className="text-[8px] md:text-[9px] font-black text-[#8E9AAF] uppercase tracking-widest">Start Time</p>
-                                                <p className={`text-[10px] md:text-xs font-black tracking-tight ${quiz.isCompleted ? 'text-[#00C853]' : isExpired ? 'text-[#FF3D00]' : 'text-white'
-                                                    }`}>
-                                                    {quiz.startDate ? new Date(quiz.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
-                                                </p>
+                                    <div className={`h-24 w-full relative overflow-hidden ${isExpired ? 'bg-rose-900' : bannerColor}`}>
+                                        <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                                        {quiz.isCompleted && (
+                                            <div className="absolute top-6 right-6 bg-emerald-500 text-white px-5 py-2 rounded-full text-[8px] font-black uppercase tracking-widest border border-white/20 flex items-center gap-2">
+                                                <i className="fas fa-check-circle"></i>
+                                                VERIFIED
                                             </div>
-                                            <div className="space-y-1 text-right">
-                                                <p className="text-[8px] md:text-[9px] font-black text-[#8E9AAF] uppercase tracking-widest">End Time</p>
-                                                <p className={`text-[10px] md:text-xs font-black tracking-tight ${quiz.isCompleted ? 'text-[#00C853]' : isExpired ? 'text-[#FF3D00]' : 'text-white'
-                                                    }`}>
-                                                    {quiz.endDate ? new Date(quiz.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
-                                                </p>
+                                        )}
+                                        {isExpired && (
+                                            <div className="absolute top-6 right-6 bg-white text-rose-900 px-5 py-2 rounded-full text-[8px] font-black uppercase tracking-widest border border-rose-200">
+                                                DISCONTINUED
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="p-12 flex flex-col flex-1">
+                                        <div className="mb-8 min-h-[4rem]">
+                                            <p className="text-[10px] font-bold text-indigo-600 tracking-[0.2em] uppercase mb-2 leading-none truncate">{quiz.courseTitle || 'CO_MODULE'}</p>
+                                            <h3 className="text-xl font-bold tracking-tight text-slate-900 line-clamp-2 leading-snug uppercase">{quiz.title}</h3>
+                                        </div>
+
+                                        <div className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100 mb-8 flex justify-between">
+                                            <div className="text-center flex-1">
+                                                <p className="text-[8px] font-black text-slate-400 tracking-[0.2rem] uppercase mb-1">START TIME</p>
+                                                <p className="text-xs font-black text-emerald-600">N/A</p>
+                                            </div>
+                                            <div className="w-px bg-slate-200"></div>
+                                            <div className="text-center flex-1">
+                                                <p className="text-[8px] font-black text-slate-400 tracking-[0.2rem] uppercase mb-1">END TIME</p>
+                                                <p className="text-xs font-black text-emerald-600">N/A</p>
                                             </div>
                                         </div>
 
-                                        {/* Metrics Row */}
-                                        <div className="flex justify-between items-center mb-3 md:mb-4">
-                                            <p className="text-xs md:text-sm font-black text-[#0066FF] tracking-tight uppercase">
-                                                {quiz.isCompleted ? `Score: ${quiz.score || 0}%` : 'Not Attempted'}
-                                            </p>
-                                            <p className="text-[8px] md:text-[10px] font-black tracking-widest uppercase text-[#8E9AAF]/60">
-                                                {quiz.totalQuestions || 0} QUESTIONS
-                                            </p>
-                                        </div>
-
-                                        {/* Duration row */}
-                                        <div className="flex items-center justify-between mb-6 md:mb-8">
-                                            <div className="flex items-center gap-2 text-[#8E9AAF]">
-                                                <i className="far fa-clock text-xs"></i>
-                                                <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase">{quiz.durationMinutes || 30} mins</span>
+                                        <div className="grid grid-cols-2 gap-4 mb-12">
+                                            <div className="bg-white/50 p-5 rounded-2xl border border-slate-100">
+                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">SCORE: {quiz.percentage || 0}%</p>
+                                                <p className="text-xs font-black text-indigo-600 italic uppercase">{quiz.durationMinutes || 30} MINS</p>
                                             </div>
-                                            {quiz.isCompleted && quiz.score < 50 && (
-                                                <span className="text-[9px] md:text-[10px] font-black text-red-500 uppercase tracking-widest">X Failed</span>
-                                            )}
+                                            <div className="bg-white/50 p-5 rounded-2xl border border-slate-100 text-right">
+                                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">{quiz.totalQuestions || 0} QUESTIONS</p>
+                                                <p className="text-xs font-black text-rose-600 italic uppercase">X FAILED</p>
+                                            </div>
                                         </div>
 
-                                        {/* Action Button */}
-                                        <div className="mt-auto flex justify-center">
+                                        <div className="mt-auto">
                                             <button
                                                 disabled={isExpired}
                                                 onClick={() => navigate(quiz.isCompleted ? `/quiz/${quiz.id}/results` : `/quiz/${quiz.id}/details`)}
-                                                className={`w-full md:w-auto px-6 md:px-12 py-3 rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 border-2 ${quiz.isCompleted
-                                                    ? 'border-[#00C853] text-[#00C853] hover:bg-[#00C853] hover:text-white'
+                                                className={`elite-button !w-full !py-5 !text-[10px] !rounded-[1.2rem] font-bold uppercase tracking-widest ${quiz.isCompleted
+                                                    ? 'bg-slate-900 !text-white'
                                                     : isExpired
-                                                        ? 'border-[#E0E0E0] text-[#BDBDBD] bg-white'
-                                                        : 'border-[#00E5FF] text-[#00E5FF] hover:bg-[#00E5FF] hover:text-white shadow-[0_5px_15px_rgba(0,229,255,0.1)]'
+                                                        ? 'opacity-20 grayscale pointer-events-none'
+                                                        : 'bg-indigo-600 shadow-xl'
                                                     }`}
                                             >
-                                                {quiz.isCompleted ? 'View Results' : isExpired ? 'Expired' : 'ATTEMPT QUIZ'}
+                                                <span>{quiz.isCompleted ? 'VIEW RESULTS' : isExpired ? 'Locked' : 'START QUIZ'}</span>
+                                                <i className={`fas ${quiz.isCompleted ? 'fa-chart-bar' : 'fa-arrow-right'} text-[10px] opacity-100 ml-2`}></i>
                                             </button>
                                         </div>
                                     </div>
@@ -153,30 +154,25 @@ const StudentQuizzes: React.FC = () => {
                             );
                         })}
                     </div>
-
                 )}
+
                 {/* Error Logic Popup */}
                 {error && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-                        <div className="glass-card max-w-md w-full p-8 rounded-[2rem] border border-white/10 shadow-2xl transform scale-100 animate-scale-in relative overflow-hidden">
-                            <div className="absolute inset-0 bg-red-500/5"></div>
-
-                            <div className="relative z-10 text-center">
-                                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
-                                    <i className="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/20 backdrop-blur-sm">
+                        <div className="bg-white max-w-sm w-full p-12 rounded-[4rem] border border-white shadow-2xl relative overflow-hidden">
+                            <div className="text-center">
+                                <div className="w-24 h-24 bg-rose-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-rose-100 shadow-sm">
+                                    <i className="fas fa-shield-halved text-4xl text-rose-600"></i>
                                 </div>
-
-                                <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Quiz Access Error</h3>
-                                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-8 leading-relaxed">
-                                    The quiz you are looking for is no longer available.<br />
-                                    <span className="text-red-400">It may have been deleted by the administrator.</span>
+                                <h3 className="text-4xl font-black italic text-slate-900 tracking-tighter mb-4 uppercase leading-none">Security Flag</h3>
+                                <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest mb-12 leading-relaxed italic">
+                                    {error}
                                 </p>
-
                                 <button
                                     onClick={() => setError(null)}
-                                    className="w-full py-4 rounded-xl bg-white/5 border border-white/5 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all"
+                                    className="elite-button !w-full !py-6 !rounded-[2rem] bg-indigo-600 uppercase italic tracking-widest"
                                 >
-                                    Dismiss
+                                    Confirm
                                 </button>
                             </div>
                         </div>

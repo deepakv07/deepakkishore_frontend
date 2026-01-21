@@ -39,123 +39,105 @@ const StudentLogin: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#030508] relative overflow-hidden flex items-center justify-center p-6">
-            {/* Background Glows */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#9D4EDD]/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#00E5FF]/10 rounded-full blur-[120px]" />
+        <div className="min-h-screen bg-bg-main relative overflow-hidden flex items-center justify-center p-6">
+            {/* Soft Pastel Orbs */}
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-pastel- blue/40 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pastel-pink/40 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
 
-            <div className="max-w-md w-full relative z-10 px-4">
-                <div className="text-center mb-6 md:mb-10 space-y-4">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-2xl md:text-3xl mx-auto mb-4 md:mb-6 shadow-[0_0_30px_rgba(157,78,221,0.2)]">
+            <div className="max-w-md w-full relative z-10 px-4 animate-fade-in">
+                <div className="text-center mb-12 space-y-4">
+                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-slate-900 font-extrabold text-3xl mx-auto mb-8 shadow-2xl shadow-slate-200/50">
                         SB
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter">
-                        {isLogin ? 'Student Login' : 'Create Account'}
+                    <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        {isLogin ? 'Welcome Back' : 'Get Started'}
                     </h2>
-                    {!isLogin && (
-                        <p className="text-[#8E9AAF] text-xs md:text-sm italic">Join our learning community today.</p>
-                    )}
-                    {isLogin && (
-                        <p className="text-[#8E9AAF] text-xs md:text-sm">Welcome back! Please enter your details.</p>
-                    )}
+                    <p className="text-slate-700 text-base font-semibold leading-relaxed">
+                        {isLogin ? 'Ready to pick up where you left off?' : 'Start your learning journey with us today.'}
+                    </p>
                 </div>
 
-                <div className="glass-card p-6 md:p-10 border-white/10">
-                    <div className="flex bg-white/5 p-1 rounded-xl mb-8">
+                <div className="glass-card p-10 md:p-14 border-white">
+                    <div className="flex bg-slate-50 p-1.5 rounded-[1.5rem] mb-10">
                         <button
                             onClick={() => setIsLogin(true)}
-                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${isLogin ? 'bg-[#9D4EDD] text-black shadow-lg shadow-[#9D4EDD]/20' : 'text-[#8E9AAF] hover:text-white'}`}
+                            className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest rounded-2xl transition-all ${isLogin ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-700'}`}
                         >
                             Sign In
                         </button>
                         <button
                             onClick={() => setIsLogin(false)}
-                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${!isLogin ? 'bg-[#9D4EDD] text-black shadow-lg shadow-[#9D4EDD]/20' : 'text-[#8E9AAF] hover:text-white'}`}
+                            className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest rounded-2xl transition-all ${!isLogin ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-700'}`}
                         >
-                            Register
+                            Join
                         </button>
                     </div>
 
                     {error && (
-                        <div className="mb-8 p-4 bg-red-500/10 border-l-4 border-red-500 text-red-400 text-sm rounded-r-lg">
-                            <i className="fas fa-exclamation-triangle mr-2"></i> {error}
+                        <div className="mb-10 p-5 bg-red-50 text-red-700 text-xs font-bold rounded-[1.2rem] flex items-center gap-3">
+                            <i className="fas fa-circle-exclamation"></i> {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-8">
                         {!isLogin && (
-                            <div className="space-y-2">
-                                <label className="block text-xs font-black text-white uppercase tracking-widest ml-1">Full Name</label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
-                                        <i className="fas fa-user text-sm"></i>
-                                    </span>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="elite-input pl-12"
-                                        placeholder="John Doe"
-                                    />
-                                </div>
+                            <div className="space-y-3">
+                                <label className="block text-[10px] font-bold text-slate-900/80 uppercase tracking-widest ml-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="elite-input"
+                                    placeholder="Enter your name"
+                                />
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <label className="block text-xs font-black text-white uppercase tracking-widest ml-1">Email Address</label>
-                            <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
-                                    <i className="fas fa-envelope text-sm"></i>
-                                </span>
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="elite-input pl-12"
-                                    placeholder="Email"
-                                />
-                            </div>
+                        <div className="space-y-3">
+                            <label className="block text-[10px] font-bold text-slate-900/80 uppercase tracking-widest ml-2">Email Address</label>
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="elite-input"
+                                placeholder="email@address.com"
+                            />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="block text-xs font-black text-white uppercase tracking-widest ml-1">Password *</label>
-                            <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E9AAF]">
-                                    <i className="fas fa-lock text-sm"></i>
-                                </span>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="elite-input pl-12"
-                                    placeholder="Password"
-                                    minLength={isLogin ? 1 : 6}
-                                />
-                            </div>
+                        <div className="space-y-3">
+                            <label className="block text-[10px] font-bold text-slate-900/80 uppercase tracking-widest ml-2">Password</label>
+                            <input
+                                type="password"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="elite-input"
+                                placeholder="••••••••"
+                                minLength={isLogin ? 1 : 6}
+                            />
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="elite-button w-full py-4 text-xs tracking-widest uppercase disabled:opacity-50 !from-[#9D4EDD] !to-[#0077FF]"
+                            className="elite-button w-full shadow-2xl shadow-slate-200"
                         >
                             {loading ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin mr-2"></i> Processing...
-                                </>
-                            ) : (isLogin ? 'Sign In' : 'Create Account')}
+                                <i className="fas fa-spinner fa-spin"></i>
+                            ) : (
+                                <span>{isLogin ? 'Continue' : 'Create Account'}</span>
+                            )}
                         </button>
                     </form>
 
-                    <div className="mt-8">
-                        <div className="relative flex items-center justify-center mb-8">
+                    <div className="mt-12">
+                        <div className="relative flex items-center justify-center mb-10">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-white/10"></div>
+                                <div className="w-full border-t border-slate-200"></div>
                             </div>
-                            <span className="relative px-4 bg-[#0A0E14] text-[#8E9AAF] text-[10px] uppercase tracking-widest">or continue with</span>
+                            <span className="relative px-6 bg-white text-slate-900/60 text-[10px] font-bold uppercase tracking-widest">or</span>
                         </div>
 
                         <button
@@ -164,20 +146,20 @@ const StudentLogin: React.FC = () => {
                                 const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/callback`;
                                 window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=email profile openid&access_type=offline`;
                             }}
-                            className="w-full flex items-center justify-center gap-3 py-3 border border-white/10 rounded-xl hover:bg-white/5 transition font-bold text-white text-xs tracking-widest uppercase"
+                            className="w-full flex items-center justify-center gap-4 py-5 bg-slate-50 hover:bg-slate-100 rounded-[1.5rem] transition-all font-bold text-slate-900 text-[10px] tracking-widest uppercase"
                         >
                             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" className="w-4 h-4" alt="Google" />
-                            Continue with Google
+                            Sign in with Google
                         </button>
                     </div>
                 </div>
 
-                <div className="mt-8 text-center text-xs">
+                <div className="mt-14 text-center">
                     <button
                         onClick={() => navigate('/role-selection')}
-                        className="text-[#8E9AAF] hover:text-white transition-all flex items-center justify-center gap-2 mx-auto font-bold tracking-widest uppercase"
+                        className="text-slate-900/60 hover:text-slate-900 transition-all flex items-center justify-center gap-4 mx-auto font-bold tracking-widest uppercase text-[10px]"
                     >
-                        <i className="fas fa-arrow-left text-[10px]"></i> Back to Role Selection
+                        <i className="fas fa-arrow-left"></i> Change Role
                     </button>
                 </div>
             </div>

@@ -68,49 +68,51 @@ const EditProfile: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-4xl mx-auto space-y-10 animate-fade-in">
+            <div className="max-w-4xl mx-auto space-y-10 md:space-y-14 animate-fade-in pb-10">
                 {/* Header Information */}
-                <div className="glass-card p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 rounded-2xl bg-[#00E5FF11] border border-[#00E5FF33] flex items-center justify-center text-[#00E5FF]">
-                            <i className="fas fa-id-card-clip text-3xl"></i>
+                <div className="bg-white rounded-[3rem] p-10 md:p-14 flex flex-col md:flex-row justify-between items-center gap-10 border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-pastel-blue opacity-40 rounded-full"></div>
+
+                    <div className="relative z-10 flex items-center gap-8">
+                        <div className="w-24 h-24 rounded-[2.5rem] bg-pastel-blue flex items-center justify-center text-blue-900 border border-white shadow-sm">
+                            <i className="fas fa-user-edit text-3xl"></i>
                         </div>
                         <div className="text-center md:text-left">
-                            <h1 className="text-2xl font-black tracking-tighter">{user?.name}</h1>
-                            <p className="text-[#8E9AAF] text-xs font-bold tracking-widest uppercase mt-1">{user?.email}</p>
+                            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 leading-none uppercase">{user?.name}</h1>
+                            <p className="text-slate-700 text-[10px] font-bold tracking-widest uppercase mt-2">Identity Management</p>
                         </div>
                     </div>
-
-
                 </div>
 
                 {/* Edit Profile Form */}
-                <div className="glass-card overflow-hidden">
-                    <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
-                        <h2 className="text-xl font-black tracking-tight flex items-center gap-3">
-                            <i className="fas fa-edit text-[#00E5FF]"></i>
-                            Edit Profile
+                <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="p-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h2 className="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-4 uppercase">
+                            <div className="w-10 h-10 bg-pastel-mint rounded-full flex items-center justify-center text-teal-900 border border-white shadow-sm">
+                                <i className="fas fa-edit text-sm"></i>
+                            </div>
+                            Update Information
                         </h2>
                         <button
                             onClick={() => navigate('/student/profile')}
-                            className="text-[#8E9AAF] hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                            className="text-slate-700 transition-all text-[10px] font-bold uppercase tracking-widest"
                         >
-                            Cancel
+                            Abandon
                         </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="p-10 space-y-10">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                    <form onSubmit={handleSubmit} className="p-10 md:p-14 space-y-14">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-10">
                             {[
                                 { name: 'firstName', label: 'FIRST NAME', placeholder: 'Enter first name' },
                                 { name: 'lastName', label: 'LAST NAME', placeholder: 'Enter last name' },
                                 { name: 'phone', label: 'PHONE NUMBER', placeholder: '+91 98765 43210' },
                                 { name: 'department', label: 'DEPARTMENT', placeholder: 'e.g. Computer Science' },
-                                { name: 'yearOfStudy', label: 'YEAR OF STUDY', placeholder: 'e.g. B.Tech CSE | 2024-2028' },
+                                { name: 'yearOfStudy', label: 'YEAR OF STUDY', placeholder: 'e.g. B.Tech | 4th Year' },
                                 { name: 'degree', label: 'DEGREE', placeholder: 'e.g. B.Tech' },
                             ].map((field) => (
-                                <div key={field.name} className="space-y-2 group">
-                                    <label className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-widest ml-1 transition-colors group-focus-within:text-[#00E5FF]">
+                                <div key={field.name} className="space-y-3">
+                                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest ml-2 leading-none">
                                         {field.label}
                                     </label>
                                     <input
@@ -119,38 +121,44 @@ const EditProfile: React.FC = () => {
                                         value={(formData as any)[field.name]}
                                         onChange={handleChange}
                                         placeholder={field.placeholder}
-                                        className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-[#00E5FF] focus:bg-[#00E5FF08] transition-all font-black text-sm tracking-tight placeholder:text-white/20"
+                                        className="elite-input border border-slate-200"
                                     />
                                 </div>
                             ))}
 
-                            <div className="space-y-2 opacity-50">
-                                <label className="text-[10px] font-black text-[#8E9AAF] uppercase tracking-widest ml-1">EMAIL ID</label>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest ml-2 leading-none">Email Address</label>
                                 <input
                                     type="email"
                                     value={formData.email}
                                     disabled
-                                    className="w-full px-6 py-4 bg-white/5 border border-white/5 rounded-2xl outline-none font-black text-sm tracking-tight text-[#8E9AAF] cursor-not-allowed"
+                                    className="elite-input cursor-not-allowed bg-slate-100 border border-slate-200 text-slate-900 font-bold"
                                 />
+                                <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest ml-2">Official identifier cannot be modified</p>
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
+                        <div className="flex flex-col md:flex-row justify-end gap-6 pt-10 border-t border-slate-100">
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="px-10 py-4 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest border border-white/5"
+                                className="px-12 py-4 text-slate-700 font-bold text-[10px] uppercase tracking-widest"
                             >
-                                RESET
+                                Reset Form
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-10 py-4 bg-[#0066FF] hover:bg-[#0052cc] text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest shadow-lg shadow-[#0066FF22]"
+                                className="elite-button !rounded-[1.5rem] !px-12 shadow-xl shadow-slate-100 bg-blue-600"
                             >
                                 {loading ? (
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : 'SAVE CHANGES'}
+                                    <i className="fas fa-spinner fa-spin"></i>
+                                ) : (
+                                    <>
+                                        <span>Commit Changes</span>
+                                        <i className="fas fa-check-circle text-[10px]"></i>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>

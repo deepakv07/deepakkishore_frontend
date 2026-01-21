@@ -7,42 +7,49 @@
     --font-inter: "Inter", sans-serif;
     --font-outfit: "Outfit", sans-serif;
 
-    /* Semantic Colors - Dark Theme (Default) */
-    --bg-main: #030508;
-    --text-main: #ffffff;
-    --card-bg: rgba(10, 14, 20, 0.8);
-    --border-color: rgba(255, 255, 255, 0.05);
+    /* Semantic Colors - Warm Lite Brown / Pastel Theme */
+    --bg-main: #F7F4F2;
+    --text-main: #141619;
+    --card-bg: #FFFFFF;
+    --border-color: #ECE9E6;
 
-    --color-elite-cyan: #00E5FF;
-    --color-elite-purple: #9D4EDD;
+    --pastel-lavender: #E8E6F5;
+    --pastel-mint: #DAEFEC;
+    --pastel-orange: #F9E7C8;
+    --pastel-blue: #E0E9F8;
+    --pastel-pink: #F8E3E6;
+
+    --color-primary: #141619;
+    --color-accent: #2563EB;
+
+    --card-radius: 2.5rem;
+    --button-radius: 1.5rem;
 }
 
-.light-theme {
-    /* Semantic Colors - Light Theme */
-    --bg-main: #FFFFFF;
-    --text-main: #000000;
-    --card-bg: #F3F4F6;
-    --border-color: #000000;
+/* Base styles for global elements - Ensuring High Contrast Static Text */
+.text-gray-300,
+.text-gray-400,
+.text-gray-500,
+.text-slate-400,
+.text-slate-300,
+.text-gray-600,
+.text-gray-700 {
+    color: #334155 !important;
+    /* Darker slate for high visibility */
+    opacity: 1 !important;
 }
 
-/* Force High Contrast Black Text in Light Theme */
-.light-theme .text-gray-300,
-.light-theme .text-gray-400,
-.light-theme .text-gray-500,
-.light-theme .text-gray-600,
-.light-theme .text-gray-700 {
-    color: #000000 !important;
+body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    font-family: var(--font-inter);
 }
 
 @layer base {
     body {
-        font-family: var(--font-inter);
-        background-color: var(--bg-main);
-        color: var(--text-main);
         margin: 0;
         min-height: 100vh;
         overflow-x: hidden;
-        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h1,
@@ -51,7 +58,26 @@
     h4,
     h5,
     h6 {
-        font-family: var(--font-outfit);
+        font-family: var(--font-inter);
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+    }
+
+    h1 {
+        @apply text-3xl md:text-4xl lg:text-5xl;
+    }
+
+    h2 {
+        @apply text-2xl md:text-3xl lg:text-4xl;
+    }
+
+    h3 {
+        @apply text-xl md:text-2xl lg:text-3xl;
+    }
+
+    h4 {
+        @apply text-lg md:text-xl;
     }
 
     * {
@@ -62,86 +88,114 @@
 @layer components {
     .glass-card {
         background-color: var(--card-bg);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
         border: 1px solid var(--border-color);
-        border-radius: 1rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        border-radius: var(--card-radius);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
     }
 
     .glass-card-hover {
-        transition: all 0.3s ease;
-    }
-
-    .glass-card-hover:hover {
-        border-color: var(--border-color);
-        box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
-    }
-
-    .neon-text-cyan {
-        color: #00E5FF;
-        filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.5));
-    }
-
-    .neon-text-purple {
-        color: #9D4EDD;
-        filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.5));
-    }
-
-    .elite-gradient-bg {
-        background: linear-gradient(135deg, #00E5FF 0%, #9D4EDD 100%);
+        /* Static shadow for mobile */
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
     }
 
     .elite-button {
-        @apply px-6 py-3 rounded-full font-bold transition-all duration-300 flex items-center justify-center gap-2;
-        background: linear-gradient(135deg, #00E5FF 0%, #9D4EDD 100%);
-        color: black;
-    }
-
-    .elite-button:hover {
-        transform: scale(1.05);
+        @apply px-8 py-4 rounded-[1.5rem] font-bold flex items-center justify-center gap-3 active:scale-95;
+        background: var(--color-primary);
+        color: white;
     }
 
     .elite-input {
-        @apply w-full border rounded-xl px-4 py-3 outline-none transition-all duration-300;
-        border-color: var(--border-color);
-        background-color: var(--card-bg);
-        color: var(--text-main);
+        @apply w-full border-none rounded-[1.5rem] px-6 py-4 outline-none;
+        background-color: #FFFFFF;
+        color: #141619;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .elite-input:focus {
+        background-color: #FFFFFF;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Pastel Utility Classes - Static and high contrast */
+    .bg-pastel-lavender {
+        background-color: var(--pastel-lavender);
+        color: #1E1B4B;
+        /* Dark indigo for lavender */
+    }
+
+    .bg-pastel-mint {
+        background-color: var(--pastel-mint);
+        color: #064E3B;
+        /* Dark emerald for mint */
+    }
+
+    .bg-pastel-orange {
+        background-color: var(--pastel-orange);
+        color: #78350F;
+        /* Dark amber for orange */
+    }
+
+    .bg-pastel-blue {
+        background-color: var(--pastel-blue);
+        color: #1E3A8A;
+        /* Dark blue for blue */
+    }
+
+    .bg-pastel-pink {
+        background-color: var(--pastel-pink);
+        color: #831843;
+        /* Dark pink for pink */
+    }
+
+    /* Fluid Typography Utilities */
+    .text-fluid-hero {
+        font-size: clamp(2rem, 8vw, 5rem);
+    }
+
+    .text-fluid-h1 {
+        font-size: clamp(1.75rem, 6vw, 3.5rem);
+    }
+
+    .text-fluid-h2 {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    .text-fluid-body {
+        font-size: clamp(0.875rem, 1.5vw, 1rem);
     }
 }
 
-@keyframes spin-slow {
+/* Animations */
+@keyframes fade-in {
     from {
-        transform: rotate(0deg);
+        opacity: 0;
+        transform: translateY(10px);
     }
 
     to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-.animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
+.animate-fade-in {
+    animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-main);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #1A1F26;
-    border-radius: 4px;
-}
-
-.light-theme ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: #E2E8F0;
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 229, 255, 0.2);
+    background: #CBD5E1;
 }

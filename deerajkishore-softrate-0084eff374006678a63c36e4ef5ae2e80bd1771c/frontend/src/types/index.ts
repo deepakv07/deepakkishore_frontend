@@ -43,7 +43,7 @@ export interface Question {
     id: number;
     _id?: string | number;
     text: string;
-    type: 'mcq' | 'aptitude' | 'programming';
+    type: 'mcq' | 'aptitude' | 'programming' | 'descriptive';
     options?: string[];
     correctAnswer?: string;
     points: number;
@@ -60,6 +60,8 @@ export interface Quiz {
     isCompleted?: boolean;
     score?: number;
     passed?: boolean;
+    courseTitle?: string;
+    completedAt?: string;
 }
 
 export interface Course {

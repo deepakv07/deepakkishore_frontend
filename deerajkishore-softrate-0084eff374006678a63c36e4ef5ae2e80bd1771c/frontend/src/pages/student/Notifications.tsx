@@ -42,50 +42,52 @@ const StudentNotifications: React.FC = () => {
             <div className="space-y-10 animate-fade-in">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <h1 className="text-4xl font-black tracking-tighter mt-1">New <span className="neon-text-cyan">Assignments</span></h1>
-                        <p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-2">
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tighter mt-1 italic text-slate-900 leading-none">New <br /><span className="text-indigo-600">Assignments</span></h1>
+                        <p className="text-sm text-slate-700 font-bold uppercase tracking-widest mt-4 italic">
                             Quizzes waiting for your attention
                         </p>
                     </div>
                 </div>
 
                 {quizzes.length === 0 ? (
-                    <div className="glass-card p-20 text-center">
-                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i className="fas fa-bell-slash text-[#8E9AAF] text-2xl"></i>
+                    <div className="bg-white rounded-[3rem] p-20 text-center border border-slate-100 shadow-sm">
+                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100">
+                            <i className="fas fa-bell-slash text-slate-400 text-2xl"></i>
                         </div>
-                        <p className="text-[#8E9AAF] font-bold tracking-widest uppercase text-xs">No new notifications</p>
-                        <p className="text-white/40 text-[10px] mt-2 italic px-10">You're all caught up! No pending quizzes assigned.</p>
+                        <p className="text-slate-900 font-black tracking-[0.2em] uppercase text-xs italic">No new notifications</p>
+                        <p className="text-slate-600 text-xs mt-4 italic px-10 font-bold">You're all caught up! No pending quizzes assigned.</p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         {quizzes.map((quiz) => (
-                            <div key={quiz.id} className="glass-card p-6 flex flex-col md:flex-row items-center gap-6 group hover:border-[#00E5FF55] transition-all duration-300">
+                            <div key={quiz.id} className="bg-white rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 border border-slate-100 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-blue opacity-30 rounded-bl-[4rem]"></div>
+
                                 {/* Icon / Status */}
-                                <div className="w-16 h-16 rounded-2xl bg-[#00E5FF11] flex items-center justify-center text-[#00E5FF] shadow-[0_0_20px_rgba(0,229,255,0.1)] group-hover:scale-110 transition-transform duration-300 shrink-0">
-                                    <i className="fas fa-bolt text-2xl animate-pulse"></i>
+                                <div className="w-20 h-20 rounded-[1.8rem] bg-pastel-blue flex items-center justify-center text-blue-900 border border-white shadow-sm shrink-0">
+                                    <i className="fas fa-bolt text-2xl"></i>
                                 </div>
 
                                 {/* Content */}
-                                <div className="flex-1 text-center md:text-left">
-                                    <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
-                                        <h3 className="text-xl font-black tracking-tight text-white">{quiz.title}</h3>
-                                        <span className="px-2 py-0.5 rounded bg-[#00E5FF] text-black text-[9px] font-black uppercase tracking-widest">NEW</span>
+                                <div className="flex-1 text-center md:text-left relative z-10">
+                                    <div className="flex flex-col md:flex-row items-center md:items-start gap-3 mb-2">
+                                        <h3 className="text-2xl font-black tracking-tight text-slate-900 uppercase italic leading-none">{quiz.title}</h3>
+                                        <span className="px-5 py-1.5 rounded-full bg-pastel-orange text-amber-900 text-[10px] font-black uppercase tracking-widest border border-white italic">NEW</span>
                                     </div>
-                                    <p className="text-xs font-bold text-[#8E9AAF] tracking-widest uppercase">{quiz.courseTitle || 'General Quiz'}</p>
+                                    <p className="text-[10px] font-black text-slate-600 tracking-[0.3em] uppercase italic">{quiz.courseTitle || 'General Quiz'}</p>
 
-                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-3">
-                                        <div className="flex items-center gap-2 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                                            <i className="far fa-clock"></i>
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6">
+                                        <div className="flex items-center gap-3 text-slate-800 text-[10px] font-black uppercase tracking-widest italic">
+                                            <i className="far fa-clock text-blue-600"></i>
                                             <span>{quiz.durationMinutes} Mins</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                                            <i className="fas fa-list-ol"></i>
+                                        <div className="flex items-center gap-3 text-slate-800 text-[10px] font-black uppercase tracking-widest italic">
+                                            <i className="fas fa-list-ol text-blue-600"></i>
                                             <span>{quiz.totalQuestions} Questions</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-gray-500 text-[10px] font-bold uppercase tracking-wider">
-                                            <i className="fas fa-calendar-alt"></i>
-                                            <span>Assigned: {quiz.startDate ? new Date(quiz.startDate).toLocaleDateString() : 'Recently'}</span>
+                                        <div className="flex items-center gap-3 text-slate-800 text-[10px] font-black uppercase tracking-widest italic">
+                                            <i className="fas fa-calendar-alt text-blue-600"></i>
+                                            <span>{quiz.startDate ? new Date(quiz.startDate).toLocaleDateString() : 'Recently'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -93,7 +95,7 @@ const StudentNotifications: React.FC = () => {
                                 {/* Action */}
                                 <button
                                     onClick={() => navigate(`/quiz/${quiz.id}/details`)}
-                                    className="px-8 py-3 rounded-xl bg-[#00E5FF11] border border-[#00E5FF33] text-[#00E5FF] hover:bg-[#00E5FF] hover:text-black font-black text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_0_15px_rgba(0,229,255,0.05)] hover:shadow-[0_0_25px_rgba(0,229,255,0.4)] whitespace-nowrap"
+                                    className="elite-button !rounded-2xl !py-6 !px-12 bg-indigo-600 shadow-xl shadow-indigo-100 whitespace-nowrap italic"
                                 >
                                     Start Now
                                 </button>
