@@ -70,7 +70,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         SB
                     </div>
                     <div>
-                        <h2 className="text-xl font-black italic tracking-tighter leading-none">SkillBuilder</h2>
+                        <h2 className="text-xl font-black tracking-tighter leading-none">SkillBuilder</h2>
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">Admin Portal</span>
                     </div>
                 </div>
@@ -101,7 +101,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                             <i className="fas fa-user-shield"></i>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-xs font-black italic truncate">{user?.name || 'Admin'}</p>
+                            <p className="text-xs font-black truncate">{user?.name || 'Admin'}</p>
                             <p className="text-[9px] font-medium text-slate-400 truncate tracking-wide">{user?.email}</p>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         >
                             <i className={`fas ${isSidebarOpen ? 'fa-indent' : 'fa-outdent'}`}></i>
                         </button>
-                        <h1 className="text-2xl md:text-3xl font-black italic tracking-tighter text-slate-900">
+                        <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 leading-none">
                             {navItems.find(item => location.pathname.includes(item.path))?.label || 'Dashboard'}
                         </h1>
                     </div>

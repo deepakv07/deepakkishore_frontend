@@ -50,20 +50,20 @@ const AdminAnalytics: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <span className="px-5 py-1.5 rounded-full bg-pastel-orange text-amber-900 text-[10px] font-black uppercase tracking-[0.4em] border border-white italic">
-                                Performance Metrics
+                            <span className="px-5 py-1.5 rounded-full bg-pastel-orange text-amber-900 text-[10px] font-black uppercase tracking-[0.4em] border border-white">
+                                Platform Analytics
                             </span>
                         </div>
-                        <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] italic">
+                        <h1 className="text-fluid-h2 font-black text-slate-900 tracking-tighter leading-none uppercase">
                             Platform <br /><span className="text-amber-600/40">Analytics</span>
                         </h1>
-                        <p className="text-slate-700 text-lg font-bold italic">Real-time engagement and proficiency mapping</p>
+                        <p className="text-slate-700 text-lg font-bold uppercase">Visualizing platform performance and engagement</p>
                     </div>
 
                     <div className="w-full md:w-auto">
                         <button className="elite-button !rounded-2xl !py-4 shadow-xl shadow-slate-200">
                             <i className="fas fa-calendar-day text-xs"></i>
-                            <span className="italic">Historical Data</span>
+                            <span className="italic uppercase">All Time</span>
                         </button>
                     </div>
                 </div>
@@ -76,15 +76,15 @@ const AdminAnalytics: React.FC = () => {
                         { label: 'Total Submissions', val: overview.totalSubmissions.toLocaleString(), color: 'text-amber-900', bg: 'bg-pastel-orange', icon: 'fa-file-signature' },
                         { label: 'Average Score', val: `${overview.averageScore}%`, color: 'text-teal-900', bg: 'bg-pastel-mint', icon: 'fa-chart-pie' },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm relative overflow-hidden">
-                            <div className={`absolute top-0 right-0 w-24 h-24 ${stat.bg} rounded-bl-[4rem]`}></div>
-                            <div className="relative z-10 space-y-8">
-                                <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center text-xl shadow-sm border border-white`}>
+                        <div key={i} className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-50 shadow-sm relative overflow-hidden transition-all hover:scale-[1.02]">
+                            <div className={`absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 ${stat.bg} rounded-bl-[3rem] md:rounded-bl-[4rem]`}></div>
+                            <div className="relative z-10 space-y-6 md:space-y-8">
+                                <div className={`w-10 h-10 md:w-14 md:h-14 ${stat.bg} ${stat.color} rounded-[1rem] md:rounded-2xl flex items-center justify-center text-lg md:text-xl shadow-sm border border-white`}>
                                     <i className={`fas ${stat.icon}`}></i>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-slate-800 mb-2 uppercase tracking-[0.3em] italic">{stat.label}</p>
-                                    <p className="text-4xl font-black text-slate-900 tracking-tighter italic leading-none tabular-nums">{stat.val}</p>
+                                    <p className="text-[9px] md:text-[10px] font-black text-slate-800 mb-1 md:mb-2 uppercase tracking-[0.3em] leading-none">{stat.label}</p>
+                                    <p className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none tabular-nums uppercase">{stat.val}</p>
                                 </div>
                             </div>
                         </div>
@@ -94,9 +94,9 @@ const AdminAnalytics: React.FC = () => {
                 {/* Secondary Metrics Cluster */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
-                        { label: 'Success Velocity', val: `${overview.passRate}%`, color: 'text-teal-900', bg: 'bg-pastel-mint', detail: `${overview.passedSubmissions} Validated`, icon: 'fa-bolt' },
-                        { label: 'Passed Entries', val: overview.passedSubmissions, color: 'text-blue-900', bg: 'bg-pastel-blue', detail: 'Above proficiency threshold', icon: 'fa-check-circle' },
-                        { label: 'Critical Entries', val: overview.failedSubmissions, color: 'text-red-700', bg: 'bg-red-50', detail: 'Requires intervention', icon: 'fa-exclamation-triangle' },
+                        { label: 'Overall Success Rate', val: `${overview.passRate}%`, color: 'text-teal-900', bg: 'bg-pastel-mint', detail: `${overview.passedSubmissions} Validated`, icon: 'fa-bolt' },
+                        { label: 'Passed Submissions', val: overview.passedSubmissions, color: 'text-blue-900', bg: 'bg-pastel-blue', detail: 'Above proficiency threshold', icon: 'fa-check-circle' },
+                        { label: 'Failed Submissions', val: overview.failedSubmissions, color: 'text-red-700', bg: 'bg-red-50', detail: 'Requires intervention', icon: 'fa-exclamation-triangle' },
                     ].map((stat, i) => (
                         <div key={i} className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-sm transition-all">
                             <div className="flex items-start gap-8">
@@ -104,9 +104,9 @@ const AdminAnalytics: React.FC = () => {
                                     <i className={`fas ${stat.icon}`}></i>
                                 </div>
                                 <div className="space-y-4">
-                                    <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em] italic">{stat.label}</p>
-                                    <p className={`text-3xl font-black ${stat.color} tracking-tighter italic leading-none tabular-nums`}>{stat.val}</p>
-                                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest italic">{stat.detail}</p>
+                                    <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em]">{stat.label}</p>
+                                    <p className={`text-3xl font-black ${stat.color} tracking-tighter leading-none tabular-nums`}>{stat.val}</p>
+                                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{stat.detail}</p>
                                 </div>
                             </div>
                         </div>
@@ -122,8 +122,8 @@ const AdminAnalytics: React.FC = () => {
                                     <i className="fas fa-poll text-xl"></i>
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-black text-slate-900 italic tracking-tighter leading-none uppercase">Module Breakdown</h2>
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-1 italic">Granular performance by assessment</p>
+                                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter leading-none uppercase">Quiz Performance</h2>
+                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-1 uppercase">Detailed breakdown by quiz</p>
                                 </div>
                             </div>
                         </div>
@@ -131,33 +131,33 @@ const AdminAnalytics: React.FC = () => {
                         <div className="p-2 overflow-x-auto pb-8">
                             <table className="w-full px-10">
                                 <thead>
-                                    <tr className="text-slate-600 uppercase tracking-[0.4em] text-[10px] font-black italic">
-                                        <th className="px-10 py-10 text-left">Entity</th>
-                                        <th className="px-6 py-10 text-center">Invocations</th>
-                                        <th className="px-6 py-10 text-center">Mean Efficiency</th>
-                                        <th className="px-10 py-10 text-right">Success Velocity</th>
+                                    <tr className="text-slate-500 uppercase tracking-[0.4em] text-[9px] md:text-[10px] font-black border-b border-slate-50">
+                                        <th className="px-6 md:px-10 py-8 text-left">Quiz Info</th>
+                                        <th className="px-4 py-8 text-center">Performance Stats</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {quizPerformance.map((quiz: any) => (
-                                        <tr key={quiz.quizId} className="transition-all">
-                                            <td className="px-10 py-10 rounded-l-[3rem]">
-                                                <div className="font-black text-2xl text-slate-900 tracking-tighter italic leading-none transition-colors uppercase">{quiz.quizTitle}</div>
-                                                <div className="text-[10px] text-slate-600 mt-2 font-bold uppercase tracking-[0.3em] italic">ID_{quiz.quizId.toString().substring(0, 8).toUpperCase()}</div>
-                                            </td>
-                                            <td className="px-6 py-10 text-center">
-                                                <span className="text-xl font-black text-slate-900 tabular-nums italic">{quiz.totalAttempts}</span>
-                                            </td>
-                                            <td className="px-6 py-10 text-center">
-                                                <div className="inline-flex items-center gap-2">
-                                                    <span className="text-3xl font-black text-slate-900 tracking-tighter tabular-nums italic">{quiz.averageScore}%</span>
+                                        <tr key={quiz.quizId} className="group border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors">
+                                            <td className="px-6 md:px-10 py-8">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter leading-none transition-colors uppercase line-clamp-1">{quiz.quizTitle}</div>
+                                                    <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">ID_{quiz.quizId.toString().substring(0, 8).toUpperCase()}</div>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-10 text-right rounded-r-[3rem]">
-                                                <div className="flex flex-col items-end gap-3">
-                                                    <span className="text-xl font-black text-teal-600 tabular-nums tracking-tighter italic">{quiz.passRate}%</span>
-                                                    <div className="w-32 h-1.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
-                                                        <div className="h-full bg-teal-500 shadow-[2px_0_10px_#4ade8055]" style={{ width: `${quiz.passRate}%` }}></div>
+                                            <td className="px-4 py-8">
+                                                <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
+                                                    <div className="text-center">
+                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">ATTEMPTS</p>
+                                                        <p className="text-sm md:text-xl font-black text-slate-900 tabular-nums leading-none">{quiz.totalAttempts}</p>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">AVG SCORE</p>
+                                                        <p className="text-sm md:text-xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">{quiz.averageScore}%</p>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">PASS RATE</p>
+                                                        <p className="text-sm md:text-xl font-black text-teal-600 tabular-nums tracking-tighter leading-none">{quiz.passRate}%</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -178,8 +178,8 @@ const AdminAnalytics: React.FC = () => {
                                     <i className="fas fa-university text-xl"></i>
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-black text-slate-900 italic tracking-tighter leading-none uppercase">Sector Intelligence</h2>
-                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-1 italic">Cross-departmental engagement mapping</p>
+                                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter leading-none uppercase">Course Performance</h2>
+                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-1 uppercase">Overall Performance by Course</p>
                                 </div>
                             </div>
                         </div>
@@ -187,28 +187,28 @@ const AdminAnalytics: React.FC = () => {
                         <div className="p-2 overflow-x-auto pb-8">
                             <table className="w-full px-10">
                                 <thead>
-                                    <tr className="text-slate-600 uppercase tracking-[0.4em] text-[10px] font-black italic">
-                                        <th className="px-10 py-10 text-left">Sector Area</th>
-                                        <th className="px-6 py-10 text-center">Modules</th>
-                                        <th className="px-6 py-10 text-center">Invocations</th>
-                                        <th className="px-10 py-10 text-right">Mean Efficiency</th>
+                                    <tr className="text-slate-600 uppercase tracking-[0.4em] text-[10px] font-black">
+                                        <th className="px-10 py-10 text-left">Course Title</th>
+                                        <th className="px-6 py-10 text-center">Quizzes</th>
+                                        <th className="px-6 py-10 text-center">Attempts</th>
+                                        <th className="px-10 py-10 text-right">Average Score</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {coursePerformance.map((course: any) => (
                                         <tr key={course.courseId} className="transition-all">
                                             <td className="px-10 py-10 rounded-l-[3rem]">
-                                                <div className="font-black text-2xl text-slate-900 tracking-tighter italic leading-none transition-colors uppercase">{course.courseTitle}</div>
+                                                <div className="font-black text-2xl text-slate-900 tracking-tighter leading-none transition-colors uppercase">{course.courseTitle}</div>
                                             </td>
                                             <td className="px-6 py-10 text-center">
-                                                <span className="text-xl font-black text-slate-900 tabular-nums italic">{course.totalQuizzes}</span>
+                                                <span className="text-xl font-black text-slate-900 tabular-nums">{course.totalQuizzes}</span>
                                             </td>
                                             <td className="px-6 py-10 text-center">
-                                                <span className="text-xl font-black text-slate-700 tabular-nums italic">{course.totalAttempts}</span>
+                                                <span className="text-xl font-black text-slate-700 tabular-nums">{course.totalAttempts}</span>
                                             </td>
                                             <td className="px-10 py-10 text-right rounded-r-[3rem]">
                                                 <div className="inline-flex items-center gap-3">
-                                                    <span className="text-4xl font-black text-amber-600 tracking-tighter tabular-nums italic">{course.averageScore}%</span>
+                                                    <span className="text-4xl font-black text-amber-600 tracking-tighter tabular-nums">{course.averageScore}%</span>
                                                     <div className="w-2 h-2 rounded-full bg-amber-600"></div>
                                                 </div>
                                             </td>

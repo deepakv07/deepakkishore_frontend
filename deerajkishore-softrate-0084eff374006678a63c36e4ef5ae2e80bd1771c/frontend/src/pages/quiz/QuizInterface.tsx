@@ -313,16 +313,16 @@ const QuizInterface: React.FC = () => {
                     {loading ? (
                         <div className="flex-1 flex flex-col items-center justify-center">
                             <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                            <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-xs italic">Syncing Entities...</p>
+                            <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-xs">Syncing Entities...</p>
                         </div>
                     ) : error ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-center">
                             <div className="w-24 h-24 bg-red-50 text-red-600 rounded-[2rem] flex items-center justify-center mb-8 text-3xl border border-red-100">
                                 <i className="fas fa-exclamation-triangle"></i>
                             </div>
-                            <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic">Sync Failure</h3>
-                            <p className="text-slate-700 max-w-sm mb-10 font-bold italic">{error}</p>
-                            <button onClick={() => navigate('/student/quizzes')} className="elite-button !px-12 bg-slate-900 text-white italic uppercase">Return to Lobby</button>
+                            <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase">Sync Failure</h3>
+                            <p className="text-slate-700 max-w-sm mb-10 font-bold">{error}</p>
+                            <button onClick={() => navigate('/student/quizzes')} className="elite-button !px-12 bg-slate-900 text-white uppercase">Return to Lobby</button>
                         </div>
                     ) : (
                         <div className="max-w-3xl w-full space-y-10">
@@ -350,9 +350,9 @@ const QuizInterface: React.FC = () => {
                             </div>
 
                             {/* Question Section */}
-                            <div className="bg-white p-10 md:p-14 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                            <div className="bg-white p-8 md:p-14 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden flex items-center justify-center min-h-[150px]">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-lavender opacity-30 rounded-bl-[4rem]"></div>
-                                <h2 className="text-xl md:text-2xl font-bold text-slate-900 leading-snug text-center relative z-10 uppercase">
+                                <h2 className="text-xl md:text-3xl font-bold text-slate-900 leading-snug text-center relative z-10 uppercase break-words px-2">
                                     {currentQuestion?.text}
                                 </h2>
                             </div>
@@ -369,22 +369,22 @@ const QuizInterface: React.FC = () => {
                                             <button
                                                 key={idx}
                                                 onClick={() => handleAnswerSelect(qId, option)}
-                                                className={`w-full flex items-center p-5 rounded-[1.5rem] border-2 transition-all duration-200 ${isSelected
+                                                className={`w-full flex items-center p-4 md:p-6 rounded-[1.2rem] md:rounded-[1.5rem] border-2 transition-all duration-200 group relative ${isSelected
                                                     ? 'bg-pastel-blue/40 border-indigo-600 shadow-sm'
-                                                    : 'bg-white border-slate-100'
+                                                    : 'bg-white border-slate-100 hover:border-slate-200'
                                                     }`}
                                             >
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs border-2 ${isSelected
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs border-2 shrink-0 ${isSelected
                                                     ? 'bg-indigo-600 border-indigo-600 text-white'
                                                     : 'bg-slate-50 border-slate-100 text-slate-900'
                                                     }`}>
                                                     {letter}
                                                 </div>
-                                                <span className={`ml-6 text-base font-bold uppercase transition-all ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
+                                                <span className={`ml-4 md:ml-6 text-sm md:text-base font-bold uppercase transition-all text-left flex-1 break-words line-clamp-3 md:line-clamp-none ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
                                                     {option}
                                                 </span>
                                                 {isSelected && (
-                                                    <div className="ml-auto text-indigo-600">
+                                                    <div className="ml-4 text-indigo-600 shrink-0">
                                                         <i className="fas fa-check-circle text-lg"></i>
                                                     </div>
                                                 )}
@@ -400,8 +400,8 @@ const QuizInterface: React.FC = () => {
                                             className="w-full h-80 p-8 rounded-[2.5rem] border-2 border-slate-100 bg-white focus:border-indigo-600 focus:ring-0 transition-all font-semibold text-base text-slate-800 resize-none outline-none shadow-sm"
                                         />
                                         <div className="flex justify-between items-center px-8">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Character Count: {(selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || '').length}</span>
-                                            <span className="text-[10px] font-black text-indigo-600/40 uppercase tracking-widest italic animate-pulse">Auto-saving...</span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Character Count: {(selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || '').length}</span>
+                                            <span className="text-[10px] font-black text-indigo-600/40 uppercase tracking-widest animate-pulse">Auto-saving...</span>
                                         </div>
                                     </div>
                                 )}
@@ -437,13 +437,13 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-20 h-20 bg-pastel-blue text-blue-900 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-white shadow-sm">
                                     <i className="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">Confirm Submission</h3>
-                                <p className="text-slate-700 mb-12 font-bold italic text-sm">
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">Confirm Submission</h3>
+                                <p className="text-slate-700 mb-12 font-bold text-sm">
                                     You have completed {Object.keys(selectedAnswers).length} out of {totalQuestions} entities. All data will be finalized.
                                 </p>
                                 <div className="space-y-4">
-                                    <button onClick={() => handleSubmitQuiz()} className="elite-button !w-full !py-5 bg-indigo-600 italic">SUBMIT</button>
-                                    <button onClick={() => setShowConfirmation(false)} className="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em] italic">CANCEL</button>
+                                    <button onClick={() => handleSubmitQuiz()} className="elite-button !w-full !py-5 bg-indigo-600">SUBMIT</button>
+                                    <button onClick={() => setShowConfirmation(false)} className="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em]">CANCEL</button>
                                 </div>
                             </div>
                         )}
@@ -453,13 +453,13 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-20 h-20 bg-pastel-orange text-amber-900 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-white shadow-sm">
                                     <i className="fas fa-exclamation-circle"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">Protocol Violation</h3>
-                                <p className="text-slate-700 mb-10 font-bold italic text-sm leading-relaxed">
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">Protocol Violation</h3>
+                                <p className="text-slate-700 mb-10 font-bold text-sm leading-relaxed">
                                     Unauthorized shift detected. Maintain focus on the assessment window to avoid <span className="text-red-600 font-black">SYSTEM TERMINATION</span>.
                                 </p>
                                 <button
                                     onClick={() => { setShowWarningModal(false); if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { }); }}
-                                    className="elite-button !w-full !py-5 bg-slate-900 italic"
+                                    className="elite-button !w-full !py-5 bg-slate-900"
                                 >
                                     RESTORE SESSION
                                 </button>
@@ -471,13 +471,13 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-20 h-20 bg-red-50 text-red-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-red-100">
                                     <i className="fas fa-user-shield"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">AUTO-TERMINATED</h3>
-                                <p className="text-slate-700 mb-10 font-bold italic text-sm leading-relaxed">
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">AUTO-TERMINATED</h3>
+                                <p className="text-slate-700 mb-10 font-bold text-sm leading-relaxed">
                                     Multiple proctoring deviations logged. Session has been force-closed and data committed for review.
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/dashboard')}
-                                    className="elite-button !w-full !py-5 bg-slate-900 italic"
+                                    className="elite-button !w-full !py-5 bg-slate-900"
                                 >
                                     DISMISS TERMINATION
                                 </button>
@@ -489,11 +489,11 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-24 h-24 bg-pastel-mint text-teal-900 rounded-full flex items-center justify-center mx-auto mb-8 text-4xl border border-white shadow-sm">
                                     <i className="fas fa-check-circle"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic leading-none">Transmission Success</h3>
-                                <p className="text-slate-700 mb-12 font-bold italic text-sm">
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">Transmission Success</h3>
+                                <p className="text-slate-700 mb-12 font-bold text-sm">
                                     Your quiz has been submitted successfully.
                                 </p>
-                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="elite-button !w-full !py-6 bg-teal-600 shadow-xl shadow-teal-100 italic">VIEW RESULTS</button>
+                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="elite-button !w-full !py-6 bg-teal-600 shadow-xl shadow-teal-100">VIEW RESULTS</button>
                             </div>
                         )}
                     </div>
@@ -506,13 +506,13 @@ const QuizInterface: React.FC = () => {
                             <div className="w-16 h-16 bg-pastel-orange text-amber-900 rounded-[1.2rem] flex items-center justify-center mx-auto mb-6 text-2xl border border-white shadow-sm">
                                 <i className="fas fa-hourglass-half"></i>
                             </div>
-                            <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase italic leading-none">Critical Threshold</h3>
-                            <p className="text-slate-700 mb-8 font-bold italic text-sm">
+                            <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase leading-none">Critical Threshold</h3>
+                            <p className="text-slate-700 mb-8 font-bold text-sm">
                                 Internal timer entering final minute. Expedite your selections.
                             </p>
                             <button
                                 onClick={() => setShowOneMinuteWarning(false)}
-                                className="elite-button !w-full bg-amber-600 italic"
+                                className="elite-button !w-full bg-amber-600"
                             >
                                 ACKNOWLEDGED
                             </button>

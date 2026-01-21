@@ -50,17 +50,17 @@ const QuizDetails: React.FC = () => {
                             <div className="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
                             <div className="absolute inset-0 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                         </div>
-                        <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-sm animate-pulse italic">Initializing Assessment...</p>
+                        <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-sm animate-pulse">Initializing Assessment...</p>
                     </div>
                 ) : (
                     <div className="space-y-12">
                         {/* Header & Stats */}
                         <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">Assessment Details</h2>
-                            <div className="text-8xl font-black text-indigo-600 tracking-tighter italic tabular-nums leading-none">
+                            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Assessment Details</h2>
+                            <div className="text-8xl font-black text-indigo-600 tracking-tighter tabular-nums leading-none">
                                 {quiz?.questions?.length || 0}
                             </div>
-                            <p className="text-slate-700 font-bold text-lg italic uppercase tracking-widest mt-4">
+                            <p className="text-slate-700 font-bold text-lg uppercase tracking-widest mt-4">
                                 {quiz?.title || 'Details'}
                             </p>
 
@@ -72,10 +72,10 @@ const QuizDetails: React.FC = () => {
                                     { label: 'TYPE', val: quiz?.questions?.every(q => q.type === 'mcq') ? 'MCQ' : 'MIXED', color: 'text-amber-900', bg: 'bg-pastel-orange' },
                                 ].map((stat, i) => (
                                     <div key={i} className={`${stat.bg} rounded-[2rem] p-10 shadow-sm border border-white flex flex-col items-center justify-center`}>
-                                        <div className={`text-4xl font-black ${stat.color} mb-1 italic tabular-nums`}>
+                                        <div className={`text-4xl font-black ${stat.color} mb-1 tabular-nums`}>
                                             {stat.val}
                                         </div>
-                                        <div className="text-slate-800 font-black text-[10px] uppercase tracking-widest italic">{stat.label}</div>
+                                        <div className="text-slate-800 font-black text-[10px] uppercase tracking-widest">{stat.label}</div>
                                     </div>
                                 ))}
                             </div>
@@ -83,7 +83,7 @@ const QuizDetails: React.FC = () => {
 
                         {/* Breakdown */}
                         <div className="space-y-8">
-                            <h2 className="text-center text-sm font-black text-slate-900 tracking-[0.3em] uppercase italic underline decoration-indigo-200 underline-offset-8">Structure Breakdown</h2>
+                            <h2 className="text-center text-sm font-black text-slate-900 tracking-[0.3em] uppercase underline decoration-indigo-200 underline-offset-8">Structure Breakdown</h2>
 
                             <div className="bg-white rounded-[3rem] p-6 shadow-sm border border-slate-100 space-y-4">
                                 {[
@@ -131,13 +131,13 @@ const QuizDetails: React.FC = () => {
                                                 <i className={`fas ${item.icon}`}></i>
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-slate-900 text-base uppercase italic">{item.title}</h3>
-                                                <p className="text-xs text-slate-600 font-bold italic">{item.desc}</p>
+                                                <h3 className="font-black text-slate-900 text-base uppercase">{item.title}</h3>
+                                                <p className="text-xs text-slate-600 font-bold">{item.desc}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-3xl font-black text-slate-900 italic tabular-nums">{item.val}</div>
-                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase italic">{item.unit}</div>
+                                            <div className="text-3xl font-black text-slate-900 tabular-nums">{item.val}</div>
+                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase">{item.unit}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -148,7 +148,7 @@ const QuizDetails: React.FC = () => {
                         <div className="space-y-8">
                             <div className="flex items-center gap-6">
                                 <div className="h-px flex-1 bg-slate-200"></div>
-                                <h2 className="text-xs font-black text-slate-900 tracking-[0.4em] uppercase italic">Assessment Directives</h2>
+                                <h2 className="text-xs font-black text-slate-900 tracking-[0.4em] uppercase">Assessment Directives</h2>
                                 <div className="h-px flex-1 bg-slate-200"></div>
                             </div>
 
@@ -163,8 +163,8 @@ const QuizDetails: React.FC = () => {
                                             <i className={`fas ${rule.icon}`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-slate-900 mb-1 text-base uppercase italic leading-none">{rule.title}</h3>
-                                            <p className="text-sm text-slate-700 font-bold italic leading-relaxed">{rule.text}</p>
+                                            <h3 className="font-black text-slate-900 mb-1 text-base uppercase leading-none">{rule.title}</h3>
+                                            <p className="text-sm text-slate-700 font-bold leading-relaxed">{rule.text}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -182,7 +182,7 @@ const QuizDetails: React.FC = () => {
                                                 <i className="fas fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i>
                                             </div>
                                         </div>
-                                        <span className="text-[10px] text-slate-800 font-black uppercase tracking-widest leading-relaxed italic">
+                                        <span className="text-[10px] text-slate-800 font-black uppercase tracking-widest leading-relaxed">
                                             I acknowledge the mission directives and agree to proceed under these standardized protocols.
                                         </span>
                                     </label>
@@ -194,7 +194,7 @@ const QuizDetails: React.FC = () => {
                         <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-12">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="w-full md:w-auto px-12 py-6 text-slate-700 font-black tracking-[0.3em] uppercase rounded-2xl border border-slate-200 bg-white shadow-sm italic"
+                                className="w-full md:w-auto px-12 py-6 text-slate-700 font-black tracking-[0.3em] uppercase rounded-2xl border border-slate-200 bg-white shadow-sm"
                             >
                                 <i className="fas fa-arrow-left mr-3"></i> Abort
                             </button>
@@ -209,7 +209,7 @@ const QuizDetails: React.FC = () => {
                                     }
                                 }}
                                 disabled={(!agreed && !quiz?.isCompleted) || loading}
-                                className={`w-full md:w-auto px-20 py-6 rounded-2xl font-black tracking-[0.3em] uppercase shadow-lg transition-all flex items-center justify-center italic ${quiz?.isCompleted
+                                className={`w-full md:w-auto px-20 py-6 rounded-2xl font-black tracking-[0.3em] uppercase shadow-lg transition-all flex items-center justify-center ${quiz?.isCompleted
                                     ? 'bg-indigo-600 text-white shadow-indigo-100'
                                     : agreed && !loading
                                         ? 'bg-indigo-600 text-white shadow-indigo-200 active:scale-95'

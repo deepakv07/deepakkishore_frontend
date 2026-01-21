@@ -306,28 +306,28 @@ const CreateQuiz: React.FC = () => {
                     </button>
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-3 mb-2">
-                            <span className="px-4 py-1 rounded-full bg-pastel-orange text-amber-600 text-[10px] font-bold uppercase tracking-widest border border-white">Asset Creation</span>
+                            <span className="px-4 py-1 rounded-full bg-pastel-orange text-amber-600 text-[10px] font-bold uppercase tracking-widest border border-white">Quiz Management</span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-none">Initialize <span className="text-amber-600/20">Module</span></h1>
+                        <h1 className="text-fluid-h2 font-extrabold text-slate-900 tracking-tight leading-none uppercase">Create <span className="text-amber-600/20">Course Quiz</span></h1>
                     </div>
                     <div className="w-14"></div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14">
-                    {/* Left Column: Mission Parameters */}
+                    {/* Left Column: Quiz Parameters */}
                     <div className="lg:col-span-4 space-y-10">
                         <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden group">
                             <div className="absolute top-[-10%] right-[-10%] w-32 h-32 bg-pastel-orange opacity-20 rounded-full"></div>
                             <h3 className="text-[10px] font-black text-amber-600 uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-                                <i className="fas fa-gear opacity-40"></i> Parameter Config
+                                <i className="fas fa-gear opacity-40"></i> Quiz Details
                             </h3>
 
                             <div className="space-y-8">
                                 <div className="space-y-3">
-                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Foundation Area</label>
+                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Course / Subject</label>
                                     <input
                                         type="text"
-                                        placeholder="Course name"
+                                        placeholder="Enter course name (e.g., Mathematics)"
                                         value={courseTitle}
                                         onChange={(e) => setCourseTitle(e.target.value)}
                                         className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-[1.25rem] focus:border-amber-400 focus:bg-white outline-none text-slate-900 font-bold transition-all shadow-inner"
@@ -335,10 +335,10 @@ const CreateQuiz: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Module Identity</label>
+                                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Quiz Title</label>
                                     <input
                                         type="text"
-                                        placeholder="Quiz title"
+                                        placeholder="Enter quiz title (e.g., JavaScript Basics)"
                                         value={quizTitle}
                                         onChange={(e) => setQuizTitle(e.target.value)}
                                         className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-[1.25rem] focus:border-amber-400 focus:bg-white outline-none text-slate-900 font-bold transition-all shadow-inner"
@@ -346,7 +346,7 @@ const CreateQuiz: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">Entity Count</label>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">Total Questions</label>
                                     <div className="relative">
                                         <input
                                             type="number"
@@ -360,7 +360,7 @@ const CreateQuiz: React.FC = () => {
 
                                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                                     <div className="space-y-3">
-                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">Genesis</label>
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">Start Date</label>
                                         <input
                                             type="datetime-local"
                                             value={startDate}
@@ -369,7 +369,7 @@ const CreateQuiz: React.FC = () => {
                                         />
                                     </div>
                                     <div className="space-y-3">
-                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">Termination</label>
+                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">End Date</label>
                                         <input
                                             type="datetime-local"
                                             value={endDate}
@@ -406,7 +406,7 @@ const CreateQuiz: React.FC = () => {
                                     </div>
                                     <span className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] border ${currentQuestion.type === 'MCQ' ? 'bg-pastel-blue text-blue-600 border-white' : 'bg-pastel-lavender text-indigo-600 border-white'
                                         }`}>
-                                        {currentQuestion.type} Core
+                                        {currentQuestion.type === 'MCQ' ? 'MCQ Mode' : 'Aptitude Mode'}
                                     </span>
                                 </div>
 
@@ -418,27 +418,27 @@ const CreateQuiz: React.FC = () => {
 
                                     <div className="space-y-12 relative z-10">
                                         <div>
-                                            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tighter uppercase mb-8">Logic Constructor</h3>
+                                            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tighter uppercase mb-8">Edit Question</h3>
 
                                             <div className="flex gap-4 mb-12 p-2 bg-slate-50 rounded-[2rem] w-fit border border-slate-100">
                                                 <button
                                                     onClick={() => updateQuestion(currentQuestionIndex, { type: 'MCQ', options: ['', '', '', ''], correctAnswer: '' })}
                                                     className={`px-8 py-3 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition-all ${currentQuestion.type === 'MCQ' ? 'bg-white text-amber-600 shadow-sm border border-amber-100' : 'text-slate-400 hover:text-slate-600'}`}
                                                 >
-                                                    Polymodal Input
+                                                    Multiple Choice
                                                 </button>
                                                 <button
                                                     onClick={() => updateQuestion(currentQuestionIndex, { type: 'Aptitude', options: undefined, correctAnswer: '' })}
                                                     className={`px-8 py-3 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition-all ${currentQuestion.type === 'Aptitude' ? 'bg-white text-amber-600 shadow-sm border border-amber-100' : 'text-slate-400 hover:text-slate-600'}`}
                                                 >
-                                                    Absolute Assertion
+                                                    Aptitude
                                                 </button>
                                             </div>
 
-                                            <label className="block text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-4 ml-1">Interrogative Context</label>
+                                            <label className="block text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-4 ml-1">Question Text</label>
                                             <textarea
                                                 rows={4}
-                                                placeholder="Articulate the query..."
+                                                placeholder="Enter question text..."
                                                 value={currentQuestion.text}
                                                 onChange={(e) => updateQuestion(currentQuestionIndex, { text: e.target.value })}
                                                 className="w-full px-8 py-6 bg-slate-50/30 border border-slate-100 rounded-[1.5rem] focus:border-amber-400 focus:bg-white outline-none text-lg font-bold text-slate-900 placeholder:text-slate-200 transition-all resize-none shadow-inner"
@@ -455,7 +455,7 @@ const CreateQuiz: React.FC = () => {
                                                             </div>
                                                             <input
                                                                 type="text"
-                                                                placeholder={`Vector ${letter}...`}
+                                                                placeholder={`Option ${letter}...`}
                                                                 value={currentQuestion.options?.[idx] || ''}
                                                                 onChange={(e) => {
                                                                     const opt = [...(currentQuestion.options || [])];
@@ -469,7 +469,7 @@ const CreateQuiz: React.FC = () => {
                                                 </div>
 
                                                 <div className="flex flex-col md:flex-row items-center gap-8 p-10 bg-pastel-blue/30 rounded-[3rem] border border-white">
-                                                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em] italic">Identify Nexus:</span>
+                                                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Correct Answer:</span>
                                                     <div className="flex gap-4">
                                                         {['A', 'B', 'C', 'D'].map(l => (
                                                             <button
@@ -487,13 +487,13 @@ const CreateQuiz: React.FC = () => {
 
                                         {currentQuestion.type === 'Aptitude' && (
                                             <div className="animate-fade-in">
-                                                <label className="block text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-4 ml-1 italic">Absolute Solution</label>
+                                                <label className="block text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-4 ml-1">Correct Answer</label>
                                                 <textarea
                                                     rows={3}
-                                                    placeholder="Define the correct response..."
+                                                    placeholder="Enter correct answer..."
                                                     value={currentQuestion.correctAnswer}
                                                     onChange={(e) => updateQuestion(currentQuestionIndex, { correctAnswer: e.target.value })}
-                                                    className="w-full px-10 py-8 bg-slate-50/30 border border-slate-100 rounded-[1.5rem] focus:border-amber-400 focus:bg-white outline-none text-base md:text-xl font-bold text-slate-900 transition-all shadow-inner resize-none italic"
+                                                    className="w-full px-10 py-8 bg-slate-50/30 border border-slate-100 rounded-[1.5rem] focus:border-amber-400 focus:bg-white outline-none text-base md:text-xl font-bold text-slate-900 transition-all shadow-inner resize-none"
                                                 />
                                             </div>
                                         )}
@@ -508,14 +508,14 @@ const CreateQuiz: React.FC = () => {
                                             disabled={currentQuestionIndex === 0}
                                             className="elite-button !rounded-[2rem] !py-6 bg-slate-50 !text-slate-400 border border-slate-100 hover:bg-slate-100 disabled:opacity-20 shadow-sm"
                                         >
-                                            <i className="fas fa-arrow-left text-[10px] opacity-50"></i> Previous Cycle
+                                            <i className="fas fa-arrow-left text-[10px] opacity-50"></i> Previous
                                         </button>
                                         <button
                                             onClick={() => currentQuestionIndex < questions.length - 1 && setCurrentQuestionIndex(currentQuestionIndex + 1)}
                                             disabled={currentQuestionIndex === questions.length - 1}
                                             className="elite-button !rounded-[2rem] !py-6 bg-white !text-amber-600 border border-amber-100 hover:bg-pastel-orange disabled:opacity-20 shadow-sm"
                                         >
-                                            Advance Cycle <i className="fas fa-arrow-right text-[10px] opacity-50"></i>
+                                            Next <i className="fas fa-arrow-right text-[10px] opacity-50"></i>
                                         </button>
                                     </div>
 
@@ -525,14 +525,14 @@ const CreateQuiz: React.FC = () => {
                                             disabled={loading}
                                             className="elite-button !rounded-[2rem] !py-6 bg-red-50 !text-red-500 border border-red-100 hover:bg-red-500 hover:!text-white shadow-sm"
                                         >
-                                            Purge Form
+                                            Reset Form
                                         </button>
                                         <button
                                             onClick={handleSubmit}
                                             disabled={loading}
                                             className="elite-button !rounded-[2rem] !py-6 bg-amber-600 hover:bg-amber-700 shadow-2xl shadow-amber-200/50"
                                         >
-                                            {loading ? <i className="fas fa-sync animate-spin"></i> : 'Finalize Architecture'}
+                                            {loading ? <i className="fas fa-sync animate-spin"></i> : 'Submit Quiz'}
                                         </button>
                                     </div>
                                 </div>
@@ -542,7 +542,7 @@ const CreateQuiz: React.FC = () => {
                                 <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-10 text-slate-200 border border-slate-100 animate-pulse">
                                     <i className="fas fa-brain text-4xl"></i>
                                 </div>
-                                <p className="text-slate-300 font-extrabold uppercase tracking-[0.4em] text-[10px] italic">Initializing Core Processing...</p>
+                                <p className="text-slate-300 font-extrabold uppercase tracking-[0.4em] text-[10px]">Initializing Core Processing...</p>
                             </div>
                         )}
                     </div>
@@ -560,9 +560,9 @@ const CreateQuiz: React.FC = () => {
                         </div>
 
                         <div className="space-y-6">
-                            <h2 className="text-5xl font-black text-slate-900 tracking-tighter italic leading-none">Module Deployed</h2>
-                            <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs leading-relaxed max-w-sm mx-auto italic">
-                                The assessment framework for <span className="text-teal-600">{courseTitle}</span> has been successfully committed to the mainframe.
+                            <h2 className="text-fluid-h2 font-black text-slate-900 tracking-tighter leading-none uppercase">Quiz Created</h2>
+                            <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs leading-relaxed max-w-sm mx-auto">
+                                The assessment framework for <span className="text-teal-600">{courseTitle}</span> has been successfully saved.
                             </p>
                         </div>
 
@@ -571,13 +571,13 @@ const CreateQuiz: React.FC = () => {
                                 onClick={() => navigate('/admin/dashboard')}
                                 className="elite-button !rounded-[2rem] !py-6 bg-teal-600 hover:bg-teal-700 shadow-2xl shadow-teal-200/50"
                             >
-                                Access Control Hub
+                                Go to Dashboard
                             </button>
                             <button
                                 onClick={() => { setShowSuccess(false); setQuizTitle(''); navigate(0); }}
                                 className="elite-button !rounded-[2rem] !py-6 bg-white !text-slate-400 border border-slate-100 hover:bg-slate-50 shadow-sm"
                             >
-                                Initiate New Record
+                                Create Another Quiz
                             </button>
                         </div>
                     </div>

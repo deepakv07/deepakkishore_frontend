@@ -45,20 +45,20 @@ const StudentDashboard: React.FC = () => {
         <StudentLayout>
             <div className="space-y-12 md:space-y-16 pb-12">
                 {/* Hero Overview Card */}
-                <div className="w-full bg-indigo-900 rounded-[3.5rem] p-12 md:p-20 flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden shadow-xl">
-                    <div className="absolute top-[-20%] right-[-10%] w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-                    <div className="relative z-10 space-y-6 text-center md:text-left">
-                        <h1 className="text-fluid-h1 font-extrabold tracking-tight text-white leading-tight uppercase">
+                <div className="w-full bg-indigo-900 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden shadow-xl">
+                    <div className="absolute top-[-20%] right-[-10%] w-60 h-60 bg-white/5 rounded-full blur-3xl"></div>
+                    <div className="relative z-10 space-y-4 text-center md:text-left">
+                        <h1 className="text-fluid-h2 font-extrabold tracking-tight text-white leading-tight uppercase">
                             Welcome back, <br />{user?.name?.split(' ')[0] || 'User'}!
                         </h1>
-                        <p className="text-indigo-200 text-lg font-semibold uppercase tracking-wide">Your learning journey continues here.</p>
+                        <p className="text-indigo-200 text-sm md:text-base font-semibold uppercase tracking-wide">Your learning journey continues here.</p>
                     </div>
                     <button
                         onClick={() => navigate('/student/quizzes')}
-                        className="elite-button !bg-white !text-indigo-900 !rounded-[1.5rem] !px-10 !py-6 !text-xs font-bold uppercase tracking-widest shadow-2xl"
+                        className="elite-button !bg-white !text-indigo-900 !rounded-[1.2rem] !px-8 !py-5 !text-[10px] font-bold uppercase tracking-widest shadow-2xl transition-all hover:scale-105 active:scale-95"
                     >
                         <span>VIEW QUIZZES</span>
-                        <i className="fas fa-arrow-right text-[10px] opacity-100"></i>
+                        <i className="fas fa-arrow-right text-[10px] opacity-100 ml-2"></i>
                     </button>
                 </div>
 
@@ -93,7 +93,7 @@ const StudentDashboard: React.FC = () => {
                                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-indigo-900 shadow-sm border border-slate-50">
                                     <i className="fas fa-id-card text-2xl"></i>
                                 </div>
-                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase italic">Identity</span>
+                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase">Identity</span>
                             </button>
                             <button
                                 onClick={() => navigate('/student/quizzes')}
@@ -102,7 +102,7 @@ const StudentDashboard: React.FC = () => {
                                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-blue-900 shadow-sm border border-slate-50">
                                     <i className="fas fa-microchip text-2xl"></i>
                                 </div>
-                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase italic">Modules</span>
+                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase">Modules</span>
                             </button>
                         </div>
                     </div>
@@ -113,7 +113,7 @@ const StudentDashboard: React.FC = () => {
                         <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 uppercase leading-none">Recent Activity</h3>
                         <button
                             onClick={() => navigate('/student/report')}
-                            className="bg-indigo-600/10 text-indigo-600 px-6 py-2 rounded-full text-[10px] font-black tracking-widest uppercase hover:bg-indigo-600 hover:text-white transition-all italic"
+                            className="bg-indigo-600/10 text-indigo-600 px-6 py-2 rounded-full text-[10px] font-black tracking-widest uppercase hover:bg-indigo-600 hover:text-white transition-all"
                         >
                             SEE ALL
                         </button>
@@ -129,31 +129,32 @@ const StudentDashboard: React.FC = () => {
                                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-100">
                                             <i className="fas fa-satellite-dish text-slate-400"></i>
                                         </div>
-                                        <p className="text-[10px] font-black tracking-[0.5em] text-slate-700 uppercase italic mb-2">No active diagnostic packets</p>
-                                        <p className="text-xs font-bold text-slate-400 italic">SYSTEM IDLE</p>
+                                        <p className="text-[10px] font-black tracking-[0.5em] text-slate-700 uppercase mb-2">No active diagnostic packets</p>
+                                        <p className="text-xs font-bold text-slate-400">SYSTEM IDLE</p>
                                     </div>
                                 );
                             }
 
                             return completedActivities.map((activity: any) => (
-                                <div key={activity.id} className="bg-white rounded-[3rem] p-10 flex items-center justify-between border border-slate-100 shadow-sm">
-                                    <div className="flex items-center gap-10">
-                                        <div className="w-20 h-20 bg-emerald-50 text-emerald-900 rounded-[1.5rem] flex items-center justify-center border border-emerald-100 shadow-sm">
-                                            <i className="fas fa-check-double text-2xl"></i>
+                                <div key={activity.id} className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-10 border border-slate-100 shadow-sm transition-all group hover:border-indigo-100">
+                                    <div className="flex items-center gap-6 md:gap-10 w-full min-w-0">
+                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-emerald-50 text-emerald-900 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center border border-emerald-100 shadow-sm shrink-0">
+                                            <i className="fas fa-check-double text-xl md:text-2xl"></i>
                                         </div>
-                                        <div>
-                                            <h4 className="font-bold text-xl text-slate-900 uppercase tracking-tight leading-none mb-3">
+                                        <div className="min-w-0 flex-1">
+                                            <h4 className="font-bold text-lg md:text-xl text-slate-900 uppercase tracking-tight leading-tight mb-2 line-clamp-2 md:line-clamp-1 break-words">
                                                 {activity.title}
                                             </h4>
-                                            <p className="text-[10px] font-bold text-slate-500 tracking-[0.1em] uppercase leading-none">
+                                            <p className="text-[9px] md:text-[10px] font-bold text-slate-500 tracking-[0.1em] uppercase leading-none">
                                                 TIMESTAMP: {new Date(activity.timestamp).toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => navigate(`/quiz/${activity.quizId}/results`)}
-                                        className="w-14 h-14 rounded-2xl border-2 border-slate-100 flex items-center justify-center text-slate-900 bg-white shadow-sm"
+                                        className="w-full md:w-14 h-14 rounded-2xl border-2 border-slate-100 flex items-center justify-center text-slate-900 bg-white shadow-sm hover:border-indigo-600 hover:text-indigo-600 transition-all shrink-0"
                                     >
+                                        <span className="md:hidden text-[10px] font-black tracking-widest uppercase mr-3">View Result</span>
                                         <i className="fas fa-chevron-right text-sm"></i>
                                     </button>
                                 </div>
@@ -170,7 +171,7 @@ const StudentDashboard: React.FC = () => {
                     className="elite-button w-full !rounded-[2rem] !py-8 bg-indigo-900 shadow-2xl"
                 >
                     <i className="fas fa-bolt text-xs"></i>
-                    <span className="text-sm font-black tracking-[0.3em] uppercase italic">VIEW QUIZZES</span>
+                    <span className="text-sm font-black tracking-[0.3em] uppercase">VIEW QUIZZES</span>
                 </button>
             </div>
         </StudentLayout>

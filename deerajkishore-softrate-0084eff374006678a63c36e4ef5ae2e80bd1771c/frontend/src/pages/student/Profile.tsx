@@ -54,7 +54,7 @@ const StudentProfile: React.FC = () => {
                         <div className="flex-1 text-center md:text-left space-y-4">
                             <div className="space-y-1">
                                 <span className="text-blue-900 text-[10px] font-bold uppercase tracking-widest leading-none">Official Profile</span>
-                                <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-none text-slate-900 uppercase">{user?.name}</h2>
+                                <h2 className="text-fluid-h2 font-extrabold tracking-tight leading-none text-slate-900 uppercase">{user?.name}</h2>
                                 <p className="text-slate-700 font-semibold text-base mt-1">{user?.email}</p>
                             </div>
 

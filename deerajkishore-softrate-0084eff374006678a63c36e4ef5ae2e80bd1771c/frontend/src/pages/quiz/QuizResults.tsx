@@ -137,9 +137,9 @@ const QuizResults: React.FC = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 md:mb-16 gap-8">
                     <div className="w-full lg:w-auto text-left">
                         <h1 className="text-3xl md:text-5xl font-extrabold text-[#141619] tracking-tight uppercase leading-tight mb-2">
-                            Success <br /><span className="text-indigo-600">Metric</span>
+                            Quiz <br /><span className="text-indigo-600">Results</span>
                         </h1>
-                        <p className="text-slate-600 font-bold uppercase tracking-widest text-[9px]">Post-Assessment Diagnostic Report</p>
+                        <p className="text-slate-600 font-bold uppercase tracking-widest text-[9px]">Summary of your performance</p>
                     </div>
 
                     {/* Identity Plate */}
@@ -171,24 +171,24 @@ const QuizResults: React.FC = () => {
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
                                     <div className="space-y-8">
                                         <div className="flex items-center gap-3">
-                                            <span className="px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest italic">
+                                            <span className="px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest">
                                                 VALIDATED REPORT
                                             </span>
                                             <span className="text-slate-300 font-bold">•</span>
-                                            <span className="text-[#334155] text-[10px] font-black uppercase tracking-widest italic">Timestamp: {result.completedDate}</span>
+                                            <span className="text-[#334155] text-[10px] font-black uppercase tracking-widest">Timestamp: {result.completedDate}</span>
                                         </div>
-                                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#141619] tracking-tight leading-none uppercase">Performance Meter</h2>
+                                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#141619] tracking-tight leading-none uppercase">Performance Overview</h2>
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] italic border ${result.passed
+                                            <div className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] border ${result.passed
                                                 ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                                                 : 'border-rose-200 bg-rose-50 text-rose-800'
                                                 }`}>
                                                 <i className={`fas ${result.passed ? 'fa-circle-check' : 'fa-circle-xmark'}`}></i>
-                                                {result.passed ? 'STATUS: PASSED' : 'STATUS: FAILED'}
+                                                {result.passed ? 'PASSED' : 'FAILED'}
                                             </div>
-                                            <div className="flex items-center gap-3 px-8 py-4 bg-slate-50 text-slate-900 border border-slate-200 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] italic">
+                                            <div className="flex items-center gap-3 px-8 py-4 bg-slate-50 text-slate-900 border border-slate-200 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px]">
                                                 <i className="fas fa-layer-group"></i>
-                                                TIER: {result.percentage >= 80 ? 'EXPERT' : result.percentage >= 60 ? 'MID-TIER' : 'INITIAL'}
+                                                LEVEL: {result.percentage >= 80 ? 'EXPERT' : result.percentage >= 60 ? 'MID-TIER' : 'BEGINNER'}
                                             </div>
                                         </div>
                                     </div>
@@ -207,8 +207,8 @@ const QuizResults: React.FC = () => {
                                     {[
                                         { label: 'CORRECT', val: result.correctAnswers, color: 'text-emerald-900', bg: 'bg-pastel-mint' },
                                         { label: 'INCORRECT', val: result.incorrectAnswers, color: 'text-rose-900', bg: 'bg-pastel-orange' },
-                                        { label: 'TOTAL TIME', val: result.timeSpent, color: 'text-indigo-900', bg: 'bg-pastel-lavender' },
-                                        { label: 'RANK TIER', val: `${result.percentile}%`, color: 'text-blue-900', bg: 'bg-pastel-blue' },
+                                        { label: 'TIME SPENT', val: result.timeSpent, color: 'text-indigo-900', bg: 'bg-pastel-lavender' },
+                                        { label: 'PERCENTILE', val: `${result.percentile}%`, color: 'text-blue-900', bg: 'bg-pastel-blue' },
                                     ].map((stat, i) => (
                                         <div key={i} className={`${stat.bg} p-6 rounded-[2rem] border border-white shadow-sm transition-all`}>
                                             <p className="text-[10px] font-bold text-[#141619] uppercase tracking-widest mb-4 opacity-70">{stat.label}</p>
@@ -222,10 +222,10 @@ const QuizResults: React.FC = () => {
                         {/* Telemetry Stream (Chart) */}
                         <div className="bg-white rounded-[4rem] p-12 border border-slate-100 shadow-sm relative">
                             <div className="flex items-center justify-between mb-16">
-                                <h3 className="text-[10px] font-black text-[#334155] uppercase tracking-[0.4em] italic leading-none">Temporal Distribution / Per Question</h3>
+                                <h3 className="text-[10px] font-black text-[#334155] uppercase tracking-[0.4em] leading-none">Time Per Question</h3>
                                 <div className="flex items-center gap-3">
                                     <div className="w-2.5 h-2.5 rounded-full bg-indigo-600"></div>
-                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest italic">Static Analysis</span>
+                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Live Analysis</span>
                                 </div>
                             </div>
                             <div className="overflow-x-auto pb-4 no-scrollbar">
@@ -241,7 +241,7 @@ const QuizResults: React.FC = () => {
                                                 <div className="absolute inset-0 flex flex-col justify-between pointer-events-none mb-4">
                                                     {steps.map(val => (
                                                         <div key={val} className="flex items-center gap-8">
-                                                            <span className="text-[9px] font-black text-slate-400 w-8 text-right tabular-nums italic">{val}s</span>
+                                                            <span className="text-[9px] font-black text-slate-400 w-8 text-right tabular-nums">{val}s</span>
                                                             <div className="flex-1 border-t border-slate-100"></div>
                                                         </div>
                                                     ))}
@@ -255,11 +255,11 @@ const QuizResults: React.FC = () => {
                                                             style={{ height: `${Math.min((time / chartMax) * 100, 100)}%`, minHeight: '6px' }}
                                                         >
                                                             <div className="opacity-0 group-hover:opacity-100 absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl whitespace-nowrap z-20 pointer-events-none transition-all duration-300 shadow-xl border border-slate-800">
-                                                                <p className="text-[10px] font-black mb-1 uppercase tracking-widest italic">POINTER Q{i + 1}</p>
-                                                                <p className="text-lg font-black tabular-nums italic">{time}s</p>
+                                                                <p className="text-[10px] font-black mb-1 uppercase tracking-widest">QUESTION Q{i + 1}</p>
+                                                                <p className="text-lg font-black tabular-nums">{time}s</p>
                                                             </div>
                                                         </div>
-                                                        <span className="text-[10px] font-black text-slate-900 uppercase mt-6 tracking-tight italic opacity-60">Q{i + 1}</span>
+                                                        <span className="text-[10px] font-black text-slate-900 uppercase mt-6 tracking-tight opacity-60">Q{i + 1}</span>
                                                     </div>
                                                 ))}
                                             </>
@@ -275,7 +275,7 @@ const QuizResults: React.FC = () => {
                                 <div className="w-14 h-14 bg-pastel-blue text-blue-900 rounded-[1.5rem] flex items-center justify-center text-xl border border-white shadow-sm">
                                     <i className="fas fa-tasks"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-[#141619] tracking-tighter uppercase italic leading-none">Question Analysis</h3>
+                                <h3 className="text-3xl font-black text-[#141619] tracking-tighter uppercase leading-none">Question Analysis</h3>
                             </div>
 
                             <div className="space-y-10">
@@ -285,17 +285,17 @@ const QuizResults: React.FC = () => {
                                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-sm border-2 ${q.isCorrect ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`}>
                                                 <i className={`fas ${q.isCorrect ? 'fa-check' : 'fa-times'}`}></i>
                                             </div>
-                                            <h4 className="text-2xl font-black text-[#141619] tracking-tight italic uppercase leading-tight">Pointer {i + 1}: {q.text}</h4>
+                                            <h4 className="text-2xl font-black text-[#141619] tracking-tight uppercase leading-tight">Q{i + 1}: {q.text}</h4>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                             <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-rose-800 uppercase tracking-widest italic">USER LOGGED ANSWER</p>
-                                                <p className="font-black text-xl text-[#141619] italic uppercase">{q.userAnswer || 'NO DATA'}</p>
+                                                <p className="text-[10px] font-black text-rose-800 uppercase tracking-widest">YOUR ANSWER</p>
+                                                <p className="font-black text-xl text-[#141619] uppercase">{q.userAnswer || 'NO DATA'}</p>
                                             </div>
                                             <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest italic">VALIDATED CORRECT DATA</p>
-                                                <p className="font-black text-xl text-[#141619] italic uppercase">{q.correctAnswer}</p>
+                                                <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest">CORRECT ANSWER</p>
+                                                <p className="font-black text-xl text-[#141619] uppercase">{q.correctAnswer}</p>
                                             </div>
                                         </div>
 
@@ -306,7 +306,7 @@ const QuizResults: React.FC = () => {
                                                         <i className="fas fa-lightbulb"></i>
                                                     </div>
                                                     <div>
-                                                        <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest mb-3 italic">REMEDIATION LOG</p>
+                                                        <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest mb-3 italic">EXPLANATION</p>
                                                         <p className="text-base text-slate-700 font-bold italic leading-relaxed">{q.explanation}</p>
                                                     </div>
                                                 </div>
@@ -320,7 +320,7 @@ const QuizResults: React.FC = () => {
                                 onClick={() => setShowMore(!showMore)}
                                 className="w-full mt-12 py-8 border-2 border-slate-100 rounded-[2.5rem] text-[10px] font-black text-slate-600 bg-white shadow-sm uppercase tracking-[0.5em] flex items-center justify-center gap-6 italic"
                             >
-                                {showMore ? 'CONTRAPOSE VIEW' : 'EXPAND FULL DIAGNOSTIC'}
+                                {showMore ? 'SHOW LESS' : 'SHOW ALL QUESTIONS'}
                                 <i className={`fas fa-chevron-${showMore ? 'up' : 'down'} text-[10px]`}></i>
                             </button>
                         </div>
@@ -339,8 +339,8 @@ const QuizResults: React.FC = () => {
                                 </div>
 
                                 <div className="text-center z-10 space-y-4">
-                                    <h3 className="text-2xl font-extrabold text-[#141619] tracking-tight uppercase leading-none">Export Packet</h3>
-                                    <p className="text-slate-500 text-[10px] font-bold tracking-widest uppercase">Generate Official PDF Dossier</p>
+                                    <h3 className="text-2xl font-extrabold text-[#141619] tracking-tight uppercase leading-none">Download Report</h3>
+                                    <p className="text-slate-500 text-[10px] font-bold tracking-widest uppercase">Get detailed performance analysis</p>
                                 </div>
                             </button>
                         </div>
@@ -352,15 +352,15 @@ const QuizResults: React.FC = () => {
                             </div>
 
                             <div className="relative z-10">
-                                <h3 className="text-4xl font-black mb-8 tracking-tighter italic uppercase leading-none">Mission <br />Proceeds</h3>
+                                <h3 className="text-4xl font-black mb-8 tracking-tighter italic uppercase leading-none">Ready for the <br />next challenge?</h3>
                                 <p className="text-slate-400 text-sm font-bold italic mb-16 leading-relaxed">
-                                    Diagnostic complete. Phase shift required. Proceed to central dashboard for further directives.
+                                    Continue your learning journey by taking another quiz or exploring new courses.
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/dashboard')}
                                     className="elite-button !w-full !py-8 !text-sm !rounded-[2.5rem] bg-indigo-600 italic uppercase tracking-[0.2em]"
                                 >
-                                    RETURN TO COMMAND
+                                    BACK TO DASHBOARD
                                 </button>
                             </div>
                         </div>

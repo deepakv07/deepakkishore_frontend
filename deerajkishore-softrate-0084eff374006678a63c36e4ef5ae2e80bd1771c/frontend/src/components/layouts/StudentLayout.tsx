@@ -76,7 +76,7 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                         SB
                     </div>
                     <div>
-                        <h2 className="text-xl font-black italic tracking-tighter leading-none">SkillBuilder</h2>
+                        <h2 className="text-xl font-black tracking-tighter leading-none">SkillBuilder</h2>
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">Student Portal</span>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                             <i className="fas fa-user-graduate"></i>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-xs font-black italic truncate">{user?.name || 'Student'}</p>
+                            <p className="text-xs font-black truncate">{user?.name || 'Student'}</p>
                             <p className="text-[9px] font-medium text-slate-400 truncate tracking-wide">{user?.email}</p>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                         >
                             <i className={`fas ${isSidebarOpen ? 'fa-indent' : 'fa-outdent'}`}></i>
                         </button>
-                        <h1 className="text-2xl md:text-3xl font-black italic tracking-tighter">
+                        <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 leading-none">
                             {navItems.find(item => location.pathname.includes(item.path))?.label || 'Overview'}
                         </h1>
                     </div>
@@ -184,7 +184,7 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                             <i className="fas fa-power-off"></i>
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-3xl font-black italic tracking-tighter">Sign Out?</h3>
+                            <h3 className="text-3xl font-black tracking-tighter">Sign Out?</h3>
                             <p className="text-slate-500 font-medium">Ready to end your session?</p>
                         </div>
                         <div className="flex gap-4">

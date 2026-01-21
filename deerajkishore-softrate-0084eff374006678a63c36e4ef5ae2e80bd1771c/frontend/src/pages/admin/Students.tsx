@@ -48,14 +48,14 @@ const AdminStudents: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <span className="px-5 py-1.5 rounded-full bg-pastel-orange text-amber-900 text-[10px] font-black uppercase tracking-[0.4em] border border-white italic">
-                                Human Capital
+                            <span className="px-5 py-1.5 rounded-full bg-pastel-orange text-amber-900 text-[10px] font-black uppercase tracking-[0.4em] border border-white">
+                                Student Management
                             </span>
                         </div>
-                        <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] italic">
-                            Student <br /><span className="text-amber-600/40">Directory</span>
+                        <h1 className="text-fluid-h2 font-black text-slate-900 tracking-tighter leading-none uppercase">
+                            Student <br /><span className="text-amber-600/40">Management</span>
                         </h1>
-                        <p className="text-slate-700 text-lg font-bold italic">Complete oversight of enrolled talent and performance</p>
+                        <p className="text-slate-700 text-lg font-bold">View all students and their performance reports</p>
                     </div>
                 </div>
 
@@ -67,8 +67,8 @@ const AdminStudents: React.FC = () => {
                                 <i className="fas fa-users-viewfinder text-xl"></i>
                             </div>
                             <div className="text-center md:text-left">
-                                <h2 className="text-3xl font-black text-slate-900 italic tracking-tighter leading-none uppercase">Registered Talent</h2>
-                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-1 italic">Real-time engagement tracking</p>
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tighter leading-none uppercase">Registered Students</h2>
+                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-1">Monitor student activity and results</p>
                             </div>
                         </div>
                     </div>
@@ -76,58 +76,49 @@ const AdminStudents: React.FC = () => {
                     <div className="p-2 overflow-x-auto pb-8">
                         <table className="w-full px-10">
                             <thead>
-                                <tr className="text-slate-600 uppercase tracking-[0.4em] text-[10px] font-black italic">
-                                    <th className="px-10 py-10 text-left">Academic Entity</th>
-                                    <th className="px-6 py-10 text-left hidden md:table-cell">Communication</th>
-                                    <th className="px-6 py-10 text-center">Modules</th>
-                                    <th className="px-6 py-10 text-center">Mean Efficiency</th>
-                                    <th className="px-6 py-10 text-center hidden lg:table-cell">Success Rate</th>
-                                    <th className="px-10 py-10 text-right">Operation</th>
+                                <tr className="text-slate-500 uppercase tracking-[0.4em] text-[9px] md:text-[10px] font-black border-b border-slate-50">
+                                    <th className="px-6 md:px-10 py-8 text-left">Student Info</th>
+                                    <th className="px-4 py-8 text-center">Performance</th>
+                                    <th className="px-6 md:px-10 py-8 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {students.map((student) => {
                                     const report = getStudentReport(student.id);
                                     return (
-                                        <tr key={student.id} className="transition-all">
-                                            <td className="px-10 py-10 rounded-l-[3rem]">
-                                                <div className="font-black text-2xl text-slate-900 tracking-tighter italic leading-none transition-colors uppercase">{student.name}</div>
-                                                <div className="text-[10px] text-slate-600 mt-2 font-bold uppercase tracking-[0.3em] italic">REF_{student.id.toString().substring(0, 8).toUpperCase()}</div>
-                                            </td>
-                                            <td className="px-6 py-10 hidden md:table-cell">
-                                                <div className="text-[10px] text-slate-700 font-bold uppercase tracking-widest bg-white/50 px-4 py-2 rounded-full border border-slate-200 italic">{student.email}</div>
-                                            </td>
-                                            <td className="px-6 py-10 text-center">
-                                                <span className="text-xl font-black text-slate-900 tabular-nums italic">{report?.totalQuizzes || 0}</span>
-                                            </td>
-                                            <td className="px-6 py-10 text-center">
-                                                <div className={`text-3xl font-black tabular-nums tracking-tighter italic ${report && report.averageScore >= 70 ? 'text-teal-600' :
-                                                    report && report.averageScore >= 50 ? 'text-amber-600' : 'text-red-700'
-                                                    }`}>
-                                                    {report ? `${report.averageScore.toFixed(0)}%` : '0%'}
+                                        <tr key={student.id} className="group border-b border-slate-50/50 last:border-0 hover:bg-slate-50/30 transition-colors">
+                                            <td className="px-6 md:px-10 py-8">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter leading-none transition-colors uppercase line-clamp-1">{student.name}</div>
+                                                    <div className="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate max-w-[150px] md:max-w-none">{student.email}</div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-10 text-center hidden lg:table-cell">
-                                                <div className="flex flex-col items-center gap-3">
-                                                    <span className="text-xl font-black text-slate-900 tabular-nums italic">
-                                                        {report && report.totalQuizzes > 0
-                                                            ? `${Math.round((report.passedQuizzes / report.totalQuizzes) * 100)}%`
-                                                            : '0%'}
-                                                    </span>
-                                                    <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                                                        <div className="h-full bg-teal-500" style={{ width: report && report.totalQuizzes > 0 ? `${(report.passedQuizzes / report.totalQuizzes) * 100}%` : '0%' }}></div>
+                                            <td className="px-4 py-8">
+                                                <div className="flex flex-wrap items-center justify-center gap-4 md:gap-10">
+                                                    <div className="text-center">
+                                                        <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">QUIZZES</p>
+                                                        <p className="text-sm md:text-xl font-black text-slate-900 tabular-nums leading-none">{report?.totalQuizzes || 0}</p>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">AVG SCORE</p>
+                                                        <p className={`text-sm md:text-xl font-black tabular-nums tracking-tighter leading-none ${report && report.averageScore >= 70 ? 'text-teal-600' :
+                                                            report && report.averageScore >= 50 ? 'text-amber-600' : 'text-red-700'
+                                                            }`}>
+                                                            {report ? `${report.averageScore.toFixed(0)}%` : '0%'}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-10 text-right rounded-r-[3rem]">
+                                            <td className="px-6 md:px-10 py-8 text-right">
                                                 <button
                                                     onClick={() => setSelectedStudent(selectedStudent === student.id ? null : student.id)}
-                                                    className={`elite-button !rounded-2xl !py-3 !px-8 shadow-sm transition-all ${selectedStudent === student.id
-                                                        ? 'bg-amber-600/10 !text-amber-800 border-amber-200'
-                                                        : 'bg-white border border-slate-200 text-slate-900 shadow-slate-100'
+                                                    className={`w-10 h-10 md:w-auto md:px-6 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center border transition-all ${selectedStudent === student.id
+                                                        ? 'bg-amber-600 text-white border-amber-600'
+                                                        : 'bg-white border-slate-200 text-slate-400 hover:text-amber-600 hover:border-amber-200'
                                                         }`}
                                                 >
-                                                    <span className="italic">{selectedStudent === student.id ? 'Collapse' : 'Examine'}</span>
+                                                    <i className={`fas ${selectedStudent === student.id ? 'fa-eye-slash' : 'fa-eye'} text-xs md:mr-2`}></i>
+                                                    <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">Report</span>
                                                 </button>
                                             </td>
                                         </tr>
@@ -148,8 +139,8 @@ const AdminStudents: React.FC = () => {
                                     <i className="fas fa-microscope"></i>
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 italic tracking-tighter leading-none uppercase">Diagnostic Analysis</h2>
-                                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mt-2 italic uppercase">Entity: {students.find(s => s.id === selectedStudent)?.name}</p>
+                                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase">Student Performance Report</h2>
+                                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mt-2 uppercase">Viewing: {students.find(s => s.id === selectedStudent)?.name}</p>
                                 </div>
                             </div>
 
@@ -158,25 +149,25 @@ const AdminStudents: React.FC = () => {
                                 if (!report) {
                                     return (
                                         <div className="text-center py-20 bg-slate-50/50 border border-dashed border-slate-200 rounded-[2.5rem]">
-                                            <p className="text-slate-600 font-extrabold uppercase tracking-[0.3em] text-[10px] italic">No telemetry detected for this entity</p>
+                                            <p className="text-slate-600 font-extrabold uppercase tracking-[0.3em] text-[10px]">No data available for this student</p>
                                         </div>
                                     );
                                 }
                                 return (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                         {[
-                                            { label: 'Modules Engaged', val: report.totalQuizzes, color: 'text-slate-900', bg: 'bg-pastel-blue', icon: 'fa-layer-group' },
-                                            { label: 'Optimal Invocations', val: report.passedQuizzes, color: 'text-teal-900', bg: 'bg-pastel-mint', icon: 'fa-check-double' },
-                                            { label: 'Critical Errors', val: report.failedQuizzes, color: 'text-red-700', bg: 'bg-red-50', icon: 'fa-exclamation-circle' },
-                                            { label: 'Mean Proficiency', val: `${report.averageScore}%`, color: 'text-amber-900', bg: 'bg-pastel-orange', icon: 'fa-bullseye' },
+                                            { label: 'Quizzes Taken', val: report.totalQuizzes, color: 'text-slate-900', bg: 'bg-pastel-blue', icon: 'fa-layer-group' },
+                                            { label: 'Passed Quizzes', val: report.passedQuizzes, color: 'text-teal-900', bg: 'bg-pastel-mint', icon: 'fa-check-double' },
+                                            { label: 'Failed Quizzes', val: report.failedQuizzes, color: 'text-red-700', bg: 'bg-red-50', icon: 'fa-exclamation-circle' },
+                                            { label: 'Average Score', val: `${report.averageScore}%`, color: 'text-amber-900', bg: 'bg-pastel-orange', icon: 'fa-bullseye' },
                                         ].map((stat, i) => (
                                             <div key={i} className={`${stat.bg} p-10 rounded-[2.5rem] border border-white shadow-sm text-center md:text-left relative overflow-hidden`}>
                                                 <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-bl-3xl"></div>
-                                                <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em] mb-8 flex items-center justify-center md:justify-start gap-3 italic">
+                                                <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em] mb-8 flex items-center justify-center md:justify-start gap-3">
                                                     <i className={`fas ${stat.icon} opacity-60`}></i>
                                                     {stat.label}
                                                 </p>
-                                                <p className={`text-5xl font-black ${stat.color} tracking-tighter tabular-nums italic leading-none`}>{stat.val}</p>
+                                                <p className={`text-5xl font-black ${stat.color} tracking-tighter tabular-nums leading-none`}>{stat.val}</p>
                                             </div>
                                         ))}
                                     </div>

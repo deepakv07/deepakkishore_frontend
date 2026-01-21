@@ -62,10 +62,10 @@ const StudentReport: React.FC = () => {
         <StudentLayout>
             <div className="space-y-12 animate-fade-in pb-10">
                 <div className="space-y-3">
-                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-[#141619] leading-tight uppercase">
-                        Performance <br /><span className="text-indigo-600/40">Diagnostic</span>
+                    <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-none uppercase">
+                        Detailed <br /><span className="text-indigo-600/40">Report</span>
                     </h1>
-                    <p className="text-slate-700 text-[10px] font-bold tracking-widest uppercase">Strategic analysis of your skills and history</p>
+                    <p className="text-slate-700 text-[10px] font-bold tracking-widest uppercase">A summary of your academic progress and quiz history</p>
                 </div>
 
                 {/* Skill Assessment Section */}
@@ -74,7 +74,7 @@ const StudentReport: React.FC = () => {
                         <div className="w-10 h-10 bg-pastel-blue rounded-xl flex items-center justify-center text-blue-900 border border-white shadow-sm">
                             <i className="fas fa-brain text-lg"></i>
                         </div>
-                        <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 uppercase">Proficiency Matrices</h3>
+                        <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 uppercase">Your Skills</h3>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -111,7 +111,7 @@ const StudentReport: React.FC = () => {
                         <div className="w-10 h-10 bg-pastel-lavender rounded-xl flex items-center justify-center text-indigo-900 border border-white shadow-sm">
                             <i className="fas fa-scroll text-lg"></i>
                         </div>
-                        <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 uppercase">Assessment Archive</h3>
+                        <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 uppercase">Past Quiz Reports</h3>
                     </div>
 
                     <div className="space-y-6">
@@ -121,32 +121,32 @@ const StudentReport: React.FC = () => {
                             <div
                                 key={quiz.id}
                                 onClick={() => navigate(`/quiz/${quiz.id}/results`)}
-                                className="bg-white rounded-[2.5rem] p-8 md:p-10 flex items-center justify-between cursor-pointer border border-slate-100 shadow-sm relative overflow-hidden"
+                                className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 cursor-pointer border border-slate-100 shadow-sm relative overflow-hidden transition-all hover:border-indigo-100 group"
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-blue opacity-20 rounded-bl-[4rem]"></div>
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-blue opacity-20 rounded-bl-[4rem] group-hover:scale-110 transition-transform"></div>
 
-                                <div className="flex items-center gap-8 relative z-10">
-                                    <div className="w-16 h-16 bg-pastel-blue rounded-[1.2rem] flex items-center justify-center text-blue-900 border border-white shadow-sm">
-                                        <i className="fas fa-file-invoice text-2xl"></i>
+                                <div className="flex items-center gap-6 md:gap-8 relative z-10 w-full min-w-0">
+                                    <div className="w-14 h-14 md:w-16 md:h-16 bg-pastel-blue rounded-[1rem] md:rounded-[1.2rem] flex items-center justify-center text-blue-900 border border-white shadow-sm shrink-0">
+                                        <i className="fas fa-file-invoice text-xl md:text-2xl"></i>
                                     </div>
-                                    <div>
-                                        <h4 className="font-bold text-xl text-slate-900 line-clamp-1 uppercase leading-none">{quiz.title}</h4>
-                                        <p className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mt-2">
-                                            {quiz.courseTitle} <span className="text-slate-300 px-2">•</span> {quiz.completedAt ? new Date(quiz.completedAt).toLocaleDateString() : ''}
+                                    <div className="min-w-0 flex-1">
+                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 line-clamp-2 md:line-clamp-1 uppercase leading-tight md:leading-none break-words">{quiz.title}</h4>
+                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-2 truncate">
+                                            {quiz.courseTitle} <span className="text-slate-200 px-2">•</span> {quiz.completedAt ? new Date(quiz.completedAt).toLocaleDateString() : ''}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-10 relative z-10">
-                                    <div className="text-right">
-                                        <p className="text-3xl font-black italic tracking-tighter text-slate-900 leading-none mb-3 tabular-nums">{quiz.score}%</p>
-                                        <span className={`text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-sm italic ${quiz.passed
+                                <div className="flex items-center justify-between md:justify-end gap-6 md:gap-10 relative z-10 w-full md:w-auto mt-2 md:mt-0">
+                                    <div className="text-left md:text-right">
+                                        <p className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 leading-none mb-2 md:mb-3 tabular-nums">{quiz.score}%</p>
+                                        <span className={`text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-sm inline-block ${quiz.passed
                                             ? 'bg-pastel-mint border-teal-500 text-teal-900'
                                             : 'bg-red-50 border-red-500 text-red-900'
                                             }`}>
-                                            {quiz.passed ? 'OPTIMAL' : 'CRITICAL'}
+                                            {quiz.passed ? 'PASSED' : 'FAILED'}
                                         </span>
                                     </div>
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm">
+                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all shrink-0">
                                         <i className="fas fa-chevron-right text-[10px]"></i>
                                     </div>
                                 </div>

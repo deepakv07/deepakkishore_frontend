@@ -1,11 +1,10 @@
 @import "tailwindcss";
 
-/* Google Fonts - Inter & Outfit for a modern look */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+/* Google Fonts - Inter for a clean, modern look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
     --font-inter: "Inter", sans-serif;
-    --font-outfit: "Outfit", sans-serif;
 
     /* Semantic Colors - Warm Lite Brown / Pastel Theme */
     --bg-main: #F7F4F2;
@@ -149,19 +148,39 @@ body {
 
     /* Fluid Typography Utilities */
     .text-fluid-hero {
-        font-size: clamp(2rem, 8vw, 5rem);
+        font-size: clamp(2.5rem, 10vw, 6rem);
     }
 
     .text-fluid-h1 {
-        font-size: clamp(1.75rem, 6vw, 3.5rem);
+        font-size: clamp(2rem, 8vw, 5rem);
     }
 
     .text-fluid-h2 {
+        font-size: clamp(1.75rem, 6vw, 3.5rem);
+    }
+
+    .text-fluid-h3 {
         font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    .text-fluid-h4 {
+        font-size: clamp(1.25rem, 3vw, 2rem);
     }
 
     .text-fluid-body {
         font-size: clamp(0.875rem, 1.5vw, 1rem);
+    }
+
+    .text-fluid-sm {
+        font-size: clamp(0.7rem, 1vw, 0.9rem);
+    }
+
+    .card-padding {
+        @apply p-6 md:p-10 lg:p-14;
+    }
+
+    .section-gap {
+        @apply gap-6 md:gap-10 lg:gap-14;
     }
 }
 
