@@ -56,8 +56,12 @@ class APIService {
 
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
-                } else if (!config.url?.includes('/auth/')) {
-                    console.warn('⚠️ No auth token found for request:', config.url);
+                } else if (!config.url?.startsWith('/auth/')) {
+                    // Only warn if it's not an auth route
+                    console.warn(`⚠️ No auth token found for request: ${config.url}`);
+
+                    // Fallback: if we're on an admin page but lost admin token, try student token as a last resort
+                    // and vice-versa, or just log clearly.
                 }
 
                 return config;
@@ -81,11 +85,14 @@ class APIService {
 
                     // Don't redirect if we're on login page, auth callback, or during login attempt
                     if (!isLoginPage && !isAuthCallback && !isLoginRequest) {
+                        console.error('🔴 401 Unauthorized - Auth failure on protected route:', currentPath);
                         // Unauthorized - clear token and redirect to login
                         localStorage.removeItem('student_auth_token');
                         localStorage.removeItem('admin_auth_token');
                         localStorage.removeItem('user');
-                        window.location.href = '/';
+
+                        // Use window.location.replace to prevent back button issues
+                        window.location.replace('/');
                     }
                 }
                 return Promise.reject(error);

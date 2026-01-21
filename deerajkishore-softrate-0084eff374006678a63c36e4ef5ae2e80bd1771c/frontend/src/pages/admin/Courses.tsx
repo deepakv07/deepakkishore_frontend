@@ -61,7 +61,7 @@ const AdminCourses: React.FC = () => {
 
                     <div className="w-full md:w-auto">
                         <Link
-                            to="/create-quiz"
+                            to="/admin/courses/create"
                             className="elite-button !rounded-[2rem] !py-6 !px-10 shadow-2xl shadow-amber-200/50 bg-amber-600"
                         >
                             <i className="fas fa-plus-circle text-xs"></i>
@@ -87,7 +87,7 @@ const AdminCourses: React.FC = () => {
                             </p>
 
                             <Link
-                                to="/create-quiz"
+                                to="/admin/courses/create"
                                 className="elite-button !rounded-full !py-6 !px-14 bg-amber-600 shadow-2xl shadow-amber-200/50 italic"
                             >
                                 <i className="fas fa-plus text-[10px]"></i>

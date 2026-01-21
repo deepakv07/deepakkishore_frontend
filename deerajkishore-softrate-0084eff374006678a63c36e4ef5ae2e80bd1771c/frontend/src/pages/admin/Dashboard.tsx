@@ -79,7 +79,7 @@ const AdminDashboard: React.FC = () => {
 
                     <div className="w-full md:w-auto">
                         <Link
-                            to="/create-quiz"
+                            to="/admin/courses/create"
                             className="elite-button !rounded-[1.5rem] !py-4 !px-8 shadow-2xl shadow-amber-200/50 bg-amber-600"
                         >
                             <i className="fas fa-plus-circle text-xs"></i>
@@ -148,7 +148,7 @@ const AdminDashboard: React.FC = () => {
                                     <p className="text-2xl font-black italic text-slate-900 tracking-tighter uppercase">No assessments deployed</p>
                                     <p className="text-slate-600 text-xs font-bold uppercase tracking-widest mt-2 italic text-center">Initiate a new module to begin tracking</p>
                                     <Link
-                                        to="/create-quiz"
+                                        to="/admin/courses/create"
                                         className="mt-10 elite-button !rounded-full !py-4 !px-12 bg-amber-600 shadow-xl shadow-amber-200/50 italic"
                                     >
                                         Create Quiz Module
