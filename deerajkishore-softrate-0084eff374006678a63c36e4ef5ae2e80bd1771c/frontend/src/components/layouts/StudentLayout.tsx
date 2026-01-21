@@ -129,44 +129,44 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                 {/* Background Grid Pattern */}
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none"></div>
 
-                <header className="px-10 py-6 flex items-center bg-transparent sticky top-0 z-30">
+                <header className="px-4 md:px-10 py-4 md:py-6 flex items-center bg-transparent sticky top-0 z-30">
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-card-bg backdrop-blur-xl border border-border-color text-gray-400 hover:text-white hover:border-[#00E5FF44] hover:shadow-[0_0_20px_rgba(0,229,255,0.1)] transition-all duration-300 group mr-6"
+                        className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl md:rounded-2xl bg-card-bg backdrop-blur-xl border border-border-color text-gray-400 hover:text-white hover:border-[#00E5FF44] hover:shadow-[0_0_20px_rgba(0,229,255,0.1)] transition-all duration-300 group mr-4 md:mr-6"
                         title={isSidebarOpen ? 'Retract Panel' : 'Expand Panel'}
                     >
-                        <i className={`fas ${isSidebarOpen ? 'fa-align-right' : 'fa-align-left'} text-lg transition-transform group-hover:scale-110`}></i>
+                        <i className={`fas ${isSidebarOpen ? 'fa-align-right' : 'fa-align-left'} text-base md:text-lg transition-transform group-hover:scale-110`}></i>
                     </button>
 
-                    <div className="flex items-center space-x-5 relative overflow-hidden group mr-auto">
-                        <div className="w-12 h-12 bg-[#00E5FF11] border border-[#00E5FF33] rounded-2xl flex items-center justify-center text-[#00E5FF] font-black text-xl shadow-[0_0_20px_rgba(0,229,255,0.1)] group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)] transition-all duration-500">
+                    <div className="flex items-center space-x-3 md:space-x-5 relative overflow-hidden group mr-auto">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-[#00E5FF11] border border-[#00E5FF33] rounded-xl md:rounded-2xl flex items-center justify-center text-[#00E5FF] font-black text-lg md:text-xl shadow-[0_0_20px_rgba(0,229,255,0.1)] group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)] transition-all duration-500">
                             SB
                         </div>
-                        <div className="hidden sm:block">
-                            <span className="text-xl font-black text-text-main tracking-tighter block group-hover:text-[#00E5FF] transition-colors">
+                        <div className="sm:block">
+                            <span className="text-lg md:text-xl font-black text-text-main tracking-tighter block group-hover:text-[#00E5FF] transition-colors leading-none">
                                 SkillBuilder
                             </span>
-                            <span className="text-[8px] font-black text-[#00E5FF] uppercase tracking-[0.4em] opacity-70">STUDENT PORTAL</span>
+                            <span className="text-[7px] md:text-[8px] font-black text-[#00E5FF] uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-70">STUDENT PORTAL</span>
                         </div>
                     </div>
 
-                    <div className="ml-auto flex items-center gap-6">
-                        <div className="hidden md:flex flex-col items-end text-right">
+                    <div className="ml-auto flex items-center gap-3 md:gap-6">
+                        <div className="hidden lg:flex flex-col items-end text-right">
                             <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Student Session</span>
                         </div>
                         <button
                             onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="w-10 h-10 rounded-xl bg-card-bg border border-border-color flex items-center justify-center hover:bg-white/10 transition-colors group"
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-card-bg border border-border-color flex items-center justify-center hover:bg-white/10 transition-colors group"
                             title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         >
-                            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-[#8E9AAF] group-hover:text-[#00E5FF]`}></i>
+                            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-sm md:text-base text-[#8E9AAF] group-hover:text-[#00E5FF]`}></i>
                         </button>
                         <button
                             onClick={() => navigate('/student/notifications')}
-                            className="w-10 h-10 rounded-xl bg-card-bg border border-border-color flex items-center justify-center text-gray-400 hover:text-[#00E5FF] hover:border-[#00E5FF44] hover:shadow-[0_0_15px_rgba(0,229,255,0.1)] transition-all duration-300 group"
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-card-bg border border-border-color flex items-center justify-center text-gray-400 hover:text-[#00E5FF] hover:border-[#00E5FF44] hover:shadow-[0_0_15px_rgba(0,229,255,0.1)] transition-all duration-300 group"
                             title="Notifications"
                         >
-                            <i className="fas fa-bell group-hover:animate-swing"></i>
+                            <i className="fas fa-bell text-sm md:text-base group-hover:animate-swing"></i>
                         </button>
                     </div>
                 </header>

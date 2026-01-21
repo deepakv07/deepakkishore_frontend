@@ -43,18 +43,18 @@ const StudentDashboard: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="space-y-8 animate-fade-in">
+            <div className="space-y-6 md:space-y-8 animate-fade-in">
                 {/* Hero Banner */}
-                <div className="w-full h-40 bg-gradient-to-r from-[#00E5FF] to-[#9D4EDD] rounded-[2.5rem] flex items-center justify-between px-12 shadow-[0_20px_40px_rgba(0,229,255,0.15)] relative overflow-hidden group">
+                <div className="w-full min-h-[10rem] md:h-40 bg-gradient-to-r from-[#00E5FF] to-[#9D4EDD] rounded-[1.5rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-center justify-center md:justify-between px-6 md:px-12 py-6 md:py-0 shadow-[0_20px_40px_rgba(0,229,255,0.15)] relative overflow-hidden group gap-6">
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    <div className="relative z-10">
-                        <h1 className="text-4xl font-black text-white tracking-tighter">
+                    <div className="relative z-10 text-center md:text-left">
+                        <h1 className="text-2xl md:text-4xl font-black text-white tracking-tighter">
                             Welcome back, {user?.name || 'Student'}!
                         </h1>
                     </div>
                     <button
                         onClick={() => navigate('/student/quizzes')}
-                        className="relative z-10 px-8 py-3 bg-white text-[#9D4EDD] rounded-2xl font-black text-sm tracking-widest uppercase hover:scale-105 transition-transform shadow-lg"
+                        className="relative z-10 px-6 md:px-8 py-2 md:py-3 bg-white text-[#9D4EDD] rounded-xl md:rounded-2xl font-black text-xs md:text-sm tracking-widest uppercase hover:scale-105 transition-transform shadow-lg"
                     >
                         View Quizzes
                     </button>

@@ -44,24 +44,23 @@ const StudentLogin: React.FC = () => {
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#9D4EDD]/10 rounded-full blur-[120px]" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#00E5FF]/10 rounded-full blur-[120px]" />
 
-            <div className="max-w-md w-full relative z-10">
-                <div className="text-center mb-10 space-y-4">
-                    <div className="w-20 h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-3xl mx-auto mb-6 shadow-[0_0_30px_rgba(157,78,221,0.2)]">
+            <div className="max-w-md w-full relative z-10 px-4">
+                <div className="text-center mb-6 md:mb-10 space-y-4">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-2xl md:text-3xl mx-auto mb-4 md:mb-6 shadow-[0_0_30px_rgba(157,78,221,0.2)]">
                         SB
                     </div>
-                    {/* <p className="text-[#9D4EDD] font-bold tracking-[0.4em] text-xs uppercase opacity-70">Student Portal</p> */}
-                    <h2 className="text-4xl font-black text-white tracking-tighter">
+                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter">
                         {isLogin ? 'Student Login' : 'Create Account'}
                     </h2>
                     {!isLogin && (
-                        <p className="text-[#8E9AAF] text-sm italic">Join our learning community today.</p>
+                        <p className="text-[#8E9AAF] text-xs md:text-sm italic">Join our learning community today.</p>
                     )}
                     {isLogin && (
-                        <p className="text-[#8E9AAF] text-sm">Welcome back! Please enter your details.</p>
+                        <p className="text-[#8E9AAF] text-xs md:text-sm">Welcome back! Please enter your details.</p>
                     )}
                 </div>
 
-                <div className="glass-card p-10 border-white/10">
+                <div className="glass-card p-6 md:p-10 border-white/10">
                     <div className="flex bg-white/5 p-1 rounded-xl mb-8">
                         <button
                             onClick={() => setIsLogin(true)}

@@ -45,62 +45,62 @@ const AdminAnalytics: React.FC = () => {
 
     return (
         <AdminLayout>
-            <div className="animate-fade-in space-y-12">
+            <div className="animate-fade-in space-y-8 md:space-y-12">
                 {/* Strategic Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-                    <div>
-                        <div className="flex items-center gap-3 mb-3">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-8 text-center md:text-left">
+                    <div className="w-full md:w-auto">
+                        <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
                             <span className="px-3 py-1 rounded-full bg-[#FFD70011] border border-[#FFD70033] text-[#FFD700] text-[10px] font-black uppercase tracking-[0.3em]">
                                 PLATFORM ANALYTICS
                             </span>
                         </div>
-                        <h1 className="text-5xl font-black text-white tracking-tighter leading-none">
+                        <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight">
                             Platform <span className="text-[#FFD700]">Analytics</span>
                         </h1>
-                        <p className="text-gray-500 mt-4 text-sm font-bold uppercase tracking-widest uppercase">Visualizing platform performance and engagement</p>
+                        <p className="text-gray-500 mt-2 md:mt-4 text-xs md:text-sm font-bold uppercase tracking-widest leading-relaxed">Visualizing platform performance and engagement</p>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
+                    <div className="flex items-center justify-center w-full md:w-auto gap-4">
+                        <button className="w-full md:w-auto px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2">
                             <i className="fas fa-calendar-alt text-[#FFD700]"></i> All Time
                         </button>
                     </div>
                 </div>
 
                 {/* KPI Distribution Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {[
                         { label: 'Total Students', val: overview.totalStudents.toLocaleString(), color: 'text-[#00E5FF]', bg: 'bg-[#00E5FF08]', icon: 'fa-users' },
                         { label: 'Active Quizzes', val: overview.totalQuizzes, color: 'text-[#9D4EDD]', bg: 'bg-[#9D4EDD08]', icon: 'fa-clipboard-list' },
                         { label: 'Total Submissions', val: overview.totalSubmissions.toLocaleString(), color: 'text-[#FFD700]', bg: 'bg-[#FFD70008]', icon: 'fa-file-alt' },
                         { label: 'Average Score', val: `${overview.averageScore}%`, color: 'text-[#00FF41]', bg: 'bg-[#00FF4108]', icon: 'fa-chart-pie' },
                     ].map((stat, i) => (
-                        <div key={i} className={`glass-card p-10 border border-white/5 shadow-2xl relative overflow-hidden group hover:border-[#FFD70033] transition-all duration-500`}>
+                        <div key={i} className={`glass-card p-6 md:p-10 border border-white/5 shadow-2xl relative overflow-hidden group hover:border-[#FFD70033] transition-all duration-500 text-center md:text-left`}>
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/2 rounded-bl-full -mr-16 -mt-16 group-hover:bg-[#FFD70008] transition-colors duration-500"></div>
-                            <p className="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.2em] flex items-center justify-between">
+                            <p className="text-[10px] font-black text-gray-500 mb-6 uppercase tracking-[0.2em] flex items-center justify-center md:justify-between">
                                 {stat.label}
-                                <i className={`fas ${stat.icon} opacity-30 text-lg`}></i>
+                                <i className={`fas ${stat.icon} opacity-30 text-lg hidden md:block`}></i>
                             </p>
-                            <p className={`text-4xl font-black ${stat.color} tracking-tighter tabular-nums`}>{stat.val}</p>
+                            <p className={`text-3xl md:text-4xl font-black ${stat.color} tracking-tighter tabular-nums`}>{stat.val}</p>
                         </div>
                     ))}
                 </div>
 
                 {/* Secondary Metrics Cluster */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {[
                         { label: 'Overall Success Rate', val: `${overview.passRate}%`, color: 'text-[#00FF41]', detail: `${overview.passedSubmissions} Pass / ${overview.totalSubmissions} Total`, icon: 'fa-check-circle' },
                         { label: 'Passed Submissions', val: overview.passedSubmissions, color: 'text-[#00FF41]', detail: 'Total successful attempts', icon: 'fa-check-double' },
                         { label: 'Failed Submissions', val: overview.failedSubmissions, color: 'text-[#FF3D00]', detail: 'Attempts below pass mark', icon: 'fa-times-circle' },
                     ].map((stat, i) => (
-                        <div key={i} className="glass-card p-8 border border-white/5 shadow-2xl relative group">
-                            <div className="flex items-start gap-6">
-                                <div className={`w-14 h-14 bg-white/2 rounded-2xl flex items-center justify-center text-xl border border-white/5 group-hover:bg-[#FFD70011] group-hover:text-[#FFD700] group-hover:border-[#FFD70022] transition-all duration-500`}>
+                        <div key={i} className="glass-card p-6 md:p-8 border border-white/5 shadow-2xl relative group">
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
+                                <div className={`w-12 h-12 md:w-14 md:h-14 bg-white/2 rounded-2xl flex items-center justify-center text-xl border border-white/5 group-hover:bg-[#FFD70011] group-hover:text-[#FFD700] group-hover:border-[#FFD70022] transition-all duration-500`}>
                                     <i className={`fas ${stat.icon}`}></i>
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <p className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-[0.2em]">{stat.label}</p>
-                                    <p className={`text-3xl font-black ${stat.color} tracking-tighter mb-2`}>{stat.val}</p>
+                                    <p className={`text-2xl md:text-3xl font-black ${stat.color} tracking-tighter mb-2`}>{stat.val}</p>
                                     <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">{stat.detail}</p>
                                 </div>
                             </div>

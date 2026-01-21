@@ -53,15 +53,15 @@ const StudentQuizzes: React.FC = () => {
             <div className="space-y-10 animate-fade-in">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <h1 className="text-4xl font-black tracking-tighter mt-1">Available <span className="neon-text-cyan">Quizzes</span></h1>
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tighter mt-1 text-center md:text-left">Available <span className="neon-text-cyan">Quizzes</span></h1>
                     </div>
 
-                    <div className="glass-card p-1 flex gap-2 w-full md:w-auto">
+                    <div className="glass-card p-1 flex gap-1 md:gap-2 w-full md:w-auto">
                         {['all', 'pending', 'completed'].map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`flex-1 md:flex-none px-6 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-300 ${filter === f ? 'bg-[#00E5FF] text-black shadow-[0_0_15px_#00E5FF55]' : 'text-[#8E9AAF] hover:text-white hover:bg-white/5'}`}
+                                className={`flex-1 md:flex-none px-3 md:px-6 py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black tracking-widest uppercase transition-all duration-300 ${filter === f ? 'bg-[#00E5FF] text-black shadow-[0_0_15px_#00E5FF55]' : 'text-[#8E9AAF] hover:text-white hover:bg-white/5'}`}
                             >
                                 {f}
                             </button>
@@ -70,12 +70,12 @@ const StudentQuizzes: React.FC = () => {
                 </div>
 
                 {quizzes.length === 0 ? (
-                    <div className="glass-card p-20 text-center">
-                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i className="fas fa-satellite-dish text-[#8E9AAF] text-2xl"></i>
+                    <div className="glass-card p-10 md:p-20 text-center">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i className="fas fa-satellite-dish text-[#8E9AAF] text-xl md:text-2xl"></i>
                         </div>
-                        <p className="text-[#8E9AAF] font-bold tracking-widest uppercase text-xs">NO quizz is yet assingned</p>
-                        <p className="text-white/40 text-[10px] mt-2 italic px-10">Check back later for new mission assignments in this sector.</p>
+                        <p className="text-[#8E9AAF] font-bold tracking-widest uppercase text-[10px] md:text-xs">NO quizz is yet assingned</p>
+                        <p className="text-white/40 text-[9px] md:text-[10px] mt-2 italic px-4 md:px-10">Check back later for new mission assignments in this sector.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -85,28 +85,27 @@ const StudentQuizzes: React.FC = () => {
                             return (
                                 <div key={quiz.id} className={`glass-card group flex flex-col relative overflow-hidden transition-all duration-500 ${isFaded ? 'opacity-60 grayscale-[0.4] hover:grayscale-0 hover:opacity-100' : ''}`}>
                                     {/* Top Banner Area */}
-                                    <div className={`h-32 w-full ${isExpired ? 'bg-[#FFEDED]' : 'bg-[#E3EBFF]'}`}></div>
+                                    <div className={`h-24 md:h-32 w-full ${isExpired ? 'bg-[#FFEDED]' : 'bg-[#E3EBFF]'}`}></div>
 
-                                    <div className="p-8 flex flex-col h-full">
+                                    <div className="p-6 md:p-8 flex flex-col h-full">
                                         {/* Header Info */}
-                                        <div className="mb-6">
-                                            <h3 className="text-2xl font-black tracking-tighter mb-1">{quiz.title}</h3>
-                                            <p className="text-xs font-bold text-[#8E9AAF] tracking-widest uppercase">{quiz.courseTitle || 'Course Quiz'}</p>
+                                        <div className="mb-4 md:mb-6 text-center md:text-left">
+                                            <h3 className="text-xl md:text-2xl font-black tracking-tighter mb-1 leading-tight">{quiz.title}</h3>
+                                            <p className="text-[10px] md:text-xs font-bold text-[#8E9AAF] tracking-widest uppercase">{quiz.courseTitle || 'Course Quiz'}</p>
                                         </div>
 
                                         {/* Timestamps */}
-                                        {/* Timestamps */}
-                                        <div className="grid grid-cols-2 gap-4 mb-8 bg-black/20 p-4 rounded-2xl border border-white/5">
+                                        <div className="grid grid-cols-2 gap-2 md:gap-4 mb-6 md:mb-8 bg-black/20 p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/5">
                                             <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-[#8E9AAF] uppercase tracking-widest">Start Time</p>
-                                                <p className={`text-xs font-black tracking-tight ${quiz.isCompleted ? 'text-[#00C853]' : isExpired ? 'text-[#FF3D00]' : 'text-white'
+                                                <p className="text-[8px] md:text-[9px] font-black text-[#8E9AAF] uppercase tracking-widest">Start Time</p>
+                                                <p className={`text-[10px] md:text-xs font-black tracking-tight ${quiz.isCompleted ? 'text-[#00C853]' : isExpired ? 'text-[#FF3D00]' : 'text-white'
                                                     }`}>
                                                     {quiz.startDate ? new Date(quiz.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                                                 </p>
                                             </div>
                                             <div className="space-y-1 text-right">
-                                                <p className="text-[9px] font-black text-[#8E9AAF] uppercase tracking-widest">End Time</p>
-                                                <p className={`text-xs font-black tracking-tight ${quiz.isCompleted ? 'text-[#00C853]' : isExpired ? 'text-[#FF3D00]' : 'text-white'
+                                                <p className="text-[8px] md:text-[9px] font-black text-[#8E9AAF] uppercase tracking-widest">End Time</p>
+                                                <p className={`text-[10px] md:text-xs font-black tracking-tight ${quiz.isCompleted ? 'text-[#00C853]' : isExpired ? 'text-[#FF3D00]' : 'text-white'
                                                     }`}>
                                                     {quiz.endDate ? new Date(quiz.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                                                 </p>
@@ -114,23 +113,23 @@ const StudentQuizzes: React.FC = () => {
                                         </div>
 
                                         {/* Metrics Row */}
-                                        <div className="flex justify-between items-center mb-4">
-                                            <p className="text-sm font-black text-[#0066FF] tracking-tight uppercase">
+                                        <div className="flex justify-between items-center mb-3 md:mb-4">
+                                            <p className="text-xs md:text-sm font-black text-[#0066FF] tracking-tight uppercase">
                                                 {quiz.isCompleted ? `Score: ${quiz.score || 0}%` : 'Not Attempted'}
                                             </p>
-                                            <p className="text-[10px] font-black tracking-widest uppercase text-[#8E9AAF]/60">
+                                            <p className="text-[8px] md:text-[10px] font-black tracking-widest uppercase text-[#8E9AAF]/60">
                                                 {quiz.totalQuestions || 0} QUESTIONS
                                             </p>
                                         </div>
 
                                         {/* Duration row */}
-                                        <div className="flex items-center justify-between mb-8">
+                                        <div className="flex items-center justify-between mb-6 md:mb-8">
                                             <div className="flex items-center gap-2 text-[#8E9AAF]">
                                                 <i className="far fa-clock text-xs"></i>
-                                                <span className="text-[10px] font-black tracking-widest uppercase">{quiz.durationMinutes || 30} mins</span>
+                                                <span className="text-[9px] md:text-[10px] font-black tracking-widest uppercase">{quiz.durationMinutes || 30} mins</span>
                                             </div>
                                             {quiz.isCompleted && quiz.score < 50 && (
-                                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">X Failed</span>
+                                                <span className="text-[9px] md:text-[10px] font-black text-red-500 uppercase tracking-widest">X Failed</span>
                                             )}
                                         </div>
 
@@ -139,7 +138,7 @@ const StudentQuizzes: React.FC = () => {
                                             <button
                                                 disabled={isExpired}
                                                 onClick={() => navigate(quiz.isCompleted ? `/quiz/${quiz.id}/results` : `/quiz/${quiz.id}/details`)}
-                                                className={`px-12 py-3 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 border-2 ${quiz.isCompleted
+                                                className={`w-full md:w-auto px-6 md:px-12 py-3 rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 border-2 ${quiz.isCompleted
                                                     ? 'border-[#00C853] text-[#00C853] hover:bg-[#00C853] hover:text-white'
                                                     : isExpired
                                                         ? 'border-[#E0E0E0] text-[#BDBDBD] bg-white'

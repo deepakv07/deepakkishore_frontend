@@ -62,42 +62,42 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <AdminLayout>
-            <div className="animate-fade-in space-y-12">
+            <div className="animate-fade-in space-y-8 md:space-y-12">
                 {/* Strategic Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-                    <div>
-                        <div className="flex items-center gap-3 mb-3">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-8 text-center md:text-left">
+                    <div className="w-full md:w-auto">
+                        <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
                             <span className="px-3 py-1 rounded-full bg-[#FFD70011] border border-[#B8860B33] dark:border-[#FFD70033] text-[#B8860B] dark:text-[#FFD700] text-[10px] font-black uppercase tracking-[0.3em]">
                                 ADMIN DASHBOARD
                             </span>
                         </div>
-                        <h1 className="text-5xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
+                        <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter leading-tight">
                             Dashboard <span className="text-[#B8860B] dark:text-[#FFD700]">Overview</span>
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-500 mt-4 text-sm font-bold uppercase tracking-widest uppercase">Welcome back, Administrator</p>
+                        <p className="text-gray-600 dark:text-gray-500 mt-2 md:mt-4 text-xs md:text-sm font-bold uppercase tracking-widest">Welcome back, Administrator</p>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-full md:w-auto gap-4">
                         <Link
-                            to="/admin/courses/create"
-                            className="px-8 py-4 bg-gray-900 text-white dark:bg-white dark:text-[#030508] font-black rounded-2xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 flex items-center shadow-2xl shadow-black/5 dark:shadow-white/5 uppercase tracking-[0.2em] text-[10px]"
+                            to="/create-quiz"
+                            className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 bg-gray-900 text-white dark:bg-white dark:text-[#030508] font-black rounded-xl md:rounded-2xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center shadow-2xl shadow-black/5 dark:shadow-white/5 uppercase tracking-[0.2em] text-[10px]"
                         >
-                            <i className="fas fa-plus mr-3 text-xs"></i> + Create Quiz
+                            <i className="fas fa-plus mr-3 text-xs"></i> Create Quiz
                         </Link>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {stats.map((stat) => (
-                        <div key={stat.label} className="glass-card p-8 border border-border-color shadow-2xl relative overflow-hidden group hover:border-[#FFD70033] transition-all duration-500">
+                        <div key={stat.label} className="glass-card p-6 md:p-8 border border-border-color shadow-2xl relative overflow-hidden group hover:border-[#FFD70033] transition-all duration-500">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/2 rounded-bl-full -mr-16 -mt-16 group-hover:bg-[#FFD70008] transition-colors duration-500"></div>
 
-                            <div className="relative z-10">
-                                <div className="w-12 h-12 bg-black/5 dark:bg-white/5 text-gray-400 rounded-xl flex items-center justify-center mb-6 text-lg border border-border-color group-hover:bg-[#FFD70011] group-hover:text-[#FFD700] group-hover:border-[#FFD70022] transition-all duration-500 shadow-lg">
+                            <div className="relative z-10 text-center md:text-left">
+                                <div className="w-12 h-12 bg-black/5 dark:bg-white/5 text-gray-400 rounded-xl flex items-center justify-center mb-4 md:mb-6 text-lg border border-border-color group-hover:bg-[#FFD70011] group-hover:text-[#FFD700] group-hover:border-[#FFD70022] mx-auto md:mx-0 transition-all duration-500 shadow-lg">
                                     <i className={stat.icon}></i>
                                 </div>
                                 <p className="text-[10px] font-black text-gray-600 dark:text-gray-500 mb-2 uppercase tracking-[0.2em]">{stat.label}</p>
-                                <p className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter tabular-nums">{stat.value}</p>
+                                <p className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter tabular-nums">{stat.value}</p>
                                 <div className="mt-4 flex items-center gap-2">
                                     <div className="flex-1 h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                         <div className="h-full bg-gradient-to-r from-gray-700 to-gray-500 w-2/3 group-hover:from-[#FFD700] group-hover:to-[#FFD70088] transition-all duration-700"></div>

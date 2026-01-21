@@ -50,16 +50,16 @@ const AdminLogin: React.FC = () => {
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00E5FF]/10 rounded-full blur-[120px]" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#9D4EDD]/10 rounded-full blur-[120px]" />
 
-            <div className="max-w-md w-full relative z-10">
-                <div className="text-center mb-10 space-y-4">
-                    <div className="w-20 h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-3xl mx-auto mb-6 shadow-[0_0_30px_rgba(0,229,255,0.2)]">
+            <div className="max-w-md w-full relative z-10 px-4">
+                <div className="text-center mb-6 md:mb-10 space-y-4">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#00E5FF] to-[#9D4EDD] rounded-2xl flex items-center justify-center text-black font-black text-2xl md:text-3xl mx-auto mb-4 md:mb-6 shadow-[0_0_30px_rgba(0,229,255,0.2)]">
                         SB
                     </div>
-                    <h2 className="text-4xl font-black text-white tracking-tighter">Administrator Panel</h2>
-                    <p className="text-[#00E5FF] font-medium tracking-wide text-sm opacity-70">Secure sign-in for platform management</p>
+                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter">Administrator Panel</h2>
+                    <p className="text-[#00E5FF] font-medium tracking-wide text-xs md:text-sm opacity-70">Secure sign-in for platform management</p>
                 </div>
 
-                <div className="glass-card p-10 border-white/10">
+                <div className="glass-card p-6 md:p-10 border-white/10">
                     {error && (
                         <div className="mb-8 p-4 bg-red-500/10 border-l-4 border-red-500 text-red-400 text-sm rounded-r-lg">
                             <i className="fas fa-exclamation-triangle mr-2"></i> {error}

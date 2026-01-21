@@ -134,27 +134,38 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 {/* Background Grid Pattern */}
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none"></div>
 
-                <header className="px-10 py-6 flex items-center bg-transparent sticky top-0 z-30">
+                <header className="px-4 md:px-10 py-4 md:py-6 flex items-center bg-transparent sticky top-0 z-30">
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-card-bg backdrop-blur-xl border border-border-color text-gray-400 hover:text-white hover:border-[#FFD70044] hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] transition-all duration-300 group"
+                        className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl md:rounded-2xl bg-card-bg backdrop-blur-xl border border-border-color text-gray-400 hover:text-white hover:border-[#FFD70044] hover:shadow-[0_0_20px_rgba(255,215,0,0.1)] transition-all duration-300 group mr-4 md:mr-6"
                         title={isSidebarOpen ? 'Retract Panel' : 'Expand Panel'}
                     >
-                        <i className={`fas ${isSidebarOpen ? 'fa-align-right' : 'fa-align-left'} text-lg transition-transform group-hover:scale-110`}></i>
+                        <i className={`fas ${isSidebarOpen ? 'fa-align-right' : 'fa-align-left'} text-base md:text-lg transition-transform group-hover:scale-110`}></i>
                     </button>
 
-                    <div className="ml-auto flex items-center gap-6">
-                        <div className="hidden md:flex flex-col items-end text-right">
+                    <div className="flex items-center space-x-3 md:space-x-5 relative overflow-hidden group mr-auto lg:hidden">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-[#FFD70011] border border-[#FFD70033] rounded-xl md:rounded-2xl flex items-center justify-center text-[#FFD700] font-black text-lg md:text-xl shadow-[0_0_20px_rgba(255,215,0,0.1)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.2)] transition-all duration-500">
+                            SB
+                        </div>
+                        <div className="sm:block">
+                            <span className="text-lg md:text-xl font-black text-text-main tracking-tighter block group-hover:text-[#FFD700] transition-colors leading-none">
+                                SkillBuilder
+                            </span>
+                            <span className="text-[7px] md:text-[8px] font-black text-[#FFD700] uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-70">ADMIN PORTAL</span>
+                        </div>
+                    </div>
+
+                    <div className="ml-auto flex items-center gap-3 md:gap-6">
+                        <div className="hidden lg:flex flex-col items-end text-right">
                             <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Administrator Session</span>
                         </div>
                         <button
                             onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="w-10 h-10 rounded-xl bg-card-bg border border-border-color flex items-center justify-center hover:bg-white/10 transition-colors group"
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-card-bg border border-border-color flex items-center justify-center hover:bg-white/10 transition-colors group"
                             title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         >
-                            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-[#8E9AAF] group-hover:text-[#FFD700]`}></i>
+                            <i className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} text-sm md:text-base text-[#8E9AAF] group-hover:text-[#FFD700]`}></i>
                         </button>
-
                     </div>
                 </header>
 

@@ -36,34 +36,33 @@ const StudentProfile: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-4xl mx-auto space-y-10 animate-fade-in">
+            <div className="max-w-4xl mx-auto space-y-6 md:space-y-10 animate-fade-in px-4">
                 {/* Header/Identity Card */}
-                <div className="glass-card p-10 relative overflow-hidden group">
+                <div className="glass-card p-6 md:p-10 relative overflow-hidden group">
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#00E5FF11] rounded-full blur-3xl group-hover:bg-[#00E5FF22] transition-colors duration-700" />
 
-                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
                         <div className="relative group">
-                            <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-[#00E5FF] to-[#0077FF] p-1 shadow-[0_0_30px_#00E5FF33]">
-                                <div className="w-full h-full rounded-[2.3rem] bg-white dark:bg-[#030508] flex items-center justify-center text-4xl font-black text-gray-900 dark:text-white group-hover:scale-95 transition-transform duration-500">
+                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] md:rounded-[2.5rem] bg-gradient-to-br from-[#00E5FF] to-[#0077FF] p-1 shadow-[0_0_30px_#00E5FF33]">
+                                <div className="w-full h-full rounded-[1.8rem] md:rounded-[2.3rem] bg-white dark:bg-[#030508] flex items-center justify-center text-3xl md:text-4xl font-black text-gray-900 dark:text-white group-hover:scale-95 transition-transform duration-500">
                                     {user?.name?.charAt(0) || 'S'}
                                 </div>
                             </div>
-                            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#00E5FF] text-black flex items-center justify-center text-xs border-4 border-white dark:border-[#030508]">
+                            <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#00E5FF] text-black flex items-center justify-center text-[10px] md:text-xs border-2 md:border-4 border-white dark:border-[#030508]">
                                 <i className="fas fa-check"></i>
                             </div>
                         </div>
 
-                        <div className="flex-1 text-center md:text-left space-y-4">
+                        <div className="flex-1 text-center md:text-left space-y-3 md:space-y-4">
                             <div>
-                                <p className="text-[#00E5FF] text-[10px] font-black tracking-[0.4em] uppercase opacity-70 mb-1">Authenticated Entity</p>
-                                <h2 className="text-4xl font-black tracking-tighter">{user?.name}</h2>
-                                <p className="text-[#8E9AAF] font-bold text-lg">{user?.email}</p>
+                                <p className="text-[#00E5FF] text-[8px] md:text-[10px] font-black tracking-[0.2em] md:tracking-[0.4em] uppercase opacity-70 mb-1">Authenticated Entity</p>
+                                <h2 className="text-2xl md:text-4xl font-black tracking-tighter leading-tight">{user?.name}</h2>
+                                <p className="text-[#8E9AAF] font-bold text-base md:text-lg truncate max-w-[200px] md:max-w-none mx-auto md:mx-0">{user?.email}</p>
                             </div>
 
-                            <div className="flex flex-wrap justify-center md:justify-start gap-3">
-
+                            <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-3">
                                 {user?.department && (
-                                    <span className="px-4 py-1.5 bg-black/5 dark:bg-white/5 border border-border-color text-gray-500 dark:text-[#8E9AAF] text-[10px] font-black uppercase tracking-widest rounded-full">
+                                    <span className="px-3 md:px-4 py-1.5 bg-black/5 dark:bg-white/5 border border-border-color text-gray-500 dark:text-[#8E9AAF] text-[8px] md:text-[10px] font-black uppercase tracking-widest rounded-full">
                                         {user.department}
                                     </span>
                                 )}
@@ -72,51 +71,51 @@ const StudentProfile: React.FC = () => {
 
                         <button
                             onClick={() => navigate('/student/profile/edit')}
-                            className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-border-color px-8 py-4 rounded-2xl transition-all group flex items-center gap-3"
+                            className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-border-color px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl transition-all group flex items-center gap-2 md:gap-3"
                         >
-                            <i className="fas fa-pencil-alt text-[#00E5FF] text-xs"></i>
-                            <span className="text-xs font-black tracking-widest uppercase text-gray-500 dark:text-[#8E9AAF]">Modify Profile</span>
+                            <i className="fas fa-pencil-alt text-[#00E5FF] text-[10px] md:text-xs"></i>
+                            <span className="text-[10px] md:text-xs font-black tracking-widest uppercase text-gray-500 dark:text-[#8E9AAF]">Modify Profile</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {/* Information Clusters */}
-                    <div className="glass-card p-8 space-y-8">
+                    <div className="glass-card p-6 md:p-8 space-y-6 md:space-y-8">
                         <div className="flex items-center gap-3">
-                            <i className="fas fa-id-card text-[#00E5FF]"></i>
-                            <h3 className="text-sm font-black tracking-[0.2em] uppercase">Identity Metadata</h3>
+                            <i className="fas fa-id-card text-[#00E5FF] text-sm md:text-base"></i>
+                            <h3 className="text-xs md:text-sm font-black tracking-[0.1em] md:tracking-[0.2em] uppercase">Identity Metadata</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-6">
+                        <div className="grid grid-cols-1 gap-4 md:gap-6">
                             {[
                                 { label: 'First Name', val: profileData?.firstName || user?.firstName || user?.name?.split(' ')[0] || 'N/A' },
                                 { label: 'Last Name', val: profileData?.lastName || user?.lastName || user?.name?.split(' ').slice(1).join(' ') || 'N/A' },
                                 { label: 'Phone Number', val: profileData?.phone || user?.phone || 'UNREGISTERED' },
                             ].map((field, idx) => (
-                                <div key={idx} className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-border-color group hover:border-[#00E5FF33] transition-colors">
+                                <div key={idx} className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-border-color group hover:border-[#00E5FF33] transition-colors text-center md:text-left">
                                     <p className="text-[8px] font-black text-gray-500 dark:text-[#8E9AAF] uppercase tracking-widest mb-1">{field.label}</p>
-                                    <p className="font-black tracking-tight text-gray-900 dark:text-white">{field.val}</p>
+                                    <p className="text-sm md:text-base font-black tracking-tight text-gray-900 dark:text-white truncate">{field.val}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="glass-card p-8 space-y-8">
+                    <div className="glass-card p-6 md:p-8 space-y-6 md:space-y-8">
                         <div className="flex items-center gap-3">
-                            <i className="fas fa-graduation-cap text-[#9D4EDD]"></i>
-                            <h3 className="text-sm font-black tracking-[0.2em] uppercase">Academic Status</h3>
+                            <i className="fas fa-graduation-cap text-[#9D4EDD] text-sm md:text-base"></i>
+                            <h3 className="text-xs md:text-sm font-black tracking-[0.1em] md:tracking-[0.2em] uppercase">Academic Status</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-6">
+                        <div className="grid grid-cols-1 gap-4 md:gap-6">
                             {[
                                 { label: 'Department', val: profileData?.department || user?.department || 'GENERAL' },
                                 { label: 'Year of Study', val: profileData?.yearOfStudy || user?.yearOfStudy || 'N/A' },
                                 { label: 'Degree', val: profileData?.degree || user?.degree || 'NONE' },
                             ].map((field, idx) => (
-                                <div key={idx} className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-border-color group hover:border-[#9D4EDD33] transition-colors">
+                                <div key={idx} className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-border-color group hover:border-[#9D4EDD33] transition-colors text-center md:text-left">
                                     <p className="text-[8px] font-black text-gray-500 dark:text-[#8E9AAF] uppercase tracking-widest mb-1">{field.label}</p>
-                                    <p className="font-black tracking-tight text-gray-900 dark:text-white">{field.val}</p>
+                                    <p className="text-sm md:text-base font-black tracking-tight text-gray-900 dark:text-white truncate">{field.val}</p>
                                 </div>
                             ))}
                         </div>
@@ -126,27 +125,27 @@ const StudentProfile: React.FC = () => {
                 {/* Futurist Career Insights */}
                 <div className="glass-card p-1 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#00E5FF11] via-transparent to-[#9D4EDD11] opacity-50" />
-                    <div className="relative z-10 p-10 bg-[#030508]/40 rounded-[1.5rem] backdrop-blur-sm border border-white/5">
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-10">
+                    <div className="relative z-10 p-6 md:p-10 bg-[#030508]/40 rounded-xl md:rounded-[1.5rem] backdrop-blur-sm border border-white/5">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-10">
                             <div className="text-center md:text-left">
-                                <p className="text-[#00E5FF] text-[8px] font-black tracking-[0.4em] uppercase mb-1">Predictive Intelligence</p>
-                                <h3 className="text-3xl font-black tracking-tighter mb-4">Career Projection</h3>
-                                <div className="inline-flex items-center gap-4 bg-white/5 px-6 py-3 rounded-full border border-white/10">
-                                    <span className="text-xs font-black tracking-widest uppercase text-white/60">Primary Vector:</span>
-                                    <span className="text-xs font-black tracking-widest uppercase text-[#00E5FF] neon-text-cyan">{profileData?.careerProjection?.role || 'SOFTWARE DEVELOPER'}</span>
-                                    <span className="w-1 h-1 bg-white/20 rounded-full" />
-                                    <span className="text-[10px] font-black text-[#8E9AAF]">{profileData?.careerProjection?.confidence || 85}% CONFIDENCE</span>
+                                <p className="text-[#00E5FF] text-[8px] font-black tracking-[0.2em] md:tracking-[0.4em] uppercase mb-1">Predictive Intelligence</p>
+                                <h3 className="text-2xl md:text-3xl font-black tracking-tighter mb-4">Career Projection</h3>
+                                <div className="inline-flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-4 bg-white/5 px-4 md:px-6 py-2 md:py-3 rounded-full border border-white/10">
+                                    <span className="text-[8px] md:text-xs font-black tracking-widest uppercase text-white/60">Primary Vector:</span>
+                                    <span className="text-[8px] md:text-xs font-black tracking-widest uppercase text-[#00E5FF] neon-text-cyan">{profileData?.careerProjection?.role || 'SOFTWARE DEVELOPER'}</span>
+                                    <span className="hidden md:block w-1 h-1 bg-white/20 rounded-full" />
+                                    <span className="text-[8px] md:text-[10px] font-black text-[#8E9AAF]">{profileData?.careerProjection?.confidence || 85}% CONFIDENCE</span>
                                 </div>
                             </div>
 
                             <div className="text-center md:text-right">
-                                <p className="text-[8px] font-black text-[#8E9AAF] tracking-[0.3em] uppercase mb-1">Projected Compensation</p>
-                                <p className="text-4xl font-black tracking-tighter neon-text-cyan">
+                                <p className="text-[8px] font-black text-[#8E9AAF] tracking-[0.2em] md:tracking-[0.3em] uppercase mb-1">Projected Compensation</p>
+                                <p className="text-2xl md:text-4xl font-black tracking-tighter neon-text-cyan leading-none mb-4 md:mb-0">
                                     {profileData?.careerProjection?.salaryRange || '₹6.0 – ₹12.0 LPA'}
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/report')}
-                                    className="mt-6 text-[10px] font-black text-[#00E5FF] hover:underline tracking-widest uppercase group flex items-center justify-center md:justify-end gap-2"
+                                    className="mt-4 md:mt-6 text-[10px] font-black text-[#00E5FF] hover:underline tracking-widest uppercase group flex items-center justify-center md:justify-end gap-2"
                                 >
                                     Access Full Diagnostic
                                     <i className="fas fa-arrow-right text-[8px] group-hover:translate-x-1 transition-transform"></i>
