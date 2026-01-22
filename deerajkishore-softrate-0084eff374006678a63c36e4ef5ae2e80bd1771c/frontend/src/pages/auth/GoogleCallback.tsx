@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import { useAuth } from '../../context/AuthContext';
 
 const GoogleCallback: React.FC = () => {
@@ -112,8 +113,8 @@ const GoogleCallback: React.FC = () => {
                     <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl mb-8 overflow-hidden p-3 animate-pulse">
                         <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder" />
                     </div>
-                    <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
-                    <p className="text-white font-black uppercase tracking-[0.2em] text-xs">Authenticating...</p>
+                    <LoadingScreen color="bg-slate-900" />
+                    <p className="text-white font-black uppercase tracking-[0.2em] text-xs mt-4">Authenticating...</p>
                 </div>
             </div>
         );

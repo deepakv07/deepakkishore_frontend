@@ -69,11 +69,11 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-border-color flex flex-col transform transition-all duration-500 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
+            <aside className={`fixed lg:sticky top-0 h-screen z-50 w-72 bg-white border-r border-border-color flex flex-col transform transition-all duration-500 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 overflow-hidden'
                 }`}>
-                <div className="p-10 flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-white rounded-[1.2rem] flex items-center justify-center shadow-sm overflow-hidden p-2 border border-slate-100">
-                        <img src="/logo.png" className="w-full h-full object-contain" alt="Logo" />
+                <div className="p-10 flex items-center space-x-4 flex-shrink-0">
+                    <div className="w-12 h-12 bg-white rounded-[1.2rem] flex items-center justify-center shadow-sm overflow-hidden p-1 border border-slate-100">
+                        <img src="/logo.png?v=2" className="w-full h-full object-contain mix-blend-multiply" alt="Logo" />
                     </div>
                     <div>
                         <h2 className="text-xl font-black tracking-tighter leading-none">Skill Builder</h2>
@@ -81,7 +81,7 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                     </div>
                 </div>
 
-                <nav className="flex-1 px-6 space-y-2">
+                <nav className="flex-1 px-6 space-y-2 overflow-y-auto no-scrollbar">
                     {navItems.map((item) => (
                         <NavLink
                             key={item.path}
@@ -101,7 +101,7 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
                     ))}
                 </nav>
 
-                <div className="p-8 space-y-4">
+                <div className="p-8 space-y-4 mt-auto flex-shrink-0 bg-white">
                     <div className="p-4 bg-slate-50 rounded-[2rem] flex items-center space-x-3">
                         <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
                             <i className="fas fa-user-graduate"></i>
@@ -122,8 +122,8 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children, hideNavbar = fa
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 pb-24 lg:pb-0">
-                <header className="px-6 md:px-12 py-6 flex items-center justify-between sticky top-0 bg-bg-main/80 backdrop-blur-md z-30">
+            <main className="flex-1 flex flex-col min-w-0 pb-24 lg:pb-0 h-screen overflow-y-auto">
+                <header className="px-6 md:px-12 py-6 flex items-center justify-between sticky top-0 bg-bg-main/95 backdrop-blur-sm z-30">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import apiService from '../../services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -239,8 +240,8 @@ const AdminStudents: React.FC = () => {
     if (loading) {
         return (
             <AdminLayout>
-                <div className="py-20 flex justify-center">
-                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="py-20 flex flex-col items-center justify-center">
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </AdminLayout>
         );
@@ -292,20 +293,20 @@ const AdminStudents: React.FC = () => {
                                     const report = getStudentReport(student.id);
                                     return (
                                         <tr key={student.id} className="group border-b border-slate-50/50 last:border-0 hover:bg-slate-50/30 transition-colors">
-                                            <td className="px-6 md:px-10 py-8">
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter leading-none transition-colors uppercase line-clamp-1">{student.name}</div>
+                                            <td className="px-6 md:px-10 py-8 align-middle">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter transition-colors uppercase line-clamp-1">{student.name}</div>
                                                     <div className="text-[9px] md:text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate max-w-[150px] md:max-w-none">{student.email}</div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-8">
+                                            <td className="px-4 py-8 align-middle">
                                                 <div className="flex flex-wrap items-center justify-center gap-4 md:gap-10">
-                                                    <div className="text-center">
-                                                        <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">QUIZZES</p>
+                                                    <div className="flex flex-col items-center gap-1.5 text-center">
+                                                        <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">QUIZZES</p>
                                                         <p className="text-sm md:text-xl font-black text-slate-900 tabular-nums leading-none">{report?.totalQuizzes || 0}</p>
                                                     </div>
-                                                    <div className="text-center">
-                                                        <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">AVG SCORE</p>
+                                                    <div className="flex flex-col items-center gap-1.5 text-center">
+                                                        <p className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">AVG SCORE</p>
                                                         <p className={`text-sm md:text-xl font-black tabular-nums tracking-tighter leading-none ${report && report.averageScore >= 70 ? 'text-teal-600' :
                                                             report && report.averageScore >= 50 ? 'text-amber-600' : 'text-red-700'
                                                             }`}>
@@ -314,17 +315,19 @@ const AdminStudents: React.FC = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 md:px-10 py-8 text-right">
-                                                <button
-                                                    onClick={() => setSelectedStudent(selectedStudent === student.id ? null : student.id)}
-                                                    className={`w-10 h-10 md:w-auto md:px-6 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center border transition-all ${selectedStudent === student.id
-                                                        ? 'bg-amber-600 text-white border-amber-600'
-                                                        : 'bg-white border-slate-200 text-slate-400 hover:text-amber-600 hover:border-amber-200'
-                                                        }`}
-                                                >
-                                                    <i className={`fas ${selectedStudent === student.id ? 'fa-eye-slash' : 'fa-eye'} text-xs md:mr-2`}></i>
-                                                    <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">Report</span>
-                                                </button>
+                                            <td className="px-6 md:px-10 py-8 text-right align-middle">
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        onClick={() => setSelectedStudent(selectedStudent === student.id ? null : student.id)}
+                                                        className={`w-10 h-10 md:w-auto md:px-6 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center border transition-all ${selectedStudent === student.id
+                                                            ? 'bg-amber-600 text-white border-amber-600'
+                                                            : 'bg-white border-slate-200 text-slate-400 hover:text-amber-600 hover:border-amber-200'
+                                                            }`}
+                                                    >
+                                                        <i className={`fas ${selectedStudent === student.id ? 'fa-eye-slash' : 'fa-eye'} text-xs md:mr-2`}></i>
+                                                        <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">Report</span>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );

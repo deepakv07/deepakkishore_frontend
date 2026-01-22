@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
 import { Link } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
 const AdminDashboard: React.FC = () => {
     const [stats, setStats] = useState<any[]>([]);
@@ -54,7 +55,7 @@ const AdminDashboard: React.FC = () => {
         return (
             <AdminLayout>
                 <div className="flex items-center justify-center py-20">
-                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </AdminLayout>
         );
@@ -71,7 +72,7 @@ const AdminDashboard: React.FC = () => {
                                 Admin Dashboard
                             </span>
                         </div>
-                        <h1 className="text-fluid-h2 font-extrabold text-slate-900 tracking-tight leading-none uppercase">
+                        <h1 className="text-fluid-h2 font-extrabold text-slate-900 tracking-tight leading-none uppercase break-normal">
                             Dashboard <br /><span className="text-amber-600/40">Overview</span>
                         </h1>
                         <p className="text-slate-700 text-base font-semibold">Welcome back, Administrator</p>
@@ -106,8 +107,8 @@ const AdminDashboard: React.FC = () => {
                                         <i className={stat.icon}></i>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-800 mb-1 md:mb-2 uppercase tracking-widest leading-none">{stat.label}</p>
-                                        <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none tabular-nums uppercase">{stat.value}</p>
+                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-800 mb-1 md:mb-2 uppercase tracking-widest leading-none break-normal">{stat.label}</p>
+                                        <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none tabular-nums uppercase break-normal">{stat.value}</p>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +134,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="p-2">
                         {quizzesLoading ? (
                             <div className="flex items-center justify-center py-32">
-                                <div className="w-16 h-16 border-4 border-pastel-orange border-t-amber-500 rounded-full animate-spin"></div>
+                                <LoadingScreen color="bg-slate-900" />
                             </div>
                         ) : quizzes.length === 0 ? (
                             <div className="text-center py-32 relative group">
@@ -141,8 +142,8 @@ const AdminDashboard: React.FC = () => {
                                     <div className="w-24 h-24 bg-pastel-orange/40 rounded-full flex items-center justify-center mb-8 border border-white text-amber-800">
                                         <i className="fas fa-ghost text-4xl"></i>
                                     </div>
-                                    <p className="text-2xl font-black text-slate-900 tracking-tighter uppercase">No Quizzes Created Yet</p>
-                                    <p className="text-slate-600 text-xs font-bold uppercase tracking-widest mt-2 text-center">Create your first quiz to get started</p>
+                                    <p className="text-2xl font-black text-slate-900 tracking-tighter uppercase break-normal">No Quizzes Created Yet</p>
+                                    <p className="text-slate-600 text-xs font-bold uppercase tracking-widest mt-2 text-center break-normal">Create your first quiz to get started</p>
                                     <Link
                                         to="/admin/courses/create"
                                         className="mt-10 elite-button !rounded-full !py-4 !px-12 bg-amber-600 shadow-xl shadow-amber-200/50"
@@ -164,31 +165,31 @@ const AdminDashboard: React.FC = () => {
                                     <tbody className="divide-y-0">
                                         {quizzes.slice(0, 10).map((quiz) => (
                                             <tr key={quiz.id} className="group border-b border-slate-50/50 last:border-0 hover:bg-slate-50/30 transition-colors">
-                                                <td className="px-6 md:px-10 py-8">
-                                                    <div className="flex flex-col gap-2">
-                                                        <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter leading-none uppercase group-hover:text-amber-600 transition-colors line-clamp-1">{quiz.title}</div>
+                                                <td className="px-6 md:px-10 py-8 align-middle">
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter uppercase group-hover:text-amber-600 transition-colors line-clamp-1 break-normal">{quiz.title}</div>
                                                         <div className="flex items-center gap-3">
-                                                            <span className="text-[8px] font-black text-amber-700 uppercase tracking-widest bg-pastel-orange/50 px-3 py-1 rounded-md">
+                                                            <span className="text-[8px] font-black text-amber-700 uppercase tracking-widest bg-pastel-orange/50 px-3 py-1 rounded-md leading-none">
                                                                 {quiz.courseTitle || 'GENERAL'}
                                                             </span>
-                                                            <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">
+                                                            <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none">
                                                                 {new Date(quiz.createdAt).toLocaleDateString()}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-8">
+                                                <td className="px-4 py-8 align-middle">
                                                     <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-                                                        <div className="text-center">
-                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">QUE</p>
+                                                        <div className="flex flex-col items-center gap-1 text-center">
+                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">QUE</p>
                                                             <p className="text-sm md:text-lg font-black text-slate-900 leading-none">{quiz.totalQuestions}</p>
                                                         </div>
-                                                        <div className="text-center">
-                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">ATT</p>
+                                                        <div className="flex flex-col items-center gap-1 text-center">
+                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">ATT</p>
                                                             <p className="text-sm md:text-lg font-black text-slate-900 leading-none">{quiz.totalSubmissions || 0}</p>
                                                         </div>
-                                                        <div className="text-center">
-                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">AVG</p>
+                                                        <div className="flex flex-col items-center gap-1 text-center">
+                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">AVG</p>
                                                             <p className={`text-sm md:text-lg font-black leading-none ${quiz.averageScore >= 70 ? 'text-teal-600' : quiz.averageScore >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
                                                                 {quiz.averageScore ? `${quiz.averageScore.toFixed(0)}%` : '0%'}
                                                             </p>

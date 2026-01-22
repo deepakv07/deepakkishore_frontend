@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
 const StudentProfile: React.FC = () => {
     const { user } = useAuth();
@@ -28,7 +29,7 @@ const StudentProfile: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#00E5FF55]"></div>
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </StudentLayout>
         );
@@ -54,7 +55,7 @@ const StudentProfile: React.FC = () => {
                         <div className="flex-1 text-center md:text-left space-y-4">
                             <div className="space-y-1">
                                 <span className="text-blue-900 text-[10px] font-bold uppercase tracking-widest leading-none">Official Profile</span>
-                                <h2 className="text-fluid-h2 font-extrabold tracking-tight leading-none text-slate-900 uppercase">{user?.name}</h2>
+                                <h2 className="text-fluid-h2 font-extrabold tracking-tight leading-none text-slate-900 uppercase break-normal">{user?.name}</h2>
                                 <p className="text-slate-700 font-semibold text-base mt-1">{user?.email}</p>
                             </div>
 
@@ -130,7 +131,7 @@ const StudentProfile: React.FC = () => {
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
                         <div className="text-center md:text-left space-y-4 w-full md:w-auto">
                             <span className="text-amber-900 text-[9px] md:text-[10px] font-bold uppercase tracking-widest leading-none">Intelligence Report</span>
-                            <h3 className="text-fluid-h3 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-words">Career Projection</h3>
+                            <h3 className="text-fluid-h3 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-normal">Career Projection</h3>
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                                 <span className="bg-white px-6 py-2 rounded-full text-xs font-bold text-slate-900 border border-white/20 shadow-sm uppercase">
                                     {profileData?.careerProjection?.role || 'Full Stack Architect'}
@@ -143,7 +144,7 @@ const StudentProfile: React.FC = () => {
 
                         <div className="text-center md:text-right space-y-4 w-full md:w-auto">
                             <p className="text-[9px] md:text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-none">Expected Package</p>
-                            <p className="text-2xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight tabular-nums break-words">
+                            <p className="text-2xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight tabular-nums break-normal">
                                 {profileData?.careerProjection?.salaryRange || '₹8L – ₹14L'}
                             </p>
                             <button

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import apiService from '../../services/api';
 
 const AdminAnalytics: React.FC = () => {
@@ -24,8 +25,8 @@ const AdminAnalytics: React.FC = () => {
     if (loading) {
         return (
             <AdminLayout>
-                <div className="py-20 flex justify-center">
-                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="py-20 flex flex-col items-center justify-center">
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </AdminLayout>
         );
@@ -139,24 +140,24 @@ const AdminAnalytics: React.FC = () => {
                                 <tbody>
                                     {quizPerformance.map((quiz: any) => (
                                         <tr key={quiz.quizId} className="group border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-colors">
-                                            <td className="px-6 md:px-10 py-8">
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter leading-none transition-colors uppercase line-clamp-1">{quiz.quizTitle}</div>
+                                            <td className="px-6 md:px-10 py-8 align-middle">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="font-black text-xl md:text-2xl text-slate-900 tracking-tighter transition-colors uppercase line-clamp-1">{quiz.quizTitle}</div>
                                                     <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">ID_{quiz.quizId.toString().substring(0, 8).toUpperCase()}</div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-8">
+                                            <td className="px-4 py-8 align-middle">
                                                 <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
-                                                    <div className="text-center">
-                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">ATTEMPTS</p>
+                                                    <div className="flex flex-col items-center gap-1 text-center">
+                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">ATTEMPTS</p>
                                                         <p className="text-sm md:text-xl font-black text-slate-900 tabular-nums leading-none">{quiz.totalAttempts}</p>
                                                     </div>
-                                                    <div className="text-center">
-                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">AVG SCORE</p>
+                                                    <div className="flex flex-col items-center gap-1 text-center">
+                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">AVG SCORE</p>
                                                         <p className="text-sm md:text-xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">{quiz.averageScore}%</p>
                                                     </div>
-                                                    <div className="text-center">
-                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">PASS RATE</p>
+                                                    <div className="flex flex-col items-center gap-1 text-center">
+                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">PASS RATE</p>
                                                         <p className="text-sm md:text-xl font-black text-teal-600 tabular-nums tracking-tighter leading-none">{quiz.passRate}%</p>
                                                     </div>
                                                 </div>
@@ -197,18 +198,18 @@ const AdminAnalytics: React.FC = () => {
                                 <tbody>
                                     {coursePerformance.map((course: any) => (
                                         <tr key={course.courseId} className="transition-all">
-                                            <td className="px-10 py-10 rounded-l-[3rem]">
+                                            <td className="px-10 py-10 rounded-l-[3rem] align-middle">
                                                 <div className="font-black text-2xl text-slate-900 tracking-tighter leading-none transition-colors uppercase">{course.courseTitle}</div>
                                             </td>
-                                            <td className="px-6 py-10 text-center">
-                                                <span className="text-xl font-black text-slate-900 tabular-nums">{course.totalQuizzes}</span>
+                                            <td className="px-6 py-10 text-center align-middle">
+                                                <span className="text-xl font-black text-slate-900 tabular-nums leading-none">{course.totalQuizzes}</span>
                                             </td>
-                                            <td className="px-6 py-10 text-center">
-                                                <span className="text-xl font-black text-slate-700 tabular-nums">{course.totalAttempts}</span>
+                                            <td className="px-6 py-10 text-center align-middle">
+                                                <span className="text-xl font-black text-slate-700 tabular-nums leading-none">{course.totalAttempts}</span>
                                             </td>
-                                            <td className="px-10 py-10 text-right rounded-r-[3rem]">
+                                            <td className="px-10 py-10 text-right rounded-r-[3rem] align-middle">
                                                 <div className="inline-flex items-center gap-3">
-                                                    <span className="text-4xl font-black text-amber-600 tracking-tighter tabular-nums">{course.averageScore}%</span>
+                                                    <span className="text-4xl font-black text-amber-600 tracking-tighter tabular-nums leading-none">{course.averageScore}%</span>
                                                     <div className="w-2 h-2 rounded-full bg-amber-600"></div>
                                                 </div>
                                             </td>

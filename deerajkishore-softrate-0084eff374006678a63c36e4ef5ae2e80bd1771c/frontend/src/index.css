@@ -211,6 +211,20 @@ body {
     animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+@keyframes ios-spinner {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.animate-ios-spinner {
+    animation: ios-spinner 1s linear infinite;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;

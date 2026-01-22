@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StudentLayout from '../../components/layouts/StudentLayout';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import apiService from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -78,8 +79,8 @@ const EditProfile: React.FC = () => {
                             <i className="fas fa-user-edit text-2xl md:text-3xl"></i>
                         </div>
                         <div className="text-center md:text-left min-w-0">
-                            <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-words">{user?.name}</h1>
-                            <p className="text-slate-700 text-[10px] font-bold tracking-widest uppercase mt-2 break-words">Identity Management</p>
+                            <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-normal">{user?.name}</h1>
+                            <p className="text-slate-700 text-[10px] font-bold tracking-widest uppercase mt-2 break-normal">Identity Management</p>
                         </div>
                     </div>
                 </div>
@@ -152,7 +153,7 @@ const EditProfile: React.FC = () => {
                                 className="elite-button !rounded-[1rem] md:!rounded-[1.5rem] !px-10 md:!px-12 shadow-xl shadow-slate-100 bg-blue-600"
                             >
                                 {loading ? (
-                                    <i className="fas fa-spinner fa-spin"></i>
+                                    <LoadingScreen color="bg-slate-900" />
                                 ) : (
                                     <>
                                         <span>Commit Changes</span>
