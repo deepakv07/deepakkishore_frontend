@@ -62,10 +62,10 @@ const StudentReport: React.FC = () => {
         <StudentLayout>
             <div className="space-y-12 animate-fade-in pb-10">
                 <div className="space-y-3">
-                    <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-none uppercase">
+                    <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-words">
                         Detailed <br /><span className="text-indigo-600/40">Report</span>
                     </h1>
-                    <p className="text-slate-700 text-[10px] font-bold tracking-widest uppercase">A summary of your academic progress and quiz history</p>
+                    <p className="text-slate-700 text-[9px] md:text-[10px] font-bold tracking-widest uppercase break-words">A summary of your academic progress and quiz history</p>
                 </div>
 
                 {/* Skill Assessment Section */}
@@ -82,14 +82,14 @@ const StudentReport: React.FC = () => {
                             { name: 'Python Programming', level: 'INTERMEDIATE', score: 65 },
                             { name: 'Data Science', level: 'BEGINNER', score: 25 },
                         ]).map((skill: Skill, index: number) => (
-                            <div key={index} className="bg-white rounded-[3rem] p-10 space-y-8 border border-slate-100 shadow-sm relative overflow-hidden">
+                            <div key={index} className="bg-white rounded-[1.5rem] md:rounded-[3rem] p-6 lg:p-10 space-y-8 border border-slate-100 shadow-sm relative overflow-hidden">
                                 <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-pastel-mint opacity-40 rounded-full"></div>
-                                <div className="flex justify-between items-start relative z-10">
-                                    <div className="space-y-1">
-                                        <h4 className="font-bold text-xl text-slate-900 uppercase leading-none">{skill.name}</h4>
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{skill.level || 'INTERMEDIATE'}</p>
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
+                                    <div className="space-y-1 min-w-0">
+                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 uppercase leading-tight break-words">{skill.name}</h4>
+                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest">{skill.level || 'INTERMEDIATE'}</p>
                                     </div>
-                                    <p className="text-3xl font-bold tracking-tight text-[#141619] leading-none tabular-nums">{skill.score}%</p>
+                                    <p className="text-2xl md:text-3xl font-bold tracking-tight text-[#141619] md:leading-none tabular-nums shrink-0">{skill.score}%</p>
                                 </div>
 
                                 <div className="relative z-10 space-y-2">
@@ -121,32 +121,38 @@ const StudentReport: React.FC = () => {
                             <div
                                 key={quiz.id}
                                 onClick={() => navigate(`/quiz/${quiz.id}/results`)}
-                                className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 cursor-pointer border border-slate-100 shadow-sm relative overflow-hidden transition-all hover:border-indigo-100 group"
+                                className="bg-white rounded-[1.25rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 cursor-pointer border border-slate-100 shadow-sm relative overflow-hidden transition-all hover:border-indigo-100 group"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-blue opacity-20 rounded-bl-[4rem] group-hover:scale-110 transition-transform"></div>
 
-                                <div className="flex items-center gap-6 md:gap-8 relative z-10 w-full min-w-0">
-                                    <div className="w-14 h-14 md:w-16 md:h-16 bg-pastel-blue rounded-[1rem] md:rounded-[1.2rem] flex items-center justify-center text-blue-900 border border-white shadow-sm shrink-0">
-                                        <i className="fas fa-file-invoice text-xl md:text-2xl"></i>
+                                <div className="flex items-center gap-4 md:gap-8 relative z-10 w-full min-w-0">
+                                    <div className="w-12 h-12 md:w-16 md:h-16 bg-pastel-blue rounded-[0.75rem] md:rounded-[1.2rem] flex items-center justify-center text-blue-900 border border-white shadow-sm shrink-0">
+                                        <i className="fas fa-file-invoice text-lg md:text-2xl"></i>
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 line-clamp-2 md:line-clamp-1 uppercase leading-tight md:leading-none break-words">{quiz.title}</h4>
-                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-2 truncate">
-                                            {quiz.courseTitle} <span className="text-slate-200 px-2">•</span> {quiz.completedAt ? new Date(quiz.completedAt).toLocaleDateString() : ''}
+                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 line-clamp-2 uppercase leading-tight break-words">{quiz.title}</h4>
+                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-tight md:tracking-widest uppercase mt-2 flex flex-wrap gap-x-2 break-words">
+                                            <span>{quiz.courseTitle}</span>
+                                            {quiz.completedAt && (
+                                                <>
+                                                    <span className="text-slate-200 hidden xs:inline">•</span>
+                                                    <span>{new Date(quiz.completedAt).toLocaleDateString()}</span>
+                                                </>
+                                            )}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between md:justify-end gap-6 md:gap-10 relative z-10 w-full md:w-auto mt-2 md:mt-0">
-                                    <div className="text-left md:text-right">
-                                        <p className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 leading-none mb-2 md:mb-3 tabular-nums">{quiz.score}%</p>
-                                        <span className={`text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border shadow-sm inline-block ${quiz.passed
+                                    <div className="text-left md:text-right shrink-0">
+                                        <p className="text-xl md:text-3xl font-black tracking-tighter text-slate-900 leading-none mb-2 md:mb-3 tabular-nums">{quiz.score}%</p>
+                                        <span className={`text-[8px] font-black uppercase tracking-widest px-3 md:px-4 py-1.5 rounded-full border shadow-sm inline-block ${quiz.passed
                                             ? 'bg-pastel-mint border-teal-500 text-teal-900'
                                             : 'bg-red-50 border-red-500 text-red-900'
                                             }`}>
                                             {quiz.passed ? 'PASSED' : 'FAILED'}
                                         </span>
                                     </div>
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all shrink-0">
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all shrink-0">
                                         <i className="fas fa-chevron-right text-[10px]"></i>
                                     </div>
                                 </div>

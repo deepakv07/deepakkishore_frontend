@@ -60,23 +60,27 @@ body {
         font-family: var(--font-inter);
         font-weight: 800;
         letter-spacing: -0.01em;
-        line-height: 1.2;
+        line-height: 1.1;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+        hyphens: auto;
     }
 
     h1 {
-        @apply text-3xl md:text-4xl lg:text-5xl;
+        font-size: clamp(1.75rem, 5vw, 3.5rem);
     }
 
     h2 {
-        @apply text-2xl md:text-3xl lg:text-4xl;
+        font-size: clamp(1.5rem, 4vw, 2.75rem);
     }
 
     h3 {
-        @apply text-xl md:text-2xl lg:text-3xl;
+        font-size: clamp(1.25rem, 3vw, 2.25rem);
     }
 
     h4 {
-        @apply text-lg md:text-xl;
+        font-size: clamp(1.1rem, 2vw, 1.75rem);
     }
 
     * {
@@ -88,13 +92,19 @@ body {
     .glass-card {
         background-color: var(--card-bg);
         border: 1px solid var(--border-color);
-        border-radius: var(--card-radius);
+        border-radius: clamp(1.25rem, 5vw, 2.5rem);
         box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        @apply p-5 md:p-8 lg:p-12;
     }
 
     .glass-card-hover {
         /* Static shadow for mobile */
         box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card-hover:hover {
+        @apply -translate-y-1 shadow-xl;
     }
 
     .elite-button {
@@ -152,19 +162,19 @@ body {
     }
 
     .text-fluid-h1 {
-        font-size: clamp(2rem, 8vw, 5rem);
+        font-size: clamp(1.75rem, 8vw, 4rem);
     }
 
     .text-fluid-h2 {
-        font-size: clamp(1.75rem, 6vw, 3.5rem);
+        font-size: clamp(1.5rem, 6vw, 3rem);
     }
 
     .text-fluid-h3 {
-        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        font-size: clamp(1.25rem, 4vw, 2.25rem);
     }
 
     .text-fluid-h4 {
-        font-size: clamp(1.25rem, 3vw, 2rem);
+        font-size: clamp(1.1rem, 3vw, 1.75rem);
     }
 
     .text-fluid-body {

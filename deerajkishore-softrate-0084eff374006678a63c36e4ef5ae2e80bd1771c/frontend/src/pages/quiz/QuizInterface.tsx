@@ -270,22 +270,22 @@ const QuizInterface: React.FC = () => {
         <StudentLayout hideNavbar={true}>
             <div className="min-h-screen bg-[var(--bg-main)] text-slate-900 flex flex-col font-sans">
                 {/* Modern Header */}
-                <div className="h-24 bg-white border-b border-slate-100 flex items-center justify-between px-6 md:px-12 sticky top-0 z-40">
-                    <div className="flex items-center gap-6">
+                <div className="h-20 md:h-24 bg-white border-b border-slate-100 flex items-center justify-between px-4 md:px-12 sticky top-0 z-40">
+                    <div className="flex items-center gap-4 md:gap-6 min-w-0">
                         <button
                             onClick={() => navigate('/student/quizzes')}
-                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-100 text-slate-900"
+                            className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl bg-slate-50 border border-slate-100 text-slate-900 shrink-0"
                         >
-                            <i className="fas fa-chevron-left"></i>
+                            <i className="fas fa-chevron-left text-xs"></i>
                         </button>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] leading-none">Assessment Session</span>
-                            <span className="text-xs font-bold text-slate-900 uppercase tracking-widest mt-1">{quiz?.title || 'Loading...'}</span>
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest md:tracking-[0.2em] leading-none">Assessment Session</span>
+                            <span className="text-[10px] md:text-xs font-bold text-slate-900 uppercase tracking-widest mt-1 truncate">{quiz?.title || 'Loading...'}</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="relative w-16 h-16 flex items-center justify-center">
+                    <div className="flex items-center gap-4 shrink-0">
+                        <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90">
                                 <circle
                                     cx="32"
@@ -308,7 +308,7 @@ const QuizInterface: React.FC = () => {
                                     className="text-indigo-600 transition-all duration-1000"
                                 />
                             </svg>
-                            <span className="absolute text-[10px] font-bold text-slate-900 tabular-nums">
+                            <span className="absolute text-[8px] md:text-[10px] font-bold text-slate-900 tabular-nums">
                                 {timeLeft !== null ? formatTime(timeLeft) : '--:--'}
                             </span>
                         </div>
@@ -376,23 +376,23 @@ const QuizInterface: React.FC = () => {
                                             <button
                                                 key={idx}
                                                 onClick={() => handleAnswerSelect(qId, option)}
-                                                className={`w-full flex items-center p-4 md:p-6 rounded-[1.2rem] md:rounded-[1.5rem] border-2 transition-all duration-200 group relative ${isSelected
+                                                className={`w-full flex items-center p-3 md:p-6 rounded-[1rem] md:rounded-[1.5rem] border-2 transition-all duration-200 group relative ${isSelected
                                                     ? 'bg-pastel-blue/40 border-indigo-600 shadow-sm'
                                                     : 'bg-white border-slate-100 hover:border-slate-200'
                                                     }`}
                                             >
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs border-2 shrink-0 ${isSelected
+                                                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center font-bold text-[10px] md:text-xs border-2 shrink-0 ${isSelected
                                                     ? 'bg-indigo-600 border-indigo-600 text-white'
                                                     : 'bg-slate-50 border-slate-100 text-slate-900'
                                                     }`}>
                                                     {letter}
                                                 </div>
-                                                <span className={`ml-4 md:ml-6 text-sm md:text-base font-bold uppercase transition-all text-left flex-1 break-words line-clamp-3 md:line-clamp-none ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
+                                                <span className={`ml-3 md:ml-6 text-sm md:text-base font-bold uppercase transition-all text-left flex-1 break-words line-clamp-3 md:line-clamp-none ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
                                                     {option}
                                                 </span>
                                                 {isSelected && (
-                                                    <div className="ml-4 text-indigo-600 shrink-0">
-                                                        <i className="fas fa-check-circle text-lg"></i>
+                                                    <div className="ml-3 text-indigo-600 shrink-0">
+                                                        <i className="fas fa-check-circle text-base md:text-lg"></i>
                                                     </div>
                                                 )}
                                             </button>
@@ -404,11 +404,11 @@ const QuizInterface: React.FC = () => {
                                             value={selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || ''}
                                             onChange={(e) => handleAnswerSelect(currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`, e.target.value)}
                                             placeholder="Type your descriptive answer here..."
-                                            className="w-full h-80 p-8 rounded-[2.5rem] border-2 border-slate-100 bg-white focus:border-indigo-600 focus:ring-0 transition-all font-semibold text-base text-slate-800 resize-none outline-none shadow-sm"
+                                            className="w-full h-80 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-slate-100 bg-white focus:border-indigo-600 focus:ring-0 transition-all font-semibold text-base text-slate-800 resize-none outline-none shadow-sm"
                                         />
-                                        <div className="flex justify-between items-center px-8">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Character Count: {(selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || '').length}</span>
-                                            <span className="text-[10px] font-black text-indigo-600/40 uppercase tracking-widest animate-pulse">Auto-saving...</span>
+                                        <div className="flex justify-between items-center px-4 md:px-8">
+                                            <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none break-words">Char Count: {(selectedAnswers[currentQuestion?.id?.toString() || currentQuestion?._id?.toString() || `q${currentQuestionIndex}`] || '').length}</span>
+                                            <span className="text-[9px] md:text-[10px] font-black text-indigo-600/40 uppercase tracking-widest animate-pulse leading-none">Auto-saving...</span>
                                         </div>
                                     </div>
                                 )}
@@ -440,33 +440,33 @@ const QuizInterface: React.FC = () => {
                 {(showConfirmation || showWarningModal || showViolationModal || showSuccessModal) && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 transition-all">
                         {showConfirmation && (
-                            <div className="bg-white w-full max-w-md p-10 md:p-14 rounded-[3.5rem] shadow-2xl text-center border border-slate-100">
-                                <div className="w-20 h-20 bg-pastel-blue text-blue-900 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-white shadow-sm">
+                            <div className="bg-white w-full max-w-sm md:max-w-md p-8 md:p-14 rounded-[1.5rem] md:rounded-[3.5rem] shadow-2xl text-center border border-slate-100 relative overflow-hidden">
+                                <div className="w-16 h-16 md:w-20 md:h-20 bg-pastel-blue text-blue-900 rounded-xl md:rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 md:mb-8 text-2xl md:text-3xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">Confirm Submission</h3>
-                                <p className="text-slate-700 mb-12 font-bold text-sm">
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">Confirm Submission</h3>
+                                <p className="text-slate-700 mb-8 md:mb-12 font-bold text-xs md:text-sm break-words">
                                     You have completed {Object.keys(selectedAnswers).length} out of {totalQuestions} entities. All data will be finalized.
                                 </p>
                                 <div className="space-y-4">
-                                    <button onClick={() => handleSubmitQuiz()} className="elite-button !w-full !py-5 bg-indigo-600">SUBMIT</button>
-                                    <button onClick={() => setShowConfirmation(false)} className="text-[10px] font-black text-slate-700 uppercase tracking-[0.3em]">CANCEL</button>
+                                    <button onClick={() => handleSubmitQuiz()} className="elite-button !w-full !py-4 md:!py-5 bg-indigo-600">SUBMIT</button>
+                                    <button onClick={() => setShowConfirmation(false)} className="text-[9px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest md:tracking-[0.3em] leading-none">CANCEL</button>
                                 </div>
                             </div>
                         )}
 
                         {showWarningModal && (
-                            <div className="bg-white rounded-[3.5rem] p-10 md:p-14 max-w-md w-full shadow-2xl text-center border border-slate-100">
-                                <div className="w-20 h-20 bg-pastel-orange text-amber-900 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-white shadow-sm">
+                            <div className="bg-white rounded-[1.5rem] md:rounded-[3.5rem] p-8 md:p-14 max-w-sm md:max-w-md w-full shadow-2xl text-center border border-slate-100 relative overflow-hidden">
+                                <div className="w-16 h-16 md:w-20 md:h-20 bg-pastel-orange text-amber-900 rounded-xl md:rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 md:mb-8 text-2xl md:text-3xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-exclamation-circle"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">Protocol Violation</h3>
-                                <p className="text-slate-700 mb-10 font-bold text-sm leading-relaxed">
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">Protocol Violation</h3>
+                                <p className="text-slate-700 mb-8 md:mb-10 font-bold text-xs md:text-sm leading-relaxed break-words">
                                     Unauthorized shift detected. Maintain focus on the assessment window to avoid <span className="text-red-600 font-black">SYSTEM TERMINATION</span>.
                                 </p>
                                 <button
                                     onClick={() => { setShowWarningModal(false); if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => { }); }}
-                                    className="elite-button !w-full !py-5 bg-slate-900"
+                                    className="elite-button !w-full !py-4 md:!py-5 bg-slate-900"
                                 >
                                     RESTORE SESSION
                                 </button>
@@ -474,17 +474,17 @@ const QuizInterface: React.FC = () => {
                         )}
 
                         {showViolationModal && (
-                            <div className="bg-white rounded-[3.5rem] p-10 md:p-14 max-w-md w-full shadow-2xl text-center border border-slate-100">
-                                <div className="w-20 h-20 bg-red-50 text-red-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 text-3xl border border-red-100">
+                            <div className="bg-white rounded-[1.5rem] md:rounded-[3.5rem] p-8 md:p-14 max-w-sm md:max-w-md w-full shadow-2xl text-center border border-slate-100 relative overflow-hidden">
+                                <div className="w-16 h-16 md:w-20 md:h-20 bg-red-50 text-red-600 rounded-xl md:rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 md:mb-8 text-2xl md:text-3xl border border-red-100">
                                     <i className="fas fa-user-shield"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">AUTO-TERMINATED</h3>
-                                <p className="text-slate-700 mb-10 font-bold text-sm leading-relaxed">
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">AUTO-TERMINATED</h3>
+                                <p className="text-slate-700 mb-8 md:mb-10 font-bold text-xs md:text-sm leading-relaxed break-words">
                                     Multiple proctoring deviations logged. Session has been force-closed and data committed for review.
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/dashboard')}
-                                    className="elite-button !w-full !py-5 bg-slate-900"
+                                    className="elite-button !w-full !py-4 md:!py-5 bg-slate-900"
                                 >
                                     DISMISS TERMINATION
                                 </button>
@@ -492,15 +492,15 @@ const QuizInterface: React.FC = () => {
                         )}
 
                         {showSuccessModal && (
-                            <div className="bg-white w-full max-w-md p-10 md:p-14 rounded-[3.5rem] shadow-2xl text-center border border-slate-100">
-                                <div className="w-24 h-24 bg-pastel-mint text-teal-900 rounded-full flex items-center justify-center mx-auto mb-8 text-4xl border border-white shadow-sm">
+                            <div className="bg-white w-full max-w-sm md:max-w-md p-8 md:p-14 rounded-[1.5rem] md:rounded-[3.5rem] shadow-2xl text-center border border-slate-100 relative overflow-hidden">
+                                <div className="w-16 h-16 md:w-24 md:h-24 bg-pastel-mint text-teal-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 text-3xl md:text-4xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-check-circle"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase leading-none">Transmission Success</h3>
-                                <p className="text-slate-700 mb-12 font-bold text-sm">
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">Transmission Success</h3>
+                                <p className="text-slate-700 mb-8 md:mb-12 font-bold text-xs md:text-sm break-words">
                                     Your quiz has been submitted successfully.
                                 </p>
-                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="elite-button !w-full !py-6 bg-teal-600 shadow-xl shadow-teal-100">VIEW RESULTS</button>
+                                <button onClick={() => navigate(`/quiz/${quizId}/results`)} className="elite-button !w-full !py-5 md:!py-6 bg-teal-600 shadow-xl shadow-teal-100">VIEW RESULTS</button>
                             </div>
                         )}
                     </div>

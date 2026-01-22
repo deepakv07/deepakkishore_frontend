@@ -133,18 +133,18 @@ const QuizResults: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-7xl mx-auto py-12 px-6" onClick={() => setActiveBar(null)}>
+            <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 md:px-6" onClick={() => setActiveBar(null)}>
                 {/* Dashboard Header */}
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 md:mb-16 gap-8">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 md:mb-16 gap-8">
                     <div className="w-full lg:w-auto text-left">
-                        <h1 className="text-3xl md:text-5xl font-extrabold text-[#141619] tracking-tight uppercase leading-tight mb-2">
+                        <h1 className="text-fluid-h1 font-extrabold text-[#141619] tracking-tight uppercase leading-tight mb-2">
                             Quiz <br /><span className="text-indigo-600">Results</span>
                         </h1>
-                        <p className="text-slate-600 font-bold uppercase tracking-widest text-[9px]">Summary of your performance</p>
+                        <p className="text-slate-600 font-bold uppercase tracking-widest text-[9px] break-words">Summary of your performance</p>
                     </div>
 
                     {/* Identity Plate */}
-                    <div className="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-6 w-full lg:w-auto relative overflow-hidden">
+                    <div className="bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-6 w-full lg:w-auto relative overflow-hidden">
                         <div className="flex items-center gap-5 w-full md:w-auto">
                             <div className="relative w-14 h-14 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-md shrink-0">
                                 {user?.name?.split(' ').map(n => n[0]).join('') || 'KM'}
@@ -158,7 +158,7 @@ const QuizResults: React.FC = () => {
                         </div>
                         <div className="relative text-center md:text-right border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex flex-row md:flex-col items-center justify-between md:justify-center gap-2">
                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none">OVERALL</p>
-                            <p className="text-3xl font-extrabold text-indigo-600 tracking-tight tabular-nums leading-none">{result.percentage?.toFixed(0)}%</p>
+                            <p className="text-2xl md:text-3xl font-extrabold text-indigo-600 tracking-tight tabular-nums leading-none shrink-0">{result.percentage?.toFixed(0)}%</p>
                         </div>
                     </div>
                 </div>
@@ -167,37 +167,37 @@ const QuizResults: React.FC = () => {
                     {/* LEFT COLUMN - Statistics Overview */}
                     <div className="lg:col-span-8 space-y-12">
                         {/* Main Performance Card */}
-                        <div className="bg-white rounded-[4rem] p-12 border border-slate-100 shadow-sm relative overflow-hidden">
+                        <div className="bg-white rounded-[1.5rem] md:rounded-[4rem] p-5 md:p-12 border border-slate-100 shadow-sm relative overflow-hidden">
                             <div className="relative z-10">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
-                                    <div className="space-y-8 min-w-0">
-                                        <div className="flex items-center gap-3">
-                                            <span className="px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest">
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-8 md:gap-10">
+                                    <div className="space-y-6 md:space-y-8 min-w-0 w-full">
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <span className="px-3 md:px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[9px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest shrink-0">
                                                 VALIDATED REPORT
                                             </span>
-                                            <span className="text-slate-300 font-bold">•</span>
-                                            <span className="text-[#334155] text-[10px] font-black uppercase tracking-widest">Timestamp: {result.completedDate}</span>
+                                            <span className="hidden md:inline text-slate-300 font-bold">•</span>
+                                            <span className="text-slate-500 text-[9px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest break-words flex-1 min-w-[100px]">Timestamp: {result.completedDate}</span>
                                         </div>
-                                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#141619] tracking-tight leading-none uppercase">Performance Overview</h2>
-                                        <div className="flex items-center gap-4">
-                                            <div className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] border ${result.passed
+                                        <h2 className="text-fluid-h2 font-extrabold text-[#141619] tracking-tight leading-tight uppercase break-words">Performance Overview</h2>
+                                        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+                                            <div className={`flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[9px] md:text-[10px] border shrink-0 ${result.passed
                                                 ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                                                 : 'border-rose-200 bg-rose-50 text-rose-800'
                                                 }`}>
                                                 <i className={`fas ${result.passed ? 'fa-circle-check' : 'fa-circle-xmark'}`}></i>
                                                 {result.passed ? 'PASSED' : 'FAILED'}
                                             </div>
-                                            <div className="flex items-center gap-3 px-8 py-4 bg-slate-50 text-slate-900 border border-slate-200 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px]">
+                                            <div className="flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 bg-slate-50 text-slate-900 border border-slate-200 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[9px] md:text-[10px] shrink-0">
                                                 <i className="fas fa-layer-group"></i>
                                                 LEVEL: {result.percentage >= 80 ? 'EXPERT' : result.percentage >= 60 ? 'MID-TIER' : 'BEGINNER'}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="text-center md:text-right shrink-0">
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">ACCURACY INDEX</p>
+                                    <div className="text-left md:text-right shrink-0 w-full md:w-auto mt-6 md:mt-0">
+                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 md:mb-4">ACCURACY INDEX</p>
                                         <div className="inline-flex items-baseline gap-1 md:gap-2">
-                                            <span className="text-5xl md:text-7xl font-extrabold text-indigo-600 tracking-tighter leading-none tabular-nums truncate">
+                                            <span className="text-5xl md:text-7xl font-extrabold text-indigo-600 tracking-tighter leading-none tabular-nums">
                                                 {result.percentage?.toFixed(0)}
                                             </span>
                                             <span className="text-xl md:text-3xl font-bold text-indigo-600">%</span>
@@ -206,16 +206,16 @@ const QuizResults: React.FC = () => {
                                 </div>
 
                                 {/* Quick Stats Grid */}
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-12 border-t border-slate-100">
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 pt-8 md:pt-12 border-t border-slate-100">
                                     {[
                                         { label: 'CORRECT', val: result.correctAnswers, color: 'text-emerald-900', bg: 'bg-pastel-mint' },
                                         { label: 'INCORRECT', val: result.incorrectAnswers, color: 'text-rose-900', bg: 'bg-pastel-orange' },
                                         { label: 'TIME SPENT', val: result.timeSpent, color: 'text-indigo-900', bg: 'bg-pastel-lavender' },
                                         { label: 'PERCENTILE', val: `${result.percentile}%`, color: 'text-blue-900', bg: 'bg-pastel-blue' },
                                     ].map((stat, i) => (
-                                        <div key={i} className={`${stat.bg} p-6 rounded-[2rem] border border-white shadow-sm transition-all`}>
-                                            <p className="text-[10px] font-bold text-[#141619] uppercase tracking-widest mb-4 opacity-70">{stat.label}</p>
-                                            <p className={`text-2xl font-bold ${stat.color} tracking-tight tabular-nums`}>{stat.val}</p>
+                                        <div key={i} className={`${stat.bg} p-4 md:p-6 rounded-[1.25rem] md:rounded-[2rem] border border-white shadow-sm transition-all`}>
+                                            <p className="text-[8px] md:text-[10px] font-bold text-[#141619] uppercase tracking-tight md:tracking-widest mb-2 md:mb-4 opacity-70 break-words line-clamp-1">{stat.label}</p>
+                                            <p className={`text-lg md:text-2xl font-bold ${stat.color} tracking-tight tabular-nums break-words`}>{stat.val}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -223,16 +223,16 @@ const QuizResults: React.FC = () => {
                         </div>
 
                         {/* Telemetry Stream (Chart) */}
-                        <div className="bg-white rounded-[4rem] p-12 border border-slate-100 shadow-sm relative">
-                            <div className="flex items-center justify-between mb-16">
-                                <h3 className="text-[10px] font-black text-[#334155] uppercase tracking-[0.4em] leading-none">Time Per Question</h3>
+                        <div className="bg-white rounded-[1.5rem] md:rounded-[4rem] p-5 md:p-12 border border-slate-100 shadow-sm relative">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 md:mb-16 gap-4">
+                                <h3 className="text-fluid-h4 font-black text-slate-500 uppercase tracking-widest leading-none">Time Per Question</h3>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-600"></div>
-                                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Live Analysis</span>
+                                    <div className="w-2 md:w-2.5 h-2 md:h-2.5 rounded-full bg-indigo-600 animate-pulse"></div>
+                                    <span className="text-[9px] md:text-[10px] font-black text-indigo-600 uppercase tracking-widest">Live Analysis</span>
                                 </div>
                             </div>
                             <div className="overflow-x-auto pb-4 no-scrollbar">
-                                <div className="relative h-72 flex items-end justify-between px-6 min-w-[600px] lg:min-w-0">
+                                <div className="relative h-64 md:h-72 flex items-end justify-between px-2 md:px-6 min-w-[500px] lg:min-w-0">
                                     {(() => {
                                         const maxTime = Math.max(...(result.timePerQuestion || [0]));
                                         const chartMax = Math.ceil(Math.max(maxTime + 5, 20) / 5) * 5;
@@ -261,15 +261,15 @@ const QuizResults: React.FC = () => {
                                                         }}
                                                     >
                                                         <div
-                                                            className={`w-12 rounded-t-xl relative z-10 border border-indigo-700/10 shadow-sm transition-all duration-300 ${activeBar === i ? 'bg-indigo-500 scale-x-110' : 'bg-indigo-600/90'}`}
+                                                            className={`w-8 md:w-12 rounded-t-xl relative z-10 border border-indigo-700/10 shadow-sm transition-all duration-300 ${activeBar === i ? 'bg-indigo-500 scale-x-110' : 'bg-indigo-600/90'}`}
                                                             style={{ height: `${Math.min((time / chartMax) * 100, 100)}%`, minHeight: '6px' }}
                                                         >
-                                                            <div className={`absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl whitespace-nowrap z-20 pointer-events-none transition-all duration-300 shadow-xl border border-slate-800 ${activeBar === i ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-95'}`}>
-                                                                <p className="text-[10px] font-black mb-1 uppercase tracking-widest">QUESTION Q{i + 1}</p>
-                                                                <p className="text-lg font-black tabular-nums">{time}s</p>
+                                                            <div className={`absolute -top-16 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-3 py-2 rounded-xl whitespace-nowrap z-20 pointer-events-none transition-all duration-300 shadow-xl border border-slate-800 ${activeBar === i ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-95'}`}>
+                                                                <p className="text-[8px] font-black mb-1 uppercase tracking-widest">Q{i + 1}</p>
+                                                                <p className="text-base font-black tabular-nums">{time}s</p>
                                                             </div>
                                                         </div>
-                                                        <span className={`text-[10px] font-black uppercase mt-6 tracking-tight transition-all duration-300 ${activeBar === i ? 'text-indigo-600 scale-110' : 'text-slate-900 opacity-60'}`}>Q{i + 1}</span>
+                                                        <span className={`text-[9px] md:text-[10px] font-black uppercase mt-4 md:mt-6 tracking-tight transition-all duration-300 ${activeBar === i ? 'text-indigo-600 scale-110' : 'text-slate-900 opacity-60'}`}>Q{i + 1}</span>
                                                     </div>
                                                 ))}
                                             </>
@@ -280,32 +280,32 @@ const QuizResults: React.FC = () => {
                         </div>
 
                         {/* Granular Analysis */}
-                        <div className="bg-white rounded-[4rem] p-12 border border-slate-100 shadow-sm">
-                            <div className="flex items-center gap-6 mb-16">
-                                <div className="w-14 h-14 bg-pastel-blue text-blue-900 rounded-[1.5rem] flex items-center justify-center text-xl border border-white shadow-sm">
+                        <div className="bg-white rounded-[1.5rem] md:rounded-[4rem] p-5 md:p-12 border border-slate-100 shadow-sm">
+                            <div className="flex items-center gap-4 md:gap-6 mb-10 md:mb-16">
+                                <div className="w-12 h-12 md:w-14 md:h-14 bg-pastel-blue text-blue-900 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center text-lg md:text-xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-tasks"></i>
                                 </div>
-                                <h3 className="text-3xl font-black text-[#141619] tracking-tighter uppercase leading-none">Question Analysis</h3>
+                                <h3 className="text-fluid-h3 font-black text-[#141619] tracking-tighter uppercase leading-none break-words">Question Analysis</h3>
                             </div>
 
-                            <div className="space-y-10">
+                            <div className="space-y-6 md:space-y-10">
                                 {(showMore ? result.questions : result.questions?.slice(0, 4))?.map((q: any, i: number) => (
-                                    <div key={i} className="p-12 rounded-[3.5rem] border border-slate-100 bg-slate-50/50">
-                                        <div className="flex items-center gap-6 mb-10">
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-sm border-2 ${q.isCorrect ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`}>
+                                    <div key={i} className="p-5 md:p-12 rounded-[1.25rem] md:rounded-[3.5rem] border border-slate-100 bg-slate-50/50">
+                                        <div className="flex items-start gap-4 md:gap-6 mb-6 md:mb-10">
+                                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-[0.75rem] md:rounded-2xl flex items-center justify-center text-xs md:text-sm border-2 shrink-0 ${q.isCorrect ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`}>
                                                 <i className={`fas ${q.isCorrect ? 'fa-check' : 'fa-times'}`}></i>
                                             </div>
-                                            <h4 className="text-2xl font-black text-[#141619] tracking-tight uppercase leading-tight">Q{i + 1}: {q.text}</h4>
+                                            <h4 className="text-fluid-h4 font-black text-[#141619] tracking-tight uppercase leading-tight break-words flex-1">Q{i + 1}: {q.text}</h4>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-rose-800 uppercase tracking-widest">YOUR ANSWER</p>
-                                                <p className="font-black text-xl text-[#141619] uppercase">{q.userAnswer || 'NO DATA'}</p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+                                            <div className="space-y-2 md:space-y-4">
+                                                <p className="text-[9px] md:text-[10px] font-black text-rose-800 uppercase tracking-widest leading-none">YOUR ANSWER</p>
+                                                <p className="font-black text-fluid-h4 text-[#141619] uppercase break-words">{q.userAnswer || 'NO DATA'}</p>
                                             </div>
-                                            <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest">CORRECT ANSWER</p>
-                                                <p className="font-black text-xl text-[#141619] uppercase">{q.correctAnswer}</p>
+                                            <div className="space-y-2 md:space-y-4">
+                                                <p className="text-[9px] md:text-[10px] font-black text-emerald-800 uppercase tracking-widest leading-none">CORRECT ANSWER</p>
+                                                <p className="font-black text-fluid-h4 text-[#141619] uppercase break-words">{q.correctAnswer}</p>
                                             </div>
                                         </div>
 
@@ -342,9 +342,9 @@ const QuizResults: React.FC = () => {
                         <div className="lg:col-span-4">
                             <button
                                 onClick={handleDownloadPDF}
-                                className="w-full min-h-[400px] bg-white rounded-[4rem] p-12 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col items-center justify-center gap-10"
+                                className="w-full min-h-[200px] md:min-h-[400px] bg-white rounded-[1.5rem] md:rounded-[4rem] p-6 md:p-12 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col items-center justify-center gap-6 md:gap-10"
                             >
-                                <div className="w-28 h-28 bg-indigo-600 rounded-[2.5rem] flex items-center justify-center text-white text-4xl shadow-xl border border-white z-10">
+                                <div className="w-16 h-16 md:w-28 md:h-28 bg-indigo-600 rounded-[1rem] md:rounded-[2.5rem] flex items-center justify-center text-white text-2xl md:text-4xl shadow-xl border border-white z-10 shrink-0">
                                     <i className="fas fa-file-download"></i>
                                 </div>
 
@@ -356,19 +356,19 @@ const QuizResults: React.FC = () => {
                         </div>
 
                         {/* Next Challenge */}
-                        <div className="bg-slate-900 rounded-[4rem] p-12 text-white shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-12 opacity-5 rotate-12">
-                                <i className="fas fa-rocket text-[12rem]"></i>
+                        <div className="bg-slate-900 rounded-[1.5rem] md:rounded-[4rem] p-6 md:p-12 text-white shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 md:p-12 opacity-5 rotate-12">
+                                <i className="fas fa-rocket text-[6rem] md:text-[12rem]"></i>
                             </div>
 
                             <div className="relative z-10">
-                                <h3 className="text-4xl font-black mb-8 tracking-tighter italic uppercase leading-none">Ready for the <br />next challenge?</h3>
-                                <p className="text-slate-400 text-sm font-bold italic mb-16 leading-relaxed">
+                                <h3 className="text-fluid-h3 font-black mb-4 md:mb-8 tracking-tighter italic uppercase leading-tight break-words">Ready for the <br />next challenge?</h3>
+                                <p className="text-slate-400 text-xs md:text-sm font-bold italic mb-8 md:mb-16 leading-relaxed break-words">
                                     Continue your learning journey by taking another quiz or exploring new courses.
                                 </p>
                                 <button
                                     onClick={() => navigate('/student/dashboard')}
-                                    className="elite-button !w-full !py-8 !text-sm !rounded-[2.5rem] bg-indigo-600 italic uppercase tracking-[0.2em]"
+                                    className="elite-button !w-full !py-5 md:!py-8 !text-[10px] md:!text-sm !rounded-[1rem] md:!rounded-[2.5rem] bg-indigo-600 italic uppercase tracking-[0.2em]"
                                 >
                                     BACK TO DASHBOARD
                                 </button>

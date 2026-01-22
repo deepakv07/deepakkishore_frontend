@@ -38,7 +38,7 @@ const StudentProfile: React.FC = () => {
         <StudentLayout>
             <div className="max-w-4xl mx-auto space-y-10 md:space-y-14 animate-fade-in pb-10">
                 {/* Header/Identity Card */}
-                <div className="w-full bg-white rounded-[3rem] p-8 md:p-14 relative overflow-hidden group border border-slate-100 shadow-sm">
+                <div className="w-full bg-white rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-14 relative overflow-hidden group border border-slate-100 shadow-sm">
                     <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-pastel-blue opacity-40 rounded-full"></div>
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
@@ -79,7 +79,7 @@ const StudentProfile: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* Information Clusters */}
-                    <div className="bg-white rounded-[3rem] p-10 md:p-14 border border-slate-100 shadow-sm space-y-10">
+                    <div className="bg-white rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 lg:p-14 border border-slate-100 shadow-sm space-y-10">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-pastel-mint rounded-2xl flex items-center justify-center text-teal-900 border border-white shadow-sm">
                                 <i className="fas fa-fingerprint text-xl"></i>
@@ -101,7 +101,7 @@ const StudentProfile: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-[3rem] p-10 md:p-14 border border-slate-100 shadow-sm space-y-10">
+                    <div className="bg-white rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 lg:p-14 border border-slate-100 shadow-sm space-y-10">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-pastel-lavender rounded-2xl flex items-center justify-center text-indigo-900 border border-white shadow-sm">
                                 <i className="fas fa-university text-xl"></i>
@@ -125,25 +125,25 @@ const StudentProfile: React.FC = () => {
                 </div>
 
                 {/* Career Projection Card */}
-                <div className="w-full bg-pastel-orange rounded-[3rem] p-10 md:p-16 relative overflow-hidden border border-white shadow-sm">
+                <div className="w-full bg-pastel-orange rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 lg:p-16 relative overflow-hidden border border-white shadow-sm">
                     <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white opacity-20 rounded-full"></div>
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
-                        <div className="text-center md:text-left space-y-4">
-                            <span className="text-amber-900 text-[10px] font-bold uppercase tracking-widest leading-none">Intelligence Report</span>
-                            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 leading-none uppercase">Career Projection</h3>
+                        <div className="text-center md:text-left space-y-4 w-full md:w-auto">
+                            <span className="text-amber-900 text-[9px] md:text-[10px] font-bold uppercase tracking-widest leading-none">Intelligence Report</span>
+                            <h3 className="text-fluid-h3 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-words">Career Projection</h3>
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                                 <span className="bg-white px-6 py-2 rounded-full text-xs font-bold text-slate-900 border border-white/20 shadow-sm uppercase">
                                     {profileData?.careerProjection?.role || 'Full Stack Architect'}
                                 </span>
-                                <span className="text-[10px] font-bold text-amber-900 uppercase tracking-widest">
+                                <span className="text-[9px] md:text-[10px] font-bold text-amber-900 uppercase tracking-widest">
                                     {profileData?.careerProjection?.confidence || 92}% Match
                                 </span>
                             </div>
                         </div>
 
-                        <div className="text-center md:text-right space-y-4">
-                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-none">Expected Package</p>
-                            <p className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-none tabular-nums">
+                        <div className="text-center md:text-right space-y-4 w-full md:w-auto">
+                            <p className="text-[9px] md:text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-none">Expected Package</p>
+                            <p className="text-2xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight tabular-nums break-words">
                                 {profileData?.careerProjection?.salaryRange || '₹8L – ₹14L'}
                             </p>
                             <button

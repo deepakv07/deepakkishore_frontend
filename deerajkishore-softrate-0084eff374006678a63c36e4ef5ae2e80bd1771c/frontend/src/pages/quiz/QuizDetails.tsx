@@ -56,26 +56,26 @@ const QuizDetails: React.FC = () => {
                     <div className="space-y-12">
                         {/* Header & Stats */}
                         <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Assessment Details</h2>
-                            <div className="text-8xl font-black text-indigo-600 tracking-tighter tabular-nums leading-none">
+                            <h2 className="text-fluid-h4 font-black text-slate-500 tracking-widest uppercase break-words">Assessment Details</h2>
+                            <div className="text-6xl md:text-8xl font-black text-indigo-600 tracking-tighter tabular-nums leading-none break-words">
                                 {quiz?.questions?.length || 0}
                             </div>
-                            <p className="text-slate-700 font-bold text-lg uppercase tracking-widest mt-4">
+                            <p className="text-slate-900 font-extrabold text-fluid-h3 uppercase tracking-tight mt-4 break-words">
                                 {quiz?.title || 'Details'}
                             </p>
 
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 pb-12">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-12 md:mt-16 pb-8 md:pb-12">
                                 {[
                                     { label: 'QUESTIONS', val: quiz?.questions?.length?.toString() || '0', color: 'text-blue-900', bg: 'bg-pastel-blue' },
                                     { label: 'DURATION', val: quiz?.durationMinutes?.toString() || '30', color: 'text-teal-900', bg: 'bg-pastel-mint' },
                                     { label: 'TOTAL POINTS', val: quiz?.questions?.reduce((sum, q) => sum + (q.points || 0), 0).toString() || '0', color: 'text-indigo-900', bg: 'bg-pastel-lavender' },
                                     { label: 'TYPE', val: quiz?.questions?.every(q => q.type === 'mcq') ? 'MCQ' : 'MIXED', color: 'text-amber-900', bg: 'bg-pastel-orange' },
                                 ].map((stat, i) => (
-                                    <div key={i} className={`${stat.bg} rounded-[2rem] p-10 shadow-sm border border-white flex flex-col items-center justify-center`}>
-                                        <div className={`text-4xl font-black ${stat.color} mb-1 tabular-nums`}>
+                                    <div key={i} className={`${stat.bg} rounded-[1.25rem] md:rounded-[2rem] p-6 md:p-10 shadow-sm border border-white flex flex-col items-center justify-center`}>
+                                        <div className={`text-2xl md:text-4xl font-black ${stat.color} mb-1 tabular-nums break-words`}>
                                             {stat.val}
                                         </div>
-                                        <div className="text-slate-800 font-black text-[10px] uppercase tracking-widest">{stat.label}</div>
+                                        <div className="text-slate-800 font-black text-[9px] md:text-[10px] uppercase tracking-widest break-words">{stat.label}</div>
                                     </div>
                                 ))}
                             </div>
@@ -83,9 +83,9 @@ const QuizDetails: React.FC = () => {
 
                         {/* Breakdown */}
                         <div className="space-y-8">
-                            <h2 className="text-center text-sm font-black text-slate-900 tracking-[0.3em] uppercase underline decoration-indigo-200 underline-offset-8">Structure Breakdown</h2>
+                            <h2 className="text-center text-[10px] font-black text-slate-500 tracking-[0.4em] uppercase">Structure Breakdown</h2>
 
-                            <div className="bg-white rounded-[3rem] p-6 shadow-sm border border-slate-100 space-y-4">
+                            <div className="bg-white rounded-[1.5rem] md:rounded-[3rem] p-4 md:p-6 shadow-sm border border-slate-100 space-y-3 md:space-y-4">
                                 {[
                                     {
                                         title: 'Multiple Choice',
@@ -127,19 +127,19 @@ const QuizDetails: React.FC = () => {
                                         isHighlighted: true
                                     },
                                 ].map((item, i) => (
-                                    <div key={i} className={`flex items-center justify-between p-8 rounded-[2.5rem] ${item.isHighlighted ? 'bg-amber-50/30 border border-amber-100' : 'bg-slate-50/50 border border-slate-50'}`}>
-                                        <div className="flex items-center space-x-6">
-                                            <div className={`w-14 h-14 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center text-xl border border-white shadow-sm`}>
+                                    <div key={i} className={`flex items-center justify-between p-5 md:p-8 rounded-[1.25rem] md:rounded-[2.5rem] ${item.isHighlighted ? 'bg-amber-50/30 border border-amber-100' : 'bg-slate-50/50 border border-slate-50'}`}>
+                                        <div className="flex items-center gap-4 md:space-x-6 min-w-0">
+                                            <div className={`w-12 h-12 md:w-14 md:h-14 ${item.bg} ${item.color} rounded-xl md:rounded-2xl flex items-center justify-center md:text-xl border border-white shadow-sm shrink-0`}>
                                                 <i className={`fas ${item.icon}`}></i>
                                             </div>
-                                            <div>
-                                                <h3 className="font-black text-slate-900 text-base uppercase">{item.title}</h3>
-                                                <p className="text-xs text-slate-600 font-bold">{item.desc}</p>
+                                            <div className="min-w-0">
+                                                <h3 className="font-black text-slate-900 text-sm md:text-base uppercase break-words">{item.title}</h3>
+                                                <p className="text-[10px] md:text-xs text-slate-600 font-bold break-words">{item.desc}</p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <div className="text-3xl font-black text-slate-900 tabular-nums">{item.val}</div>
-                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase">{item.unit}</div>
+                                        <div className="text-right shrink-0">
+                                            <div className="text-xl md:text-3xl font-black text-slate-900 tabular-nums break-words">{item.val}</div>
+                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase break-words">{item.unit}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -154,19 +154,19 @@ const QuizDetails: React.FC = () => {
                                 <div className="h-px flex-1 bg-slate-200"></div>
                             </div>
 
-                            <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-sm space-y-10">
+                            <div className="bg-white rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 border border-slate-100 shadow-sm space-y-8 md:space-y-10">
                                 {[
                                     { title: 'Anti-Cheat Protocols', text: 'Screen tracking is active. Unauthorized window shifts will be logged.', icon: 'fa-shield-alt', color: 'text-red-700' },
                                     { title: 'Data Persistence', text: "Progress is recorded dynamically. Do not refresh or close the browser.", icon: 'fa-database', color: 'text-blue-700' },
                                     { title: 'Execution Window', text: 'Timer is absolute. System termination occurs upon expiration.', icon: 'fa-hourglass-start', color: 'text-indigo-700' },
                                 ].map((rule, i) => (
-                                    <div key={i} className="flex gap-6">
-                                        <div className={`${rule.color} text-2xl pt-1`}>
+                                    <div key={i} className="flex gap-4 md:gap-6">
+                                        <div className={`${rule.color} md:text-2xl pt-1 shrink-0`}>
                                             <i className={`fas ${rule.icon}`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-slate-900 mb-1 text-base uppercase leading-none">{rule.title}</h3>
-                                            <p className="text-sm text-slate-700 font-bold leading-relaxed">{rule.text}</p>
+                                            <h3 className="font-black text-slate-900 mb-1 text-sm md:text-base uppercase leading-none break-words">{rule.title}</h3>
+                                            <p className="text-xs md:text-sm text-slate-700 font-bold leading-relaxed break-words">{rule.text}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -193,10 +193,10 @@ const QuizDetails: React.FC = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-12">
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 pt-12">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="w-full md:w-auto px-12 py-6 text-slate-700 font-black tracking-[0.3em] uppercase rounded-2xl border border-slate-200 bg-white shadow-sm"
+                                className="w-full md:w-auto px-10 md:px-12 py-5 md:py-6 text-slate-700 font-black tracking-widest md:tracking-[0.3em] uppercase rounded-[1rem] md:rounded-2xl border border-slate-200 bg-white shadow-sm"
                             >
                                 <i className="fas fa-arrow-left mr-3"></i> Abort
                             </button>
@@ -211,7 +211,7 @@ const QuizDetails: React.FC = () => {
                                     }
                                 }}
                                 disabled={(!agreed && !quiz?.isCompleted) || loading}
-                                className={`w-full md:w-auto px-20 py-6 rounded-2xl font-black tracking-[0.3em] uppercase shadow-lg transition-all flex items-center justify-center ${quiz?.isCompleted
+                                className={`w-full md:w-auto px-12 md:px-20 py-5 md:py-6 rounded-[1rem] md:rounded-2xl font-black tracking-widest md:tracking-[0.3em] uppercase shadow-lg transition-all flex items-center justify-center ${quiz?.isCompleted
                                     ? 'bg-indigo-600 text-white shadow-indigo-100'
                                     : agreed && !loading
                                         ? 'bg-indigo-600 text-white shadow-indigo-200 active:scale-95'

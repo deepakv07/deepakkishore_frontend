@@ -34,37 +34,37 @@ const RoleSelection: React.FC = () => {
             <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-pastel-mint/40 rounded-full blur-[120px]" />
 
             <div className="max-w-4xl w-full relative z-10 px-6 animate-fade-in">
-                <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight">
+                <div className="text-center mb-10 md:mb-16 space-y-4">
+                    <h2 className="text-fluid-h1 font-black tracking-tight text-slate-900 leading-tight uppercase break-words">
                         Choose Your <br /><span className="text-slate-900/30">Access</span>
                     </h2>
-                    <p className="text-slate-700 text-fluid-body font-semibold">Ready to continue your journey?</p>
+                    <p className="text-slate-700 text-fluid-h4 font-extrabold uppercase tracking-tight break-words">Ready to continue your journey?</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14">
                     {roles.map((role, idx) => (
                         <div
                             key={role.title}
                             onClick={() => navigate(role.path)}
-                            className="glass-card group p-10 md:p-14 cursor-pointer text-left relative overflow-hidden border-white"
+                            className="glass-card group p-8 md:p-14 cursor-pointer text-left relative overflow-hidden border-white"
                         >
                             <div
-                                className={`w-20 h-20 md:w-28 md:h-28 rounded-[2rem] flex items-center justify-center text-4xl md:text-6xl mb-10 shadow-sm ${idx === 0 ? 'bg-pastel-blue' : 'bg-pastel-orange'
+                                className={`w-16 h-16 md:w-28 md:h-28 rounded-[1.5rem] md:rounded-[2.5rem] flex items-center justify-center text-3xl md:text-6xl mb-8 md:mb-12 shadow-sm shrink-0 ${idx === 0 ? 'bg-pastel-blue' : 'bg-pastel-orange'
                                     }`}
                             >
                                 <i className={role.icon}></i>
                             </div>
 
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">
+                            <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-4 tracking-tight uppercase break-words">
                                 {role.title}
                             </h3>
-                            <p className="text-slate-600 mb-10 leading-relaxed text-base font-medium">
+                            <p className="text-slate-600 mb-8 md:mb-12 leading-relaxed text-sm md:text-base font-bold break-words">
                                 {role.description}
                             </p>
 
-                            <div className="elite-button !rounded-[1.5rem] !py-6 shadow-xl">
+                            <div className="elite-button !rounded-[1rem] md:!rounded-[1.5rem] !py-5 md:!py-6 shadow-xl transition-all active:scale-95">
                                 <span>Go to {role.title}</span>
-                                <i className="fas fa-chevron-right text-[10px] opacity-50"></i>
+                                <i className="fas fa-chevron-right text-[10px] opacity-50 ml-2"></i>
                             </div>
                         </div>
                     ))}
