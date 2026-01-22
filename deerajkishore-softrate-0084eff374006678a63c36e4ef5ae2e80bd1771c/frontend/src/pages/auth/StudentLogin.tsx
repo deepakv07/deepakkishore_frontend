@@ -133,26 +133,7 @@ const StudentLogin: React.FC = () => {
                         </button>
                     </form>
 
-                    <div className="mt-12">
-                        <div className="relative flex items-center justify-center mb-10">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-slate-200"></div>
-                            </div>
-                            <span className="relative px-6 bg-white text-slate-900/60 text-[10px] font-bold uppercase tracking-widest">or</span>
-                        </div>
 
-                        <button
-                            onClick={() => {
-                                const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-                                const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/callback`;
-                                window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=email profile openid&access_type=offline`;
-                            }}
-                            className="w-full flex items-center justify-center gap-4 py-5 bg-slate-50 hover:bg-slate-100 rounded-[1.5rem] transition-all font-bold text-slate-900 text-[10px] tracking-widest uppercase"
-                        >
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" className="w-4 h-4" alt="Google" />
-                            Sign in with Google
-                        </button>
-                    </div>
                 </div>
 
                 <div className="mt-14 text-center">

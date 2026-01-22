@@ -118,7 +118,6 @@ const AdminStudents: React.FC = () => {
             currentY += (maxItems * 6) + 20;
 
             // --- Market Value Analysis ---
-            // --- Market Value Analysis ---
             if (detailedReport.market_value || detailedReport.lpa_estimation) {
                 // Helpers
                 const formatRange = (val: string | undefined) => {
