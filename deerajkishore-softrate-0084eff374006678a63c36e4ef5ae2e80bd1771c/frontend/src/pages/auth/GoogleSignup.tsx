@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
 const GoogleSignup: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -54,7 +55,9 @@ const GoogleSignup: React.FC = () => {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-6">
                 <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <div className="mx-auto mb-4 flex justify-center">
+                        <LoadingScreen color="bg-slate-900" />
+                    </div>
                     <p className="text-white font-medium">Loading...</p>
                 </div>
             </div>
@@ -65,8 +68,8 @@ const GoogleSignup: React.FC = () => {
         <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-6">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 sm:p-12">
                 <div className="flex justify-center mb-8">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-2">
-                        <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder" />
+                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-1">
+                        <img src="/logo.png?v=2" className="w-full h-full object-contain mix-blend-multiply" alt="Skill Builder" />
                     </div>
                 </div>
 
@@ -124,7 +127,8 @@ const GoogleSignup: React.FC = () => {
                     >
                         {loading ? (
                             <span className="flex items-center justify-center">
-                                <i className="fas fa-spinner fa-spin mr-2"></i> Creating Account...
+                                <LoadingScreen color="bg-slate-900" />
+                                <span className="ml-2">Creating Account...</span>
                             </span>
                         ) : (
                             'Create Account'

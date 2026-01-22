@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
 import { Link } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import ValidationModal from '../../components/common/ValidationModal';
 
 const AdminCourses: React.FC = () => {
@@ -72,7 +73,7 @@ const AdminCourses: React.FC = () => {
 
                 {loading ? (
                     <div className="py-40 flex flex-col items-center justify-center">
-                        <div className="w-20 h-20 border-4 border-pastel-orange border-t-amber-500 rounded-full animate-spin mb-10"></div>
+                        <LoadingScreen color="bg-slate-900" />
                         <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] animate-pulse">Loading Courses...</p>
                     </div>
                 ) : quizzes.length === 0 ? (

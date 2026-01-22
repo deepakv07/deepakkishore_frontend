@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import type { Quiz } from '../../types';
-
 
 interface Skill {
     name: string;
@@ -52,7 +52,7 @@ const StudentReport: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#00E5FF55]"></div>
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </StudentLayout>
         );
@@ -62,10 +62,10 @@ const StudentReport: React.FC = () => {
         <StudentLayout>
             <div className="space-y-12 animate-fade-in pb-10">
                 <div className="space-y-3">
-                    <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-words">
+                    <h1 className="text-fluid-h2 font-extrabold tracking-tight text-slate-900 leading-tight uppercase break-normal">
                         Detailed <br /><span className="text-indigo-600/40">Report</span>
                     </h1>
-                    <p className="text-slate-700 text-[9px] md:text-[10px] font-bold tracking-widest uppercase break-words">A summary of your academic progress and quiz history</p>
+                    <p className="text-slate-700 text-[9px] md:text-[10px] font-bold tracking-widest uppercase break-normal">A summary of your academic progress and quiz history</p>
                 </div>
 
                 {/* Skill Assessment Section */}
@@ -86,7 +86,7 @@ const StudentReport: React.FC = () => {
                                 <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-pastel-mint opacity-40 rounded-full"></div>
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
                                     <div className="space-y-1 min-w-0">
-                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 uppercase leading-tight break-words">{skill.name}</h4>
+                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 uppercase leading-tight break-normal">{skill.name}</h4>
                                         <p className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest">{skill.level || 'INTERMEDIATE'}</p>
                                     </div>
                                     <p className="text-2xl md:text-3xl font-bold tracking-tight text-[#141619] md:leading-none tabular-nums shrink-0">{skill.score}%</p>
@@ -130,8 +130,8 @@ const StudentReport: React.FC = () => {
                                         <i className="fas fa-file-invoice text-lg md:text-2xl"></i>
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 line-clamp-2 uppercase leading-tight break-words">{quiz.title}</h4>
-                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-tight md:tracking-widest uppercase mt-2 flex flex-wrap gap-x-2 break-words">
+                                        <h4 className="font-bold text-lg md:text-xl text-slate-900 line-clamp-2 uppercase leading-tight break-normal">{quiz.title}</h4>
+                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-tight md:tracking-widest uppercase mt-2 flex flex-wrap gap-x-2 break-normal">
                                             <span>{quiz.courseTitle}</span>
                                             {quiz.completedAt && (
                                                 <>

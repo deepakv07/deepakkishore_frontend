@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import type { Quiz } from '../../types';
 
 const QuizInterface: React.FC = () => {
@@ -280,7 +281,7 @@ const QuizInterface: React.FC = () => {
                         </button>
                         <div className="flex flex-col min-w-0">
                             <span className="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest md:tracking-[0.2em] leading-none">Assessment Session</span>
-                            <span className="text-[10px] md:text-xs font-bold text-slate-900 uppercase tracking-widest mt-1 truncate">{quiz?.title || 'Loading...'}</span>
+                            <span className="text-[10px] md:text-xs font-bold text-slate-900 uppercase tracking-widest mt-1 truncate break-normal">{quiz?.title || 'Loading...'}</span>
                         </div>
                     </div>
 
@@ -319,7 +320,7 @@ const QuizInterface: React.FC = () => {
                 <div className="flex-1 flex flex-col items-center py-12 px-6 overflow-y-auto">
                     {loading ? (
                         <div className="flex-1 flex flex-col items-center justify-center">
-                            <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                            <LoadingScreen color="bg-slate-900" />
                             <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-xs">Syncing Entities...</p>
                         </div>
                     ) : error ? (
@@ -359,7 +360,7 @@ const QuizInterface: React.FC = () => {
                             {/* Question Section */}
                             <div className="bg-white p-8 md:p-14 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden flex items-center justify-center min-h-[150px]">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-lavender opacity-30 rounded-bl-[4rem]"></div>
-                                <h2 className="text-xl md:text-3xl font-bold text-slate-900 leading-snug text-center relative z-10 uppercase break-words px-2">
+                                <h2 className="text-xl md:text-3xl font-bold text-slate-900 leading-snug text-center relative z-10 uppercase break-normal px-2">
                                     {currentQuestion?.text}
                                 </h2>
                             </div>
@@ -444,7 +445,7 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-16 h-16 md:w-20 md:h-20 bg-pastel-blue text-blue-900 rounded-xl md:rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 md:mb-8 text-2xl md:text-3xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">Confirm Submission</h3>
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-normal">Confirm Submission</h3>
                                 <p className="text-slate-700 mb-8 md:mb-12 font-bold text-xs md:text-sm break-words">
                                     You have completed {Object.keys(selectedAnswers).length} out of {totalQuestions} entities. All data will be finalized.
                                 </p>
@@ -460,7 +461,7 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-16 h-16 md:w-20 md:h-20 bg-pastel-orange text-amber-900 rounded-xl md:rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 md:mb-8 text-2xl md:text-3xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-exclamation-circle"></i>
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">Protocol Violation</h3>
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-normal">Protocol Violation</h3>
                                 <p className="text-slate-700 mb-8 md:mb-10 font-bold text-xs md:text-sm leading-relaxed break-words">
                                     Unauthorized shift detected. Maintain focus on the assessment window to avoid <span className="text-red-600 font-black">SYSTEM TERMINATION</span>.
                                 </p>
@@ -478,7 +479,7 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-16 h-16 md:w-20 md:h-20 bg-red-50 text-red-600 rounded-xl md:rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 md:mb-8 text-2xl md:text-3xl border border-red-100">
                                     <i className="fas fa-user-shield"></i>
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">AUTO-TERMINATED</h3>
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-normal">AUTO-TERMINATED</h3>
                                 <p className="text-slate-700 mb-8 md:mb-10 font-bold text-xs md:text-sm leading-relaxed break-words">
                                     Multiple proctoring deviations logged. Session has been force-closed and data committed for review.
                                 </p>
@@ -496,7 +497,7 @@ const QuizInterface: React.FC = () => {
                                 <div className="w-16 h-16 md:w-24 md:h-24 bg-pastel-mint text-teal-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 text-3xl md:text-4xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-check-circle"></i>
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-words">Transmission Success</h3>
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 uppercase leading-none break-normal">Transmission Success</h3>
                                 <p className="text-slate-700 mb-8 md:mb-12 font-bold text-xs md:text-sm break-words">
                                     Your quiz has been submitted successfully.
                                 </p>

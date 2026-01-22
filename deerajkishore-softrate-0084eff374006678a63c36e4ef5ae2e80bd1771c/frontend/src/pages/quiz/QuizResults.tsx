@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useAuth } from '../../context/AuthContext';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import type { QuizResult } from '../../types';
 
 const QuizResults: React.FC = () => {
@@ -123,7 +124,7 @@ const QuizResults: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </StudentLayout>
         );
@@ -137,10 +138,10 @@ const QuizResults: React.FC = () => {
                 {/* Dashboard Header */}
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 md:mb-16 gap-8">
                     <div className="w-full lg:w-auto text-left">
-                        <h1 className="text-fluid-h1 font-extrabold text-[#141619] tracking-tight uppercase leading-tight mb-2">
+                        <h1 className="text-fluid-h1 font-extrabold text-[#141619] tracking-tight uppercase leading-tight mb-2 break-normal">
                             Quiz <br /><span className="text-indigo-600">Results</span>
                         </h1>
-                        <p className="text-slate-600 font-bold uppercase tracking-widest text-[9px] break-words">Summary of your performance</p>
+                        <p className="text-slate-600 font-bold uppercase tracking-widest text-[9px] break-normal">Summary of your performance</p>
                     </div>
 
                     {/* Identity Plate */}
@@ -176,9 +177,9 @@ const QuizResults: React.FC = () => {
                                                 VALIDATED REPORT
                                             </span>
                                             <span className="hidden md:inline text-slate-300 font-bold">•</span>
-                                            <span className="text-slate-500 text-[9px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest break-words flex-1 min-w-[100px]">Timestamp: {result.completedDate}</span>
+                                            <span className="text-slate-500 text-[9px] md:text-[10px] font-black uppercase tracking-tight md:tracking-widest break-normal flex-1 min-w-[100px]">Timestamp: {result.completedDate}</span>
                                         </div>
-                                        <h2 className="text-fluid-h2 font-extrabold text-[#141619] tracking-tight leading-tight uppercase break-words">Performance Overview</h2>
+                                        <h2 className="text-fluid-h2 font-extrabold text-[#141619] tracking-tight leading-tight uppercase break-normal">Performance Overview</h2>
                                         <div className="flex flex-wrap items-center gap-3 md:gap-4">
                                             <div className={`flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[9px] md:text-[10px] border shrink-0 ${result.passed
                                                 ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
@@ -214,8 +215,8 @@ const QuizResults: React.FC = () => {
                                         { label: 'PERCENTILE', val: `${result.percentile}%`, color: 'text-blue-900', bg: 'bg-pastel-blue' },
                                     ].map((stat, i) => (
                                         <div key={i} className={`${stat.bg} p-4 md:p-6 rounded-[1.25rem] md:rounded-[2rem] border border-white shadow-sm transition-all`}>
-                                            <p className="text-[8px] md:text-[10px] font-bold text-[#141619] uppercase tracking-tight md:tracking-widest mb-2 md:mb-4 opacity-70 break-words line-clamp-1">{stat.label}</p>
-                                            <p className={`text-lg md:text-2xl font-bold ${stat.color} tracking-tight tabular-nums break-words`}>{stat.val}</p>
+                                            <p className="text-[8px] md:text-[10px] font-bold text-[#141619] uppercase tracking-tight md:tracking-widest mb-2 md:mb-4 opacity-70 break-normal line-clamp-1">{stat.label}</p>
+                                            <p className={`text-lg md:text-2xl font-bold ${stat.color} tracking-tight tabular-nums break-normal`}>{stat.val}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -285,7 +286,7 @@ const QuizResults: React.FC = () => {
                                 <div className="w-12 h-12 md:w-14 md:h-14 bg-pastel-blue text-blue-900 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center text-lg md:text-xl border border-white shadow-sm shrink-0">
                                     <i className="fas fa-tasks"></i>
                                 </div>
-                                <h3 className="text-fluid-h3 font-black text-[#141619] tracking-tighter uppercase leading-none break-words">Question Analysis</h3>
+                                <h3 className="text-fluid-h3 font-black text-[#141619] tracking-tighter uppercase leading-none break-normal">Question Analysis</h3>
                             </div>
 
                             <div className="space-y-6 md:space-y-10">
@@ -295,17 +296,17 @@ const QuizResults: React.FC = () => {
                                             <div className={`w-10 h-10 md:w-12 md:h-12 rounded-[0.75rem] md:rounded-2xl flex items-center justify-center text-xs md:text-sm border-2 shrink-0 ${q.isCorrect ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`}>
                                                 <i className={`fas ${q.isCorrect ? 'fa-check' : 'fa-times'}`}></i>
                                             </div>
-                                            <h4 className="text-fluid-h4 font-black text-[#141619] tracking-tight uppercase leading-tight break-words flex-1">Q{i + 1}: {q.text}</h4>
+                                            <h4 className="text-fluid-h4 font-black text-[#141619] tracking-tight uppercase leading-tight break-normal flex-1">Q{i + 1}: {q.text}</h4>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                                             <div className="space-y-2 md:space-y-4">
                                                 <p className="text-[9px] md:text-[10px] font-black text-rose-800 uppercase tracking-widest leading-none">YOUR ANSWER</p>
-                                                <p className="font-black text-fluid-h4 text-[#141619] uppercase break-words">{q.userAnswer || 'NO DATA'}</p>
+                                                <p className="font-black text-fluid-h4 text-[#141619] uppercase break-normal">{q.userAnswer || 'NO DATA'}</p>
                                             </div>
                                             <div className="space-y-2 md:space-y-4">
                                                 <p className="text-[9px] md:text-[10px] font-black text-emerald-800 uppercase tracking-widest leading-none">CORRECT ANSWER</p>
-                                                <p className="font-black text-fluid-h4 text-[#141619] uppercase break-words">{q.correctAnswer}</p>
+                                                <p className="font-black text-fluid-h4 text-[#141619] uppercase break-normal">{q.correctAnswer}</p>
                                             </div>
                                         </div>
 
@@ -362,8 +363,8 @@ const QuizResults: React.FC = () => {
                             </div>
 
                             <div className="relative z-10">
-                                <h3 className="text-fluid-h3 font-black mb-4 md:mb-8 tracking-tighter italic uppercase leading-tight break-words">Ready for the <br />next challenge?</h3>
-                                <p className="text-slate-400 text-xs md:text-sm font-bold italic mb-8 md:mb-16 leading-relaxed break-words">
+                                <h3 className="text-fluid-h3 font-black mb-4 md:mb-8 tracking-tighter italic uppercase leading-tight break-normal">Ready for the <br />next challenge?</h3>
+                                <p className="text-slate-400 text-xs md:text-sm font-bold italic mb-8 md:mb-16 leading-relaxed break-normal">
                                     Continue your learning journey by taking another quiz or exploring new courses.
                                 </p>
                                 <button

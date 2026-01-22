@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import type { Quiz } from '../../types';
 
 const QuizDetails: React.FC = () => {
@@ -46,21 +47,18 @@ const QuizDetails: React.FC = () => {
             <div className="max-w-5xl mx-auto py-12 px-4 animate-fade-in">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-40">
-                        <div className="relative w-24 h-24">
-                            <div className="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
-                            <div className="absolute inset-0 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                        </div>
+                        <LoadingScreen color="bg-slate-900" />
                         <p className="mt-8 text-slate-900 font-black uppercase tracking-[0.3em] text-sm animate-pulse">Initializing Assessment...</p>
                     </div>
                 ) : (
                     <div className="space-y-12">
                         {/* Header & Stats */}
                         <div className="text-center space-y-2">
-                            <h2 className="text-fluid-h4 font-black text-slate-500 tracking-widest uppercase break-words">Assessment Details</h2>
-                            <div className="text-6xl md:text-8xl font-black text-indigo-600 tracking-tighter tabular-nums leading-none break-words">
+                            <h2 className="text-fluid-h4 font-black text-slate-500 tracking-widest uppercase break-normal">Assessment Details</h2>
+                            <div className="text-6xl md:text-8xl font-black text-indigo-600 tracking-tighter tabular-nums leading-none break-normal">
                                 {quiz?.questions?.length || 0}
                             </div>
-                            <p className="text-slate-900 font-extrabold text-fluid-h3 uppercase tracking-tight mt-4 break-words">
+                            <p className="text-slate-900 font-extrabold text-fluid-h3 uppercase tracking-tight mt-4 break-normal">
                                 {quiz?.title || 'Details'}
                             </p>
 
@@ -72,10 +70,10 @@ const QuizDetails: React.FC = () => {
                                     { label: 'TYPE', val: quiz?.questions?.every(q => q.type === 'mcq') ? 'MCQ' : 'MIXED', color: 'text-amber-900', bg: 'bg-pastel-orange' },
                                 ].map((stat, i) => (
                                     <div key={i} className={`${stat.bg} rounded-[1.25rem] md:rounded-[2rem] p-6 md:p-10 shadow-sm border border-white flex flex-col items-center justify-center`}>
-                                        <div className={`text-2xl md:text-4xl font-black ${stat.color} mb-1 tabular-nums break-words`}>
+                                        <div className={`text-2xl md:text-4xl font-black ${stat.color} mb-1 tabular-nums break-normal`}>
                                             {stat.val}
                                         </div>
-                                        <div className="text-slate-800 font-black text-[9px] md:text-[10px] uppercase tracking-widest break-words">{stat.label}</div>
+                                        <div className="text-slate-800 font-black text-[9px] md:text-[10px] uppercase tracking-widest break-normal">{stat.label}</div>
                                     </div>
                                 ))}
                             </div>
@@ -133,13 +131,13 @@ const QuizDetails: React.FC = () => {
                                                 <i className={`fas ${item.icon}`}></i>
                                             </div>
                                             <div className="min-w-0">
-                                                <h3 className="font-black text-slate-900 text-sm md:text-base uppercase break-words">{item.title}</h3>
+                                                <h3 className="font-black text-slate-900 text-sm md:text-base uppercase break-normal">{item.title}</h3>
                                                 <p className="text-[10px] md:text-xs text-slate-600 font-bold break-words">{item.desc}</p>
                                             </div>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <div className="text-xl md:text-3xl font-black text-slate-900 tabular-nums break-words">{item.val}</div>
-                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase break-words">{item.unit}</div>
+                                            <div className="text-xl md:text-3xl font-black text-slate-900 tabular-nums break-normal">{item.val}</div>
+                                            <div className="text-[8px] font-black text-slate-500 tracking-widest uppercase break-normal">{item.unit}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -165,7 +163,7 @@ const QuizDetails: React.FC = () => {
                                             <i className={`fas ${rule.icon}`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-slate-900 mb-1 text-sm md:text-base uppercase leading-none break-words">{rule.title}</h3>
+                                            <h3 className="font-black text-slate-900 mb-1 text-sm md:text-base uppercase leading-none break-normal">{rule.title}</h3>
                                             <p className="text-xs md:text-sm text-slate-700 font-bold leading-relaxed break-words">{rule.text}</p>
                                         </div>
                                     </div>

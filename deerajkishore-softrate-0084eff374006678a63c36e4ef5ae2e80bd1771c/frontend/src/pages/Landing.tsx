@@ -1,42 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 const Landing: React.FC = () => {
     const navigate = useNavigate();
 
-    return (
-        <div
-            className="min-h-screen flex items-center justify-center bg-bg-main relative overflow-hidden cursor-pointer"
-            onClick={() => navigate('/role-selection')}
-        >
-            {/* Soft Pastel Orbs */}
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-pastel-lavender/60 rounded-full blur-[120px] animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pastel-mint/60 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-pastel-blue/30 rounded-full blur-[150px]" />
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            navigate('/role-selection');
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [navigate]);
 
-            <div className="text-center space-y-8 relative z-10 px-6 max-w-4xl animate-fade-in">
-                <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl shadow-slate-200/50 mb-10 active:scale-95 overflow-hidden p-4">
-                    <img src="/logo.png" className="w-full h-full object-contain" alt="Skill Builder Logo" />
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-bg-main relative px-6 py-20 overflow-hidden">
+            <div className="text-center space-y-12 relative z-10 max-w-4xl w-full animate-fade-in">
+                {/* Logo Box */}
+                <div className="w-24 h-24 md:w-36 md:h-36 bg-white rounded-[2rem] md:rounded-[3rem] flex items-center justify-center mx-auto shadow-2xl shadow-slate-200/50 mb-14 overflow-hidden p-3 border border-slate-50">
+                    <img src="/logo.png?v=2" className="w-full h-full object-contain mix-blend-multiply" alt="Skill Builder Logo" />
                 </div>
 
+                {/* Typography Block */}
                 <div className="space-y-4">
-                    <h1 className="text-fluid-h1 font-extrabold tracking-tighter text-slate-900 leading-[1.1]">
-                        Skill<br /><span className="text-slate-900/30">Builder</span>
+                    <h1 className="flex flex-col items-center leading-none tracking-tighter">
+                        <span className="text-5xl md:text-8xl font-black text-[#141619] uppercase tracking-tighter">Skill</span>
+                        <span className="text-5xl md:text-8xl font-black text-slate-300 uppercase tracking-tighter">Builder</span>
                     </h1>
                 </div>
 
-                <p className="text-slate-700 text-fluid-body font-semibold max-w-2xl mx-auto leading-relaxed">
+                <p className="text-slate-500 text-sm md:text-base font-bold max-w-lg mx-auto leading-relaxed uppercase tracking-tight">
                     The next generation of assessment and learning.
                 </p>
 
-                <div className="pt-20">
-                    <div className="flex flex-col items-center gap-6">
-                        <div className="w-1.5 h-16 bg-slate-900/20 rounded-full overflow-hidden">
-                            <div className="w-full h-1/2 bg-slate-900 animate-bounce"></div>
-                        </div>
-                        <p className="text-slate-900 text-[10px] md:text-xs font-black tracking-[0.4em] uppercase animate-pulse">Tap anywhere</p>
-                    </div>
+                {/* Loading Component */}
+                <div className="pt-24 scale-125">
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
+            </div>
+
+            {/* Subtle Corner Graphic */}
+            <div className="absolute bottom-8 right-8 opacity-10">
+                <i className="fas fa-sparkles text-2xl text-slate-400"></i>
             </div>
         </div>
     );

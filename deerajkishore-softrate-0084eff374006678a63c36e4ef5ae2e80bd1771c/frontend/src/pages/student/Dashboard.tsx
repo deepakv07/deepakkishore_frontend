@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import type { StudentDashboardData } from '../../types';
 
 const StudentDashboard: React.FC = () => {
@@ -30,7 +31,7 @@ const StudentDashboard: React.FC = () => {
         return (
             <StudentLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </StudentLayout>
         );
@@ -48,10 +49,10 @@ const StudentDashboard: React.FC = () => {
                 <div className="w-full bg-indigo-900 rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-10 relative overflow-hidden shadow-xl">
                     <div className="absolute top-[-20%] right-[-10%] w-60 h-60 bg-white/5 rounded-full blur-3xl"></div>
                     <div className="relative z-10 space-y-4 text-center md:text-left w-full md:w-auto">
-                        <h1 className="text-fluid-h2 font-extrabold tracking-tight text-white leading-tight uppercase break-words">
+                        <h1 className="text-fluid-h2 font-extrabold tracking-tight text-white leading-tight uppercase break-normal">
                             Welcome back, <br />{user?.name?.split(' ')[0] || 'User'}!
                         </h1>
-                        <p className="text-indigo-200 text-sm md:text-base font-semibold uppercase tracking-wide break-words">Your learning journey continues here.</p>
+                        <p className="text-indigo-200 text-sm md:text-base font-semibold uppercase tracking-wide break-normal">Your learning journey continues here.</p>
                     </div>
                     <button
                         onClick={() => navigate('/student/quizzes')}
@@ -72,8 +73,8 @@ const StudentDashboard: React.FC = () => {
                                         <i className={`fas ${stat.icon} ${stat.color}`}></i>
                                     </div>
                                     <div className="relative z-10">
-                                        <p className="text-[9px] md:text-[10px] font-bold tracking-[0.2em] text-slate-700 uppercase leading-none break-words">{stat.label}</p>
-                                        <p className="text-3xl md:text-5xl font-extrabold tracking-tight mt-3 md:mt-4 text-slate-900 leading-none tabular-nums break-words shrink-0">{stat.value}</p>
+                                        <p className="text-[9px] md:text-[10px] font-bold tracking-[0.2em] text-slate-700 uppercase leading-none break-normal">{stat.label}</p>
+                                        <p className="text-3xl md:text-5xl font-extrabold tracking-tight mt-3 md:mt-4 text-slate-900 leading-none tabular-nums break-normal shrink-0">{stat.value}</p>
                                     </div>
                                     <div className="absolute bottom-6 right-12 opacity-5 text-7xl">
                                         <i className={`fas ${stat.icon}`}></i>
@@ -142,10 +143,10 @@ const StudentDashboard: React.FC = () => {
                                             <i className="fas fa-check-double text-lg md:text-2xl"></i>
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h4 className="font-bold text-lg md:text-xl text-slate-900 uppercase tracking-tight leading-tight mb-2 break-words">
+                                            <h4 className="font-bold text-lg md:text-xl text-slate-900 uppercase tracking-tight leading-tight mb-2 break-normal">
                                                 {activity.title}
                                             </h4>
-                                            <p className="text-[9px] md:text-[10px] font-bold text-slate-500 tracking-[0.1em] uppercase leading-none break-words">
+                                            <p className="text-[9px] md:text-[10px] font-bold text-slate-500 tracking-[0.1em] uppercase leading-none break-normal">
                                                 TIMESTAMP: {new Date(activity.timestamp).toLocaleDateString()}
                                             </p>
                                         </div>

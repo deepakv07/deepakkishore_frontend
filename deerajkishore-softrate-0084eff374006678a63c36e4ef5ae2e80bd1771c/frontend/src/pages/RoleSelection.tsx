@@ -55,7 +55,7 @@ const RoleSelection: React.FC = () => {
                                 <i className={role.icon}></i>
                             </div>
 
-                            <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-4 tracking-tight uppercase break-words">
+                            <h3 className="text-xl md:text-3xl font-black text-slate-900 mb-4 tracking-tight uppercase break-normal">
                                 {role.title}
                             </h3>
                             <p className="text-slate-600 mb-8 md:mb-12 leading-relaxed text-sm md:text-base font-bold break-words">

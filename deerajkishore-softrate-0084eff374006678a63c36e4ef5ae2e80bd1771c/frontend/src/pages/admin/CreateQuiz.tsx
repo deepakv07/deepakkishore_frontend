@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layouts/AdminLayout';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import apiService from '../../services/api';
 import ValidationModal from '../../components/common/ValidationModal';
 
@@ -459,7 +460,7 @@ const CreateQuiz: React.FC = () => {
                                                     ? 'bg-amber-600 text-white border-amber-600 shadow-xl shadow-amber-200/50'
                                                     : questions[idx].text.trim() !== ''
                                                         ? 'bg-pastel-blue text-blue-600 border-white'
-                                                        : 'bg-white text-slate-300 border-slate-100 hover:border-amber-200 hover:text-amber-500'
+                                                        : 'bg-white text-slate-300 border-slate-100 hover:border-amber-200 hover:bg-slate-900'
                                                     }`}
                                             >
                                                 {idx + 1}
@@ -512,7 +513,7 @@ const CreateQuiz: React.FC = () => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                     {['A', 'B', 'C', 'D'].map((letter, idx) => (
                                                         <div key={letter} className="relative group">
-                                                            <div className={`absolute left-0 top-0 bottom-0 w-14 bg-slate-50 border-r border-slate-100 rounded-l-[1.5rem] flex items-center justify-center font-black text-sm transition-colors ${currentQuestion.correctAnswer === letter ? 'bg-pastel-orange text-amber-600' : 'text-slate-300 group-hover:text-amber-500'}`}>
+                                                            <div className={`absolute left-0 top-0 bottom-0 w-14 bg-slate-50 border-r border-slate-100 rounded-l-[1.5rem] flex items-center justify-center font-black text-sm transition-colors ${currentQuestion.correctAnswer === letter ? 'bg-pastel-orange text-amber-600' : 'text-slate-300 group-hover:bg-slate-900'}`}>
                                                                 {letter}
                                                             </div>
                                                             <input
@@ -594,7 +595,7 @@ const CreateQuiz: React.FC = () => {
                                             disabled={loading}
                                             className="elite-button !rounded-[2rem] !py-6 bg-amber-600 hover:bg-amber-700 shadow-2xl shadow-amber-200/50"
                                         >
-                                            {loading ? <i className="fas fa-sync animate-spin"></i> : 'Submit Quiz'}
+                                            {loading ? <LoadingScreen color="bg-slate-900" /> : 'Submit Quiz'}
                                         </button>
                                     </div>
                                 </div>

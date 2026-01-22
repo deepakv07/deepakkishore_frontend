@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StudentLayout from '../../components/layouts/StudentLayout';
 import apiService from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
 const StudentNotifications: React.FC = () => {
     const [quizzes, setQuizzes] = useState<any[]>([]);
@@ -30,8 +31,8 @@ const StudentNotifications: React.FC = () => {
     if (loading) {
         return (
             <StudentLayout>
-                <div className="flex items-center justify-center py-40">
-                    <div className="w-16 h-16 border-4 border-[#00E5FF] border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#00E5FF55]"></div>
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <LoadingScreen color="bg-slate-900" />
                 </div>
             </StudentLayout>
         );
@@ -42,8 +43,8 @@ const StudentNotifications: React.FC = () => {
             <div className="space-y-10 animate-fade-in">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="space-y-4">
-                        <h1 className="text-fluid-h1 font-black tracking-tighter text-slate-900 leading-tight md:leading-none uppercase break-words">New <br /><span className="text-indigo-600">Assignments</span></h1>
-                        <p className="text-[10px] md:text-sm text-slate-700 font-bold uppercase tracking-widest break-words">
+                        <h1 className="text-fluid-h1 font-black tracking-tighter text-slate-900 leading-tight md:leading-none uppercase break-normal">New <br /><span className="text-indigo-600">Assignments</span></h1>
+                        <p className="text-[10px] md:text-sm text-slate-700 font-bold uppercase tracking-widest break-normal">
                             Quizzes waiting for your attention
                         </p>
                     </div>
@@ -71,7 +72,7 @@ const StudentNotifications: React.FC = () => {
                                 {/* Content */}
                                 <div className="flex-1 text-left relative z-10 w-full min-w-0">
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-3 mb-2 md:mb-1">
-                                        <h3 className="text-fluid-h4 font-black tracking-tight text-slate-900 uppercase leading-none break-words">{quiz.title}</h3>
+                                        <h3 className="text-fluid-h4 font-black tracking-tight text-slate-900 uppercase leading-none break-normal">{quiz.title}</h3>
                                         <span className="px-4 py-1 rounded-full bg-pastel-orange text-amber-900 text-[8px] md:text-[10px] font-black uppercase tracking-widest border border-white w-fit shrink-0">NEW</span>
                                     </div>
                                     <p className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-[0.2em] md:tracking-[0.3em] uppercase break-words">{quiz.courseTitle || 'General Quiz'}</p>
