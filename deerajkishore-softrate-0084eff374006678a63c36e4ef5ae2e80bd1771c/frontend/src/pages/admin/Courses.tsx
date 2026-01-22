@@ -65,8 +65,7 @@ const AdminCourses: React.FC = () => {
                             to="/admin/courses/create"
                             className="elite-button !rounded-[2rem] !py-6 !px-10 shadow-2xl shadow-amber-200/50 bg-amber-600"
                         >
-                            <i className="fas fa-plus-circle text-xs"></i>
-                            <span className="italic">+ Create New Quiz</span>
+                            <span className="italic font-bold">+ Create New Quiz</span>
                         </Link>
                     </div>
                 </div>
@@ -103,23 +102,17 @@ const AdminCourses: React.FC = () => {
                                 <div className="absolute top-[-10%] right-[-10%] w-32 h-32 bg-pastel-orange opacity-20 rounded-full"></div>
 
                                 <div className="relative z-10 flex flex-col h-full">
-                                    <div className="flex justify-between items-start mb-10">
-                                        <span className="px-5 py-2 rounded-full bg-pastel-orange border border-white text-amber-900 text-[10px] font-black uppercase tracking-[0.2em]">
+                                    <div className="flex justify-between items-center mb-10 gap-4">
+                                        <span className="px-5 py-2 rounded-full bg-pastel-orange border border-white text-amber-900 text-[9px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
                                             COMPREHENSIVE
                                         </span>
-                                        <div className="flex gap-3">
-                                            <button
-                                                className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-sm"
-                                                title="Edit Entity"
-                                            >
-                                                <i className="fas fa-pen-nib text-sm"></i>
-                                            </button>
+                                        <div className="flex gap-2">
                                             <button
                                                 onClick={() => handleDeleteClick(quiz.id)}
-                                                className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-sm"
+                                                className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-sm transition-all hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100"
                                                 title="Decommission Entity"
                                             >
-                                                <i className="fas fa-trash-can text-sm"></i>
+                                                <i className="fas fa-trash-can text-xs"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -142,7 +135,7 @@ const AdminCourses: React.FC = () => {
                                             <div className="w-10 h-10 rounded-2xl bg-pastel-lavender text-indigo-900 flex items-center justify-center border border-white shadow-sm">
                                                 <i className="fas fa-hourglass-half text-xs"></i>
                                             </div>
-                                            <span className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">{quiz.durationMinutes || 30} Cycles</span>
+                                            <span className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">{quiz.durationMinutes || 30} Minutes</span>
                                         </div>
                                     </div>
                                 </div>

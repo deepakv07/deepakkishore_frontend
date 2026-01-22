@@ -103,7 +103,7 @@ const AdminLogin: React.FC = () => {
                             {loading ? (
                                 <i className="fas fa-spinner fa-spin"></i>
                             ) : (
-                                <span>Enter Dashboard</span>
+                                <span>Login</span>
                             )}
                         </button>
                     </form>

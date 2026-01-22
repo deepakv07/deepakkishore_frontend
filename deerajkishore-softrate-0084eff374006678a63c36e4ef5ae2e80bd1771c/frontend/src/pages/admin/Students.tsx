@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import apiService from '../../services/api';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const AdminStudents: React.FC = () => {
     const [students, setStudents] = useState<any[]>([]);
@@ -29,6 +31,50 @@ const AdminStudents: React.FC = () => {
 
     const getStudentReport = (studentId: string) => {
         return reports.find(r => r.studentId === studentId);
+    };
+
+    const handleDownloadReport = (studentId: string) => {
+        const student = students.find(s => s.id === studentId);
+        const report = getStudentReport(studentId);
+        if (!student || !report) return;
+
+        const doc = new jsPDF();
+
+        // Add header
+        doc.setFontSize(22);
+        doc.setTextColor(30, 41, 59);
+        doc.text('Student Performance Report', 14, 25);
+
+        // Add details
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Student Name: ${student.name}`, 14, 40);
+        doc.text(`Email: ${student.email}`, 14, 47);
+        doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 14, 54);
+
+        // Add summary table
+        autoTable(doc, {
+            startY: 65,
+            head: [['Performance Index', 'Statistical Value']],
+            body: [
+                ['Total Quizzes Taken', report.totalQuizzes.toString()],
+                ['Quizzes Passed', report.passedQuizzes.toString()],
+                ['Quizzes Failed', report.failedQuizzes.toString()],
+                ['Overall Average Score', `${report.averageScore.toFixed(2)}%`],
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [245, 158, 11], textColor: 255, fontStyle: 'bold' },
+            styles: { fontSize: 11, cellPadding: 6 },
+            columnStyles: { 0: { fontStyle: 'bold' } }
+        });
+
+        // Add some nice footer
+        const finalY = (doc as any).lastAutoTable.finalY || 100;
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text('SkillBuilder Platform Intelligence Report', 14, finalY + 20);
+
+        doc.save(`Student_Report_${student.name.replace(/\s+/g, '_')}.pdf`);
     };
 
     if (loading) {
@@ -134,14 +180,24 @@ const AdminStudents: React.FC = () => {
                         <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-pastel-orange/30 rounded-full blur-[100px]"></div>
 
                         <div className="relative z-10">
-                            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-14 text-center md:text-left">
-                                <div className="w-16 h-16 bg-pastel-orange rounded-[1.5rem] flex items-center justify-center text-amber-900 text-2xl border border-white shadow-sm">
-                                    <i className="fas fa-microscope"></i>
+                            <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-14 text-center md:text-left">
+                                <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                                    <div className="w-16 h-16 bg-pastel-orange rounded-[1.5rem] flex items-center justify-center text-amber-900 text-2xl border border-white shadow-sm">
+                                        <i className="fas fa-microscope"></i>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase">Student Performance Report</h2>
+                                        <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mt-2 uppercase">Viewing: {students.find(s => s.id === selectedStudent)?.name}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase">Student Performance Report</h2>
-                                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mt-2 uppercase">Viewing: {students.find(s => s.id === selectedStudent)?.name}</p>
-                                </div>
+
+                                <button
+                                    onClick={() => handleDownloadReport(selectedStudent)}
+                                    className="elite-button !rounded-2xl !py-4 !px-8 bg-amber-600 shadow-xl shadow-amber-200/50 flex items-center gap-3 transition-all hover:scale-105"
+                                >
+                                    <i className="fas fa-file-pdf text-sm"></i>
+                                    <span className="text-[11px] font-black uppercase tracking-widest">Download Report</span>
+                                </button>
                             </div>
 
                             {(() => {

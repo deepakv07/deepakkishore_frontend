@@ -94,6 +94,7 @@ export interface StudentDashboardData {
 export interface AdminDashboardStats {
     totalStudents: number;
     activeCourses: number;
+    activeQuizzes: number;
     avgQuizScore: number;
     totalEnrollments: number;
 }
@@ -107,6 +108,7 @@ export interface Activity {
     startTime?: string;
     endTime?: string;
     details?: string;
+    quizId?: string | number;
 }
 
 export interface JobPrediction {

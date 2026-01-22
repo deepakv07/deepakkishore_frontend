@@ -29,8 +29,18 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
         const courses = await Course.find({ students: studentId });
         const submissions = await QuizSubmission.find({ studentId });
         const activities = await Activity.find({ userId: studentId })
-            .sort({ timestamp: -1 })
-            .limit(10);
+            .populate('quizId')
+            .sort({ timestamp: -1 });
+
+        // Filter out activities where the linked quiz was deleted (only for quiz_completed type)
+        const finalActivities = activities.filter(a => {
+            if (a.type === 'quiz_completed') {
+                // quizId === null means it was populated but the reference is broken (quiz deleted)
+                // quizId === undefined means it's a legacy activity created before quizId tracking was added
+                return a.quizId !== null;
+            }
+            return true;
+        }).slice(0, 10);
 
         // Get unique quizzes attempted (whether passed or not)
         const attemptedQuizIds = new Set(submissions.map(s => s.quizId.toString()));
@@ -62,12 +72,13 @@ router.get('/dashboard', async (req: AuthRequest, res: Response) => {
                     totalAvailableQuizzes, // New field for "Quizzes" box
                     pendingQuizzes, // Unattended quizzes
                 },
-                recentActivity: activities.map((a) => ({
+                recentActivity: finalActivities.map((a: any) => ({
                     id: a._id.toString(),
                     type: a.type,
                     title: a.title,
                     timestamp: a.timestamp.toISOString(),
                     details: a.details,
+                    quizId: a.quizId?._id?.toString() || a.quizId?.toString(),
                 })),
                 aiJobPrediction: {
                     role: 'Software Developer',

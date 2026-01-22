@@ -20,7 +20,7 @@ const AdminDashboard: React.FC = () => {
             // Map API data to UI stats format
             setStats([
                 { label: 'Total Students', value: data.totalStudents.toLocaleString(), icon: 'fas fa-users', color: 'blue' },
-                { label: 'Active Courses', value: data.activeCourses.toString(), icon: 'fas fa-book', color: 'indigo' },
+                { label: 'Active Quizzes', value: data.activeQuizzes.toString(), icon: 'fas fa-layer-group', color: 'indigo' },
                 { label: 'Average Score', value: `${data.avgQuizScore}%`, icon: 'fas fa-star', color: 'yellow' },
                 { label: 'Enrollments', value: data.totalEnrollments.toLocaleString(), icon: 'fas fa-graduation-cap', color: 'green' },
             ]);
@@ -28,10 +28,10 @@ const AdminDashboard: React.FC = () => {
             console.error('Error fetching admin analytics:', err);
             // Fallback to mock data
             setStats([
-                { label: 'Total Students', value: '1,248', icon: 'fas fa-users', color: 'blue' },
-                { label: 'Active Courses', value: '24', icon: 'fas fa-book', color: 'indigo' },
-                { label: 'Average Score', value: '78%', icon: 'fas fa-star', color: 'yellow' },
-                { label: 'Enrollments', value: '3,500', icon: 'fas fa-graduation-cap', color: 'green' },
+                { label: 'Total Students', value: '0', icon: 'fas fa-users', color: 'blue' },
+                { label: 'Active Quizzes', value: '0', icon: 'fas fa-layer-group', color: 'indigo' },
+                { label: 'Average Score', value: '0%', icon: 'fas fa-star', color: 'yellow' },
+                { label: 'Enrollments', value: '0', icon: 'fas fa-graduation-cap', color: 'green' },
             ]);
         } finally {
             setLoading(false);
@@ -82,7 +82,6 @@ const AdminDashboard: React.FC = () => {
                             to="/admin/courses/create"
                             className="elite-button !rounded-[1.5rem] !py-4 !px-8 shadow-2xl shadow-amber-200/50 bg-amber-600"
                         >
-                            <i className="fas fa-plus-circle text-xs"></i>
                             <span className="font-bold">+ Create Quiz</span>
                         </Link>
                     </div>
@@ -128,10 +127,7 @@ const AdminDashboard: React.FC = () => {
                                 <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-1">Recently created quizzes and assignments</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <button className="px-6 py-3 rounded-2xl bg-white border border-slate-200 text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] shadow-sm">Filter</button>
-                            <button className="px-6 py-3 rounded-2xl bg-white border border-slate-200 text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] shadow-sm">Export</button>
-                        </div>
+
                     </div>
 
                     <div className="p-2">
@@ -162,7 +158,7 @@ const AdminDashboard: React.FC = () => {
                                         <tr className="text-slate-500 uppercase tracking-[0.4em] text-[9px] md:text-[10px] font-black border-b border-slate-50">
                                             <th className="px-6 md:px-10 py-8 text-left">Quiz Info</th>
                                             <th className="px-4 py-8 text-center">Stats</th>
-                                            <th className="px-6 md:px-10 py-8 text-right">Actions</th>
+
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y-0">
@@ -199,14 +195,7 @@ const AdminDashboard: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 md:px-10 py-8 text-right">
-                                                    <Link
-                                                        to={`/admin/analytics/${quiz.id}`}
-                                                        className="w-10 h-10 md:w-12 md:h-12 inline-flex items-center justify-center rounded-xl md:rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-amber-600 hover:border-amber-200 transition-all shadow-sm"
-                                                    >
-                                                        <i className="fas fa-chart-pie text-xs"></i>
-                                                    </Link>
-                                                </td>
+
                                             </tr>
                                         ))}
                                     </tbody>

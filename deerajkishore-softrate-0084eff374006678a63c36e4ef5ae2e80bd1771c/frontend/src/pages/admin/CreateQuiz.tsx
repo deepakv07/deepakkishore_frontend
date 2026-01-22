@@ -420,7 +420,7 @@ const CreateQuiz: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                         <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">Start Date</label>
                                         <input

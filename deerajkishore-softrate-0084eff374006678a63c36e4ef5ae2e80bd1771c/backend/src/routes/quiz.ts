@@ -199,6 +199,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
                     // Create activity
                     const activity = new Activity({
                         userId: studentId,
+                        quizId: quizId,
                         type: 'quiz_completed',
                         title: `Completed quiz: ${quiz.title}`,
                         details: `Score: ${aiScore} (${aiPercentage.toFixed(1)}%) - AI Analyzed`,
@@ -334,6 +335,7 @@ router.post('/:id/submit', async (req: AuthRequest, res: Response) => {
         // Create activity
         const activity = new Activity({
             userId: studentId,
+            quizId: quizId,
             type: 'quiz_completed',
             title: `Completed quiz: ${quiz.title}`,
             details: `Score: ${score}/${totalPoints} (${percentage.toFixed(1)}%)`,

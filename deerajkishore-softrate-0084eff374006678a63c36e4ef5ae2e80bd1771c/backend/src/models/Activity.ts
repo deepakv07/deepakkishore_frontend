@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IActivity extends Document {
     userId: mongoose.Types.ObjectId;
+    quizId?: mongoose.Types.ObjectId;
     type: 'quiz_completed' | 'course_enrolled' | 'badge_earned';
     title: string;
     details?: string;
@@ -16,6 +17,11 @@ const ActivitySchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
+        },
+        quizId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Quiz',
+            required: false,
         },
         type: {
             type: String,

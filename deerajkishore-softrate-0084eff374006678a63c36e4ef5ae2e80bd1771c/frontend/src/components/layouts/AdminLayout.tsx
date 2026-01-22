@@ -11,6 +11,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     // Force light theme and clean up legacy classes
     useEffect(() => {
@@ -106,7 +107,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         </div>
                     </div>
                     <button
-                        onClick={handleLogout}
+                        onClick={() => setShowLogoutModal(true)}
                         className="w-full flex items-center justify-center space-x-3 py-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-[1.5rem] transition-all font-bold text-[10px] uppercase tracking-widest border border-red-100/50"
                     >
                         <i className="fas fa-sign-out-alt"></i>
@@ -164,12 +165,41 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     );
                 })}
                 <button
-                    onClick={handleLogout}
+                    onClick={() => setShowLogoutModal(true)}
                     className="w-14 h-14 rounded-full flex items-center justify-center text-red-400 hover:text-red-600 transition-all"
                 >
                     <i className="fas fa-power-off text-lg"></i>
                 </button>
             </div>
+
+            {/* Logout Confirmation Modal */}
+            {showLogoutModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/20 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white max-w-sm w-full p-10 rounded-[3rem] shadow-2xl space-y-8 text-center border border-white">
+                        <div className="w-20 h-20 bg-red-50 rounded-[2rem] flex items-center justify-center text-red-500 mx-auto text-3xl">
+                            <i className="fas fa-power-off"></i>
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-3xl font-black tracking-tighter">Sign Out?</h3>
+                            <p className="text-slate-500 font-medium">Ready to end your session?</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setShowLogoutModal(false)}
+                                className="flex-1 py-5 rounded-[1.5rem] bg-slate-100 hover:bg-slate-200 text-[10px] font-bold tracking-widest uppercase transition-all"
+                            >
+                                Stay
+                            </button>
+                            <button
+                                onClick={handleLogout}
+                                className="flex-1 py-5 rounded-[1.5rem] bg-slate-900 text-white hover:bg-black text-[10px] font-bold tracking-widest uppercase transition-all shadow-xl shadow-slate-200"
+                            >
+                                Leave
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -4,6 +4,7 @@ import User from '../models/User';
 import Course from '../models/Course';
 import Quiz from '../models/Quiz';
 import QuizSubmission from '../models/QuizSubmission';
+import Activity from '../models/Activity';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response) => {
     try {
         const totalStudents = await User.countDocuments({ role: 'student' });
         const activeCourses = await Course.countDocuments();
+        const activeQuizzes = await Quiz.countDocuments();
         const submissions = await QuizSubmission.find();
         const avgScore =
             submissions.length > 0
@@ -31,6 +33,7 @@ router.get('/dashboard/stats', async (req: AuthRequest, res: Response) => {
             data: {
                 totalStudents,
                 activeCourses,
+                activeQuizzes,
                 avgQuizScore: Math.round(avgScore * 10) / 10,
                 totalEnrollments: totalEnrollments[0]?.total || 0,
             },
@@ -268,8 +271,9 @@ router.delete('/quizzes/:id', async (req: AuthRequest, res: Response) => {
         // 1. Delete the quiz
         await Quiz.findByIdAndDelete(id);
 
-        // 2. Cascade delete: Submissions
+        // 2. Cascade delete: Submissions and Activities
         await QuizSubmission.deleteMany({ quizId: id });
+        await Activity.deleteMany({ quizId: id });
 
         // 3. Cascade delete: Progress/Warnings (assuming checking warnings model)
         // Since warnings are stored in QuizProgress (from quiz.ts), we should delete them too
@@ -549,8 +553,9 @@ router.delete('/quizzes/:quizId', async (req: AuthRequest, res: Response) => {
             $inc: { totalQuizzes: -1 },
         });
 
-        // Optional: Delete associated submissions
+        // Optional: Delete associated submissions and activities
         await QuizSubmission.deleteMany({ quizId });
+        await Activity.deleteMany({ quizId });
 
         res.json({
             success: true,

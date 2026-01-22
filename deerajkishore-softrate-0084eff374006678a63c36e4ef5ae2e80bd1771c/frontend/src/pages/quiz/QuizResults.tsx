@@ -14,6 +14,7 @@ const QuizResults: React.FC = () => {
     const [result, setResult] = useState<QuizResult | null>(null);
     const [loading, setLoading] = useState(true);
     const [showMore, setShowMore] = useState(false);
+    const [activeBar, setActiveBar] = useState<number | null>(null);
 
     useEffect(() => {
         if (quizId) {
@@ -132,7 +133,7 @@ const QuizResults: React.FC = () => {
 
     return (
         <StudentLayout>
-            <div className="max-w-7xl mx-auto py-12 px-6">
+            <div className="max-w-7xl mx-auto py-12 px-6" onClick={() => setActiveBar(null)}>
                 {/* Dashboard Header */}
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 md:mb-16 gap-8">
                     <div className="w-full lg:w-auto text-left">
@@ -169,7 +170,7 @@ const QuizResults: React.FC = () => {
                         <div className="bg-white rounded-[4rem] p-12 border border-slate-100 shadow-sm relative overflow-hidden">
                             <div className="relative z-10">
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
-                                    <div className="space-y-8">
+                                    <div className="space-y-8 min-w-0">
                                         <div className="flex items-center gap-3">
                                             <span className="px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest">
                                                 VALIDATED REPORT
@@ -193,11 +194,13 @@ const QuizResults: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="text-center md:text-right">
+                                    <div className="text-center md:text-right shrink-0">
                                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">ACCURACY INDEX</p>
-                                        <div className="inline-flex items-baseline gap-2">
-                                            <span className="text-6xl md:text-8xl font-extrabold text-indigo-600 tracking-tight leading-none tabular-nums">{result.percentage?.toFixed(0)}</span>
-                                            <span className="text-2xl md:text-4xl font-bold text-indigo-600">%</span>
+                                        <div className="inline-flex items-baseline gap-1 md:gap-2">
+                                            <span className="text-5xl md:text-7xl font-extrabold text-indigo-600 tracking-tighter leading-none tabular-nums truncate">
+                                                {result.percentage?.toFixed(0)}
+                                            </span>
+                                            <span className="text-xl md:text-3xl font-bold text-indigo-600">%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -249,17 +252,24 @@ const QuizResults: React.FC = () => {
 
                                                 {/* Bars */}
                                                 {result.timePerQuestion?.map((time: number, i: number) => (
-                                                    <div key={i} className="relative group flex flex-col items-center flex-1">
+                                                    <div
+                                                        key={i}
+                                                        className="relative group flex flex-col items-center flex-1 cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setActiveBar(activeBar === i ? null : i);
+                                                        }}
+                                                    >
                                                         <div
-                                                            className="w-12 bg-indigo-600/90 rounded-t-xl relative z-10 border border-indigo-700/10 shadow-sm"
+                                                            className={`w-12 rounded-t-xl relative z-10 border border-indigo-700/10 shadow-sm transition-all duration-300 ${activeBar === i ? 'bg-indigo-500 scale-x-110' : 'bg-indigo-600/90'}`}
                                                             style={{ height: `${Math.min((time / chartMax) * 100, 100)}%`, minHeight: '6px' }}
                                                         >
-                                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl whitespace-nowrap z-20 pointer-events-none transition-all duration-300 shadow-xl border border-slate-800">
+                                                            <div className={`absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl whitespace-nowrap z-20 pointer-events-none transition-all duration-300 shadow-xl border border-slate-800 ${activeBar === i ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-95'}`}>
                                                                 <p className="text-[10px] font-black mb-1 uppercase tracking-widest">QUESTION Q{i + 1}</p>
                                                                 <p className="text-lg font-black tabular-nums">{time}s</p>
                                                             </div>
                                                         </div>
-                                                        <span className="text-[10px] font-black text-slate-900 uppercase mt-6 tracking-tight opacity-60">Q{i + 1}</span>
+                                                        <span className={`text-[10px] font-black uppercase mt-6 tracking-tight transition-all duration-300 ${activeBar === i ? 'text-indigo-600 scale-110' : 'text-slate-900 opacity-60'}`}>Q{i + 1}</span>
                                                     </div>
                                                 ))}
                                             </>

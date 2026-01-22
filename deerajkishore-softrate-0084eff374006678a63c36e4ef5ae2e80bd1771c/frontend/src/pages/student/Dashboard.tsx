@@ -85,24 +85,24 @@ const StudentDashboard: React.FC = () => {
 
                     <div className="space-y-12">
                         <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 uppercase leading-none">Quick Actions</h3>
-                        <div className="bg-white rounded-[3.5rem] p-12 grid grid-cols-2 gap-8 border border-slate-100 shadow-sm">
+                        <div className="bg-white rounded-[3rem] p-8 grid grid-cols-2 gap-6 border border-slate-100 shadow-sm">
                             <button
                                 onClick={() => navigate('/student/profile')}
-                                className="aspect-square flex flex-col items-center justify-center gap-6 bg-pastel-lavender rounded-[2.5rem] border-2 border-white shadow-sm transition-all"
+                                className="flex flex-col items-center justify-center py-8 gap-4 bg-pastel-lavender rounded-[2rem] border border-white shadow-sm transition-all hover:bg-indigo-100 hover:scale-[1.02]"
                             >
-                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-indigo-900 shadow-sm border border-slate-50">
-                                    <i className="fas fa-id-card text-2xl"></i>
+                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-900 shadow-sm border border-slate-50">
+                                    <i className="fas fa-user-circle text-xl"></i>
                                 </div>
-                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase">Identity</span>
+                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase">Profile</span>
                             </button>
                             <button
                                 onClick={() => navigate('/student/quizzes')}
-                                className="aspect-square flex flex-col items-center justify-center gap-6 bg-pastel-blue rounded-[2.5rem] border-2 border-white shadow-sm transition-all"
+                                className="flex flex-col items-center justify-center py-8 gap-4 bg-pastel-blue rounded-[2rem] border border-white shadow-sm transition-all hover:bg-blue-100 hover:scale-[1.02]"
                             >
-                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-blue-900 shadow-sm border border-slate-50">
-                                    <i className="fas fa-microchip text-2xl"></i>
+                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-900 shadow-sm border border-slate-50">
+                                    <i className="fas fa-layer-group text-xl"></i>
                                 </div>
-                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase">Modules</span>
+                                <span className="text-[10px] font-black tracking-widest text-slate-900 uppercase">Quizzes</span>
                             </button>
                         </div>
                     </div>
@@ -129,8 +129,8 @@ const StudentDashboard: React.FC = () => {
                                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-100">
                                             <i className="fas fa-satellite-dish text-slate-400"></i>
                                         </div>
-                                        <p className="text-[10px] font-black tracking-[0.5em] text-slate-700 uppercase mb-2">No active diagnostic packets</p>
-                                        <p className="text-xs font-bold text-slate-400">SYSTEM IDLE</p>
+                                        <p className="text-[10px] font-black tracking-[0.5em] text-slate-700 uppercase mb-2">No quiz is attended yet</p>
+                                        <p className="text-xs font-bold text-slate-400">READY TO START</p>
                                     </div>
                                 );
                             }
