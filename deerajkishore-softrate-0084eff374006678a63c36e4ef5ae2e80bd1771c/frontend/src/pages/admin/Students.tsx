@@ -33,48 +33,207 @@ const AdminStudents: React.FC = () => {
         return reports.find(r => r.studentId === studentId);
     };
 
-    const handleDownloadReport = (studentId: string) => {
-        const student = students.find(s => s.id === studentId);
-        const report = getStudentReport(studentId);
-        if (!student || !report) return;
+    const handleDownloadReport = async (studentId: string) => {
+        try {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
 
-        const doc = new jsPDF();
+            // Fetch detailed report
+            const detailedReport = await apiService.getStudentLatestDetailedReport(studentId);
 
-        // Add header
-        doc.setFontSize(22);
-        doc.setTextColor(30, 41, 59);
-        doc.text('Student Performance Report', 14, 25);
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.width;
 
-        // Add details
-        doc.setFontSize(12);
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Student Name: ${student.name}`, 14, 40);
-        doc.text(`Email: ${student.email}`, 14, 47);
-        doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 14, 54);
+            // --- Header ---
+            doc.setFillColor(30, 41, 59); // Slate-800
+            doc.rect(0, 0, pageWidth, 40, 'F');
 
-        // Add summary table
-        autoTable(doc, {
-            startY: 65,
-            head: [['Performance Index', 'Statistical Value']],
-            body: [
-                ['Total Quizzes Taken', report.totalQuizzes.toString()],
-                ['Quizzes Passed', report.passedQuizzes.toString()],
-                ['Quizzes Failed', report.failedQuizzes.toString()],
-                ['Overall Average Score', `${report.averageScore.toFixed(2)}%`],
-            ],
-            theme: 'grid',
-            headStyles: { fillColor: [245, 158, 11], textColor: 255, fontStyle: 'bold' },
-            styles: { fontSize: 11, cellPadding: 6 },
-            columnStyles: { 0: { fontStyle: 'bold' } }
-        });
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.text('Student Performance Report', 14, 20);
 
-        // Add some nice footer
-        const finalY = (doc as any).lastAutoTable.finalY || 100;
-        doc.setFontSize(10);
-        doc.setTextColor(150, 150, 150);
-        doc.text('SkillBuilder Platform Intelligence Report', 14, finalY + 20);
+            doc.setFontSize(10);
+            doc.setTextColor(200, 200, 200);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
 
-        doc.save(`Student_Report_${student.name.replace(/\s+/g, '_')}.pdf`);
+            // --- Student Info ---
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(14);
+            doc.text(`Student: ${student.name}`, 14, 55);
+            doc.setFontSize(11);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`${student.email}`, 14, 62);
+
+            // --- Executive Summary ---
+            let currentY = 75;
+
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Executive Summary (Latest Quiz)', 14, currentY);
+            currentY += 10;
+
+            autoTable(doc, {
+                startY: currentY,
+                head: [['Metric', 'Value']],
+                body: [
+                    ['Score', `${(detailedReport.quiz_summary?.average_score * 100).toFixed(1)}%`],
+                    ['Duration', `${detailedReport.quiz_summary?.total_duration}s`],
+                    ['Total Questions', detailedReport.quiz_summary?.total_questions?.toString() || 'N/A'],
+                    ['Questions Attempted', detailedReport.quiz_summary?.questions_attempted?.toString() || 'N/A'],
+                    ['Job Readiness', detailedReport.quick_summary_view?.job_readiness ? `${detailedReport.quick_summary_view.job_readiness.score} (${detailedReport.quick_summary_view.job_readiness.level})` : (detailedReport.job_readiness ? `${detailedReport.job_readiness.readiness_score}/100` : 'N/A')],
+                    ['Estimated Role', detailedReport.quick_summary_view?.market_value?.estimated_role || detailedReport.lpa_estimation?.role || 'N/A'],
+                    ['Expected LPA', detailedReport.quick_summary_view?.market_value?.expected_lpa || detailedReport.lpa_estimation?.estimated_lpa || 'N/A']
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [79, 70, 229] }, // Indigo
+                styles: { fontSize: 10 },
+                margin: { left: 14, right: 100 } // Keep it narrow
+            });
+
+            currentY = (doc as any).lastAutoTable.finalY + 20;
+
+            // --- Strengths & Weaknesses ---
+            const strengths = detailedReport.topic_analysis?.strengths || [];
+            const weaknesses = detailedReport.topic_analysis?.weaknesses || [];
+
+            doc.setFontSize(14);
+            doc.setTextColor(22, 163, 74); // Green
+            doc.text('Key Strengths', 14, currentY);
+
+            doc.setTextColor(220, 38, 38); // Red
+            doc.text('Areas for Improvement', pageWidth / 2 + 10, currentY);
+
+            currentY += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+
+            // Render lists
+            const maxItems = Math.max(strengths.length, weaknesses.length, 1);
+            for (let i = 0; i < maxItems; i++) {
+                if (strengths[i]) doc.text(`• ${strengths[i]}`, 14, currentY + (i * 6));
+                if (weaknesses[i]) doc.text(`• ${weaknesses[i]}`, pageWidth / 2 + 10, currentY + (i * 6));
+            }
+
+            currentY += (maxItems * 6) + 20;
+
+            // --- Market Value Analysis ---
+            // --- Market Value Analysis ---
+            if (detailedReport.market_value || detailedReport.lpa_estimation) {
+                // Helpers
+                const formatRange = (val: string | undefined) => {
+                    if (!val) return 'N/A';
+                    return val.replace(/([\d\.]+)/g, (match) => {
+                        const num = parseFloat(match);
+                        return isNaN(num) ? match : num.toFixed(2);
+                    });
+                };
+
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text('Market Value Analysis', 14, currentY);
+                currentY += 10;
+
+                const market = detailedReport.market_value || detailedReport.lpa_estimation || {};
+                const role = market.estimated_role || market.role || 'N/A';
+                const range = market.salary_range || market.range || 'N/A';
+
+                autoTable(doc, {
+                    startY: currentY,
+                    head: [['Role Estimation', 'Expected Salary Range']],
+                    body: [
+                        [
+                            role,
+                            formatRange(range)
+                        ]
+                    ],
+                    theme: 'striped',
+                    headStyles: { fillColor: [234, 179, 8] }, // Yellow/Gold
+                    styles: { fontSize: 10, cellPadding: 5 }
+                });
+
+                currentY = (doc as any).lastAutoTable.finalY + 20;
+            }
+
+            // --- Strategic Interpretation ---
+            if (detailedReport.interpretation) {
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text('Strategic Roadmap', 14, currentY);
+                currentY += 10;
+
+                doc.setFontSize(11);
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Advisor Message: "${detailedReport.interpretation.message}"`, 14, currentY);
+                currentY += 10;
+
+                doc.text(`Recommended Timeline: ${detailedReport.interpretation.timeline}`, 14, currentY);
+                currentY += 10;
+
+                if (detailedReport.interpretation.actions && detailedReport.interpretation.actions.length > 0) {
+                    doc.text('Recommended Actions:', 14, currentY);
+                    currentY += 7;
+                    detailedReport.interpretation.actions.forEach((action: string) => {
+                        doc.text(`• ${action}`, 20, currentY);
+                        currentY += 6;
+                    });
+                }
+
+                currentY += 10;
+            }
+
+            // --- Detailed Question Analysis ---
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Detailed Question Analysis', 14, currentY);
+            currentY += 10;
+
+            const questions = detailedReport.questions_attempted || detailedReport.questions || [];
+
+            const tableRows = questions.map((q: any, i: number) => {
+                return [
+                    (i + 1).toString(),
+                    q.question || q.question_text || q.text || 'Question text missing',
+                    q.user_answer || q.userAnswer || '-',
+                    q.correct_answer || q.correctAnswer || '-',
+                    q.explanation || 'No explanation available.'
+                ];
+            });
+
+            autoTable(doc, {
+                startY: currentY,
+                head: [['#', 'Question', 'Your Answer', 'Correct', 'AI Feedback']],
+                body: tableRows,
+                theme: 'striped',
+                headStyles: { fillColor: [44, 62, 80], textColor: 255, fontStyle: 'bold' },
+                styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
+                columnStyles: {
+                    0: { cellWidth: 14, halign: 'center' }, // # Increased from 8 to 14
+                    1: { cellWidth: 50 }, // Question
+                    2: { cellWidth: 35 }, // Your Answer
+                    3: { cellWidth: 35 }, // Correct Answer
+                    4: { cellWidth: 'auto' } // AI Feedback
+                },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+                didParseCell: (data) => {
+                    if (data.section === 'body' && data.column.index === 4) {
+                        const text = data.cell.raw as string;
+                        if (text && text.includes("No explanation available")) {
+                            data.cell.styles.textColor = [150, 150, 150];
+                            data.cell.styles.fontStyle = 'italic';
+                        } else {
+                            data.cell.styles.textColor = [20, 83, 45];
+                        }
+                    }
+                }
+            });
+
+            // Save
+            doc.save(`Detailed_Report_${student.name.replace(/\s+/g, '_')}.pdf`);
+
+        } catch (error) {
+            console.error("Failed to generate report", error);
+            alert("Could not generate detailed report. Please try again.");
+        }
     };
 
     if (loading) {

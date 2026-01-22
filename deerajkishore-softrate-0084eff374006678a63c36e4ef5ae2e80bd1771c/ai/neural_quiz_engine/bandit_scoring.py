@@ -96,15 +96,26 @@ class BanditScoringBrain(tf.keras.Model):
         # User Feedback: "give them score like 0.8 or 0.9"
         # If similarity is high, we force the score to be high regardless of the bandit arm's opinion (time penalty etc)
         
-        if similarity >= 0.9:
-             # Force score to be at least 0.95
+        # --- AGGRESSIVE GENEROSITY BOOST (User Request) ---
+        # The user wants "very excellent" scoring. 
+        # We apply a curve that pushes reasonable answers (>0.4) to high scores (>0.75).
+        
+        if similarity >= 0.85:
+             # Almost perfect -> Full marks
+             raw_score = 1.0
+        elif similarity >= 0.7:
+             # Good match -> Excellent score
              raw_score = max(raw_score, 0.95)
-        elif similarity >= 0.8:
-             # Force score to be at least 0.90
-             raw_score = max(raw_score, 0.90)
-        elif similarity >= 0.6:
-             # Boost scores for relevant answers
-             raw_score = max(raw_score, similarity * 1.1)
+        elif similarity >= 0.5:
+             # Decent match -> Very Good score
+             raw_score = max(raw_score, 0.85)
+        elif similarity >= 0.35:
+             # Partially relevant -> Good score (Passing)
+             raw_score = max(raw_score, 0.70)
+             
+        # Normalize: If raw_score implies high confidence, ignore lower bandit output
+        if similarity > 0.6:
+            raw_score = max(raw_score, similarity * 1.3) # 30% boost
 
         # Apply time bonus
         final_score = min(1.0, raw_score + time_bonus)

@@ -80,21 +80,43 @@ class MongoDBClient:
             # Plan A: Fetch from specific Quiz document
             if quiz_id:
                 quiz = self.get_quiz_by_id(quiz_id)
-                if quiz and 'questions' in quiz:
-                    questions = quiz['questions']
-                    # Ensure they look like questions (if they are just objects, pass them through)
-                    # If they are IDs, we would need to fetch them (assuming embedded for now based on 'questions' field existing)
+                if quiz and 'questions' in quiz and quiz['questions']:
+                    raw_questions = quiz['questions']
+                    
+                    # Check if these are ObjectIds or full objects
+                    if raw_questions and isinstance(raw_questions[0], (str, ObjectId)):
+                         # They are references, need to fetch from QUESTIONS_COLLECTION
+                         question_ids = [ObjectId(q) if isinstance(q, str) else q for q in raw_questions]
+                         cursor = self.db[self.QUESTIONS_COLLECTION].find({'_id': {'$in': question_ids}})
+                         questions = list(cursor)
+                    else:
+                         # They are embedded objects
+                         questions = raw_questions
+
                     if limit > 0:
                         return questions[:limit]
                     return questions
+                elif quiz:
+                     # Quiz exists but has no 'questions' array. 
+                     # Fallback: Query QUESTIONS_COLLECTION where quizId matches OR quiz_type matches
+                     # Try to infer quiz type from title if not present
+                     # CRITICAL FIX: Update the 'quiz_type' argument variable so Plan B uses it!
+                     inferred_type = quiz.get('type') or quiz.get('title', '').split(' ')[0].lower()
+                     if not quiz_type: # Only override if not provided
+                         quiz_type = inferred_type
+                     print(f"   ℹ️ Quiz document has no embedded questions. Falling back to type: {str(quiz_type)}")
                 else:
-                    print(f"Warning: Quiz {quiz_id} not found or has no questions.")
+                    print(f"Warning: Quiz {quiz_id} not found.")
                     return []
 
             # Plan B: Fetch from global questions collection (legacy mode)
             query = {'is_active': True}
             if quiz_type and quiz_type.lower() != 'all':
-                query['quiz_type'] = quiz_type
+                # Use Case-Insensitive Regex to match "Java", "java", "JAVA"
+                query['quiz_type'] = {'$regex': f'^{quiz_type}$', '$options': 'i'}
+            
+            # If we have a fallback quiz_type but query is empty (because quiz_type was None initially), this ensures it works.
+            # (The logic above updates 'quiz_type' which is used here)
             
             cursor = self.db[self.QUESTIONS_COLLECTION].find(query)
             

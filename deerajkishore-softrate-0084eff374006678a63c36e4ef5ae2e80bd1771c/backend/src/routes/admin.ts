@@ -726,7 +726,95 @@ router.get('/reports/students', async (req: AuthRequest, res: Response) => {
             success: true,
             data: studentReports.sort((a, b) => b.averageScore - a.averageScore),
         });
+
     } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Server error',
+        });
+    }
+});
+
+// Get Student Latest Detailed Report (For PDF)
+router.get('/reports/student/:studentId/latest-detailed', async (req: AuthRequest, res: Response) => {
+    try {
+        const { studentId } = req.params;
+
+        // 1. Find the latest submission for this student to get the session/quiz context
+        const latestSubmission = await QuizSubmission.findOne({ studentId })
+            .sort({ submittedAt: -1 });
+
+        if (!latestSubmission) {
+            res.status(404).json({ success: false, message: 'No quiz submissions found for this student.' });
+            return;
+        }
+
+        console.log(`🔍 Fetching detailed report for student ${studentId}, latest quiz: ${latestSubmission.quizId}`);
+
+        // 2. Try to find the AI Report first (in 'reports' collection)
+        // The AI engine saves reports with 'user_id' as string usually
+        // We need to access the raw MongoDB collection because Mongoose model might not verify 'reports' schema fully if not defined
+        // Using mongoose.connection.db to access raw collection
+        const db = QuizSubmission.db; // Access native db through model
+
+        // Try to find report by user_id = studentId (string) and sort by generated_at desc
+        const reportsCollection = db.collection('reports');
+        const latestAiReport = await reportsCollection.findOne(
+            { user_id: studentId },
+            { sort: { generated_at: -1 } }
+        );
+
+        if (latestAiReport) {
+            console.log('✅ Found AI Report');
+
+            // Critical Fallback: If AI report somehow has empty questions (but submission exists),
+            // merge the submission questions so the PDF table isn't empty.
+            if ((!latestAiReport.questions_attempted || latestAiReport.questions_attempted.length === 0) && latestSubmission.questions) {
+                console.log('⚠️ AI Report missing questions, merging from submission...');
+                (latestAiReport as any).questions = latestSubmission.questions;
+            }
+
+            res.json({ success: true, data: latestAiReport });
+            return;
+        }
+
+        // 3. Fallback: If no AI report found (maybe old quiz?), try to find the session in 'quiz_sessions'
+        console.log('⚠️ No AI Report found, falling back to Quiz Session lookup...');
+        const sessionsCollection = db.collection('quiz_sessions');
+        const latestSession = await sessionsCollection.findOne(
+            { user_id: studentId },
+            { sort: { start_time: -1 } }
+        );
+
+        if (latestSession) {
+            console.log('✅ Found Quiz Session (Fallback)');
+            res.json({ success: true, data: { ...latestSession, is_fallback: true } });
+            return;
+        }
+
+        // 4. Default: Return data constrcuted from the submission itself (minimal detail)
+        console.log('⚠️ No AI Session found, returning basic submission data...');
+        res.json({
+            success: true,
+            data: {
+                user_id: studentId,
+                quiz_summary: {
+                    average_score: latestSubmission.percentage / 100,
+                    total_questions: latestSubmission.totalPoints / 10, // Approx
+                },
+                questions_attempted: latestSubmission.answers.map(a => ({
+                    question_text: "Question details unavailable in basic mode",
+                    user_answer: a.answer,
+                    correct_answer: "N/A",
+                    explanation: "Detailed AI analysis not available for this historical quiz.",
+                    is_correct: false // Unknown
+                })),
+                topic_analysis: { strengths: [], weaknesses: [] }
+            }
+        });
+
+    } catch (error: any) {
+        console.error('❌ Error fetching detailed report:', error);
         res.status(500).json({
             success: false,
             message: error.message || 'Server error',

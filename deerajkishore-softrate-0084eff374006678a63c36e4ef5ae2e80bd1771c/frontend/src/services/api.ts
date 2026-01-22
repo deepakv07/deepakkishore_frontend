@@ -352,6 +352,11 @@ class APIService {
         return response.data.data;
     }
 
+    async getStudentLatestDetailedReport(studentId: string) {
+        const response = await this.api.get(`/admin/reports/student/${studentId}/latest-detailed`);
+        return response.data.data;
+    }
+
     async getAdminQuizzes() {
         const response = await this.api.get('/admin/quizzes');
         return response.data.data;

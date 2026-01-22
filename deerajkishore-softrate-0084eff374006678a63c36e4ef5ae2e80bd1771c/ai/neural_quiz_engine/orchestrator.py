@@ -19,18 +19,18 @@ class QuizOrchestrator:
         np.random.seed(seed)
 
     def shuffle_questions(self, questions: List[Dict], user_id: str) -> List[Dict]:
-        """Deterministic shuffle based on user ID"""
-        # Create unique seed per user session
-        session_hash = hashlib.md5(
-            f"{user_id}_{datetime.now().date()}".encode()).hexdigest()
-        session_seed = int(session_hash[:8], 16)
-
-        # Create a copy and shuffle
+        """
+        True Random Shuffle (User Request: Prevent Lab Cheating)
+        Previously deterministic based on date, now fully random per attempt.
+        """
+        # Create a copy to avoid modifying original list
         shuffled = questions.copy()
-        random.seed(session_seed)
+        
+        # Use system random (no fixed seed)
+        random.seed() 
         random.shuffle(shuffled)
 
-        # Return exactly 10 questions
+        # Return exactly 10 questions (or fewer if not enough)
         return shuffled[:10]
 
     def select_questions(self, all_questions: List[Dict], quiz_type: str, user_id: str) -> List[Dict]:

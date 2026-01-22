@@ -196,6 +196,68 @@ class AnswerUnderstandingBrain(tf.keras.Model):
 
         return float(max(0.0, min(1.0, final_score)))
 
+    def generate_explanation(self, user_answer: str, correct_answer: str, question_text: str = "") -> str:
+        """
+        Generate a detailed explanation for the student's answer using rule-based logic.
+        """
+        import re
+        
+        # 1. Normalize
+        u_clean = user_answer.strip()
+        c_clean = correct_answer.strip()
+        
+        # Handle empty/short answers
+        if not u_clean:
+            return "You didn't provide an answer. The correct answer is essential to understand this concept."
+        
+        # 2. Check for Exact Match
+        if u_clean.lower() == c_clean.lower():
+            return "Perfect! Your answer exactly matches what we were looking for."
+            
+        # 3. Keyword Analysis
+        stop_words = {'the', 'is', 'a', 'an', 'and', 'to', 'of', 'it', 'that', 'this', 'in', 'on', 'for', 'with', 'by', 'at'}
+        
+        def get_tokens(text):
+            return set(re.findall(r'\b\w+\b', text.lower())) - stop_words
+
+        user_tokens = get_tokens(u_clean)
+        correct_tokens = get_tokens(c_clean)
+        
+        missing_tokens = correct_tokens - user_tokens
+        extra_tokens = user_tokens - correct_tokens
+        
+        # 4. Construct Feedback
+        explanation = []
+        
+        # A. Completeness
+        if missing_tokens:
+            most_impt_missing = list(missing_tokens)[:3] # Top 3
+            explanation.append(f"You missed key concepts like '{', '.join(most_impt_missing)}'.")
+            
+        # B. Irrelevance
+        if extra_tokens and len(correct_tokens) > 0:
+            ratio = len(extra_tokens) / len(user_tokens)
+            if ratio > 0.5:
+                explanation.append("Your answer included information that wasn't quite relevant to the specific question.")
+                
+        # C. Length/Depth
+        if len(user_tokens) < len(correct_tokens) * 0.5:
+            explanation.append("Your response was a bit too brief. Try to elaborate more to fully cover the topic.")
+            
+        # D. Parrot Check (if question text available)
+        if question_text:
+            q_tokens = get_tokens(question_text)
+            if len(user_tokens) > 0 and len(user_tokens.intersection(q_tokens)) / len(user_tokens) > 0.8:
+                explanation.append("It looks like you mostly repeated words from the question. Try to explain in your own words.")
+
+        if not explanation:
+            # Fallback for when tokens match well but maybe grammar/order is diff (or synonyms used that we didn't catch)
+            return f"Your answer is close! Compare it with the suggested answer to see the precise phrasing: '{c_clean}'."
+            
+        # Final Assemblage
+        full_explanation = " ".join(explanation)
+        return f"{full_explanation} The correct answer is: '{c_clean}'."
+
     def score_answers_batch(self, user_answers: List[str],
                             correct_answers: List[str]) -> List[float]:
         """Score multiple answers"""

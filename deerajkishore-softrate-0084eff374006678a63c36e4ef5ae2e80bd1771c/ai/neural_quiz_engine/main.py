@@ -447,6 +447,20 @@ class NeuralQuizEngine:
                 elif score < 0.6:
                     for t in q_topics:
                          session_weaknesses.add(t)
+                
+                # --- ADDED: Generate Explanation for Report ---
+                # We add it directly to the question object in the session data (which goes into the report)
+                try:
+                    explanation = self.answer_brain.generate_explanation(
+                        user_answer=q_data.get('user_answer', ''),
+                        correct_answer=q_data.get('correct_answer', ''),
+                        question_text=q_data.get('question_text', '')
+                    )
+                    q_data['explanation'] = explanation
+                except Exception as exp_e:
+                    q_data['explanation'] = "Could not generate explanation."
+                    print(f"⚠️ Error generating explanation: {exp_e}")
+                # ---------------------------------------------
             
             # Clean up overlap: If a topic is in both, consider it a weakness (needs improvement)
             strengths = list(session_strengths - session_weaknesses)
@@ -537,7 +551,8 @@ class NeuralQuizEngine:
                     'strengths': strengths,
                     'weaknesses': weaknesses,
                     'total_topics_covered': len(all_topics)
-                }
+                },
+                'questions_attempted': session_data['questions_attempted'] # Save detailed Qs including explanations
             }
 
             # Convert to native types for MongoDB

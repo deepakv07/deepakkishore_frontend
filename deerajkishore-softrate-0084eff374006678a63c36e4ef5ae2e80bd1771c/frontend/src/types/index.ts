@@ -171,6 +171,8 @@ export interface QuizResult {
     attempts?: number;
     timePerQuestion?: number[];
     questionTimings?: Record<string, number>;
+    totalQuestions?: number;
+    questionsAttempted?: number;
     sectionBreakdown?: {
         name: string;
         correct: number;
@@ -186,6 +188,24 @@ export interface QuizResult {
         salaryRange: string;
         confidence: number;
     };
+    job_readiness?: {
+        readiness_score: number;
+        status: string;
+        market_fit: string;
+    };
+    market_value?: {
+        estimated_role: string;
+        expected_lpa: string;
+        salary_range: string;
+        role?: string;
+        range?: string;
+        estimated_lpa?: string;
+    };
+    interpretation?: {
+        message: string;
+        timeline: string;
+        actions: string[];
+    };
     questions?: {
         id: string;
         text: string;
@@ -195,5 +215,9 @@ export interface QuizResult {
         type: string;
         points: number;
         explanation?: string;
+        question?: string;
+        question_text?: string;
+        user_answer?: string;
+        correct_answer?: string;
     }[];
 }

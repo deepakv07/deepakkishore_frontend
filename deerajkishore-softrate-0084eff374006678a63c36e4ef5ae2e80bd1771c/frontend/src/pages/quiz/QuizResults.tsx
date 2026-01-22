@@ -82,40 +82,255 @@ const QuizResults: React.FC = () => {
     const handleDownloadPDF = () => {
         if (!result) return;
         const doc = new jsPDF();
-        doc.setFontSize(20);
-        doc.setTextColor(33, 33, 33);
-        doc.text('Quiz Performance Report', 14, 22);
+        const pageWidth = doc.internal.pageSize.width;
+
+        // Helper to format range string "2 - 10.8 LPA"
+        const formatRange = (val: string | undefined) => {
+            if (!val) return 'N/A';
+            return val.replace(/([\d\.]+)/g, (match) => {
+                const num = parseFloat(match);
+                return isNaN(num) ? match : num.toFixed(2);
+            });
+        };
+
+        // --- Abstract Header Background ---
+        const drawAbstractBackground = () => {
+            doc.setFillColor(37, 99, 235); // Primary Blue
+            doc.rect(0, 0, pageWidth, 50, 'F');
+
+            // Abstract Shapes (Circles)
+            doc.setFillColor(59, 130, 246); // Lighter Blue
+            doc.circle(pageWidth - 20, 10, 30, 'F');
+            doc.setFillColor(96, 165, 250); // Even Lighter
+            doc.circle(20, 40, 15, 'F');
+            doc.setFillColor(37, 99, 235); // Reset
+        };
+        drawAbstractBackground();
+
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255);
+        doc.text('Performance Analysis Report', 14, 25);
+
+        doc.setFontSize(10);
+        doc.setTextColor(200, 220, 255);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 35);
+
+        // --- Student Info ---
+        doc.setTextColor(30, 41, 59);
+        doc.setFontSize(14);
+        doc.text(`Student: ${result.studentName || user?.name || 'Student'}`, 14, 65);
+
+        const dateStr = result.completedDate ? result.completedDate : new Date().toLocaleDateString();
         doc.setFontSize(11);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Student: ${result.studentName || user?.name || 'Student'}`, 14, 32);
-        doc.text(`Date: ${result.completedDate || new Date().toLocaleDateString()}`, 14, 38);
-        doc.setFontSize(12);
-        doc.setTextColor(33, 33, 33);
-        doc.text(`Overall Score: ${result.percentage}% (${result.score}/${result.totalPoints})`, 14, 48);
-        doc.text(`Status: ${result.passed ? 'PASSED' : 'FAILED'}`, 14, 54);
-        const rows = result.questions?.map((q: any, index: number) => ({
-            index: index + 1,
-            question: q.text,
-            userAnswer: q.userAnswer,
-            correctAnswer: q.correctAnswer,
-            status: q.isCorrect ? 'Correct' : 'Incorrect',
-        })) || [];
+        doc.text(`Completed: ${dateStr}`, 14, 72);
+
+        // --- Executive Summary ---
+        let currentY = 85;
+
+        // --- Helper: Circular Progress ---
+        const drawCircularProgress = (x: number, y: number, r: number, percentage: number, color: number[]) => {
+            // Background Circle
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(2);
+            doc.circle(x, y, r, 'S');
+
+            // Progress Arc
+            const angle = (percentage / 100) * 360;
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.setLineWidth(2);
+
+            const startAngle = -90;
+            // Draw arc segments using lines for compatibility
+            for (let i = 0; i < angle; i += 10) {
+                const a1 = (startAngle + i) * (Math.PI / 180);
+                const a2 = (startAngle + i + 10) * (Math.PI / 180);
+                doc.line(x + r * Math.cos(a1), y + r * Math.sin(a1), x + r * Math.cos(a2), y + r * Math.sin(a2));
+            }
+        };
+
+        // --- Executive Summary (AESTHETIC GRID) ---
+        // Draw a 4x2 grid of cards
+        const boxWidth = (pageWidth - 28 - 15) / 4;
+        const boxHeight = 30;
+        const gap = 5;
+
+        // Data for the grid
+        const summaryItems = [
+            { label: 'SCORE', value: `${result.percentage}%`, color: [37, 99, 235], icon: 'graph' },
+            { label: 'DURATION', value: result.timeSpent, color: [37, 99, 235], icon: 'clock' },
+            { label: 'STATUS', value: result.passed ? 'PASSED' : 'FAILED', color: result.passed ? [22, 163, 74] : [220, 38, 38], icon: 'flag' },
+            { label: 'PERCENTILE', value: `${result.percentile || 0}%`, color: [37, 99, 235], icon: 'chart' },
+
+            { label: 'TOTAL Q', value: (result.totalQuestions || result.questions?.length || 0).toString(), color: [71, 85, 105], icon: 'list' },
+            { label: 'ATTEMPTED', value: (result.questionsAttempted || result.questions?.length || 0).toString(), color: [71, 85, 105], icon: 'check' },
+            { label: 'READINESS', value: (result.job_readiness && result.job_readiness.readiness_score) ? `${result.job_readiness.readiness_score}/100` : 'N/A', color: [234, 179, 8], icon: 'star' },
+            { label: 'EST. ROLE', value: result.market_value?.estimated_role?.split(' ')[0] || 'N/A', color: [234, 179, 8], icon: 'briefcase' }
+        ];
+
+        summaryItems.forEach((item, index) => {
+            const row = Math.floor(index / 4);
+            const col = index % 4;
+            const x = 14 + (col * (boxWidth + gap));
+            const y = currentY + (row * (boxHeight + gap));
+
+            // Card Background
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(x, y, boxWidth, boxHeight, 3, 3, 'F');
+            doc.setDrawColor(226, 232, 240); // Subtle Border
+            doc.roundedRect(x, y, boxWidth, boxHeight, 3, 3, 'S');
+
+            // Draw Icon (Abstract Geometric Representation)
+            doc.setDrawColor(item.color[0], item.color[1], item.color[2]);
+            doc.setLineWidth(1);
+            if (item.icon === 'graph') {
+                doc.circle(x + boxWidth - 10, y + 10, 4, 'S');
+            } else if (item.icon === 'star') {
+                doc.lines([[2, 2], [2, -2]], x + boxWidth - 12, y + 8, [1, 1]);
+            }
+
+            // Label
+            doc.setFontSize(7);
+            doc.setTextColor(100, 116, 139);
+            doc.text(item.label, x + 4, y + 8);
+
+            // Value
+            doc.setFontSize(11);
+            doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+            doc.setFont("helvetica", "bold");
+            doc.text(item.value || '', x + 4, y + 20);
+            doc.setFont("helvetica", "normal");
+        });
+
+        currentY += (2 * (boxHeight + gap)) + 15;
+
+
+        // --- Strengths & Weaknesses ---
+        const strengths = result.performanceAnalysis?.strongAreas || [];
+        const weaknesses = result.performanceAnalysis?.toImprove || [];
+
+        doc.setFontSize(14);
+        doc.setTextColor(22, 163, 74); // Green
+        doc.text('Key Strengths', 14, currentY);
+
+        doc.setTextColor(220, 38, 38); // Red
+        doc.text('Areas for Improvement', pageWidth / 2 + 10, currentY);
+
+        currentY += 10;
+        doc.setFontSize(10);
+        doc.setTextColor(50, 50, 50);
+
+        const maxItems = Math.max(strengths.length, weaknesses.length, 1);
+        for (let i = 0; i < maxItems; i++) {
+            if (strengths[i]) doc.text(`• ${strengths[i]}`, 14, currentY + (i * 6));
+            if (weaknesses[i]) doc.text(`• ${weaknesses[i]}`, pageWidth / 2 + 10, currentY + (i * 6));
+        }
+
+        currentY += (maxItems * 6) + 20;
+
+        // --- Market Value Analysis Table (The "Yellow Box" User likes) ---
+        if (result.market_value) {
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Market Value Analysis', 14, currentY);
+            currentY += 10;
+
+            autoTable(doc, {
+                startY: currentY,
+                head: [['Role Estimation', 'Expected Salary Range']],
+                body: [
+                    [
+                        result.market_value.estimated_role || 'N/A',
+                        formatRange(result.market_value.salary_range)
+                    ]
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [234, 179, 8] }, // Yellow/Gold
+                styles: { fontSize: 10, cellPadding: 5 }
+            });
+
+            currentY = (doc as any).lastAutoTable.finalY + 20;
+        }
+
+        // --- Strategic Interpretation ---
+        if (result.interpretation) {
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Strategic Roadmap', 14, currentY);
+            currentY += 10;
+
+            doc.setFontSize(11);
+            doc.setTextColor(50, 50, 50);
+            const message = result.interpretation.message || 'Focus on improvement.';
+            doc.text(`Advisor Message: "${message}"`, 14, currentY);
+            currentY += 10;
+
+            const timeline = result.interpretation.timeline || 'N/A';
+            doc.text(`Recommended Timeline: ${timeline}`, 14, currentY);
+            currentY += 10;
+
+            if (result.interpretation.actions && result.interpretation.actions.length > 0) {
+                doc.text('Recommended Actions:', 14, currentY);
+                currentY += 7;
+                result.interpretation.actions.forEach((action: string) => {
+                    doc.text(`• ${action}`, 20, currentY);
+                    currentY += 6;
+                });
+            }
+
+            currentY += 10;
+        }
+
+        // --- Detailed Question Analysis Header & Table ---
+        if (currentY > 250) {
+            doc.addPage();
+            currentY = 20;
+        }
+
+        const questions = result.questions || [];
+        const tableRows = questions.map((q: any, i: number) => {
+            return [
+                (i + 1).toString(),
+                q.question || q.question_text || q.text || 'Question text missing',
+                q.user_answer || q.userAnswer || '-',
+                q.correct_answer || q.correctAnswer || '-',
+                q.explanation || 'No explanation available.'
+            ];
+        });
+
+        doc.setFontSize(14);
+        doc.setTextColor(30, 41, 59);
+        doc.text('Detailed Question Analysis', 14, currentY);
+        currentY += 10;
+
+        // --- Detailed Question Analysis ---
         autoTable(doc, {
-            startY: 60,
-            head: [['#', 'Question', 'Your Answer', 'Correct Answer', 'Status']],
-            body: rows.map((r: any) => [r.index, r.question, r.userAnswer, r.correctAnswer, r.status]),
-            theme: 'grid',
-            headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-            styles: { fontSize: 9, cellPadding: 3 },
-            columnStyles: { 0: { cellWidth: 10 }, 1: { cellWidth: 80 } },
-            didParseCell: function (data) {
+            startY: currentY + 15,
+            head: [['#', 'Question', 'Your Answer', 'Correct', 'AI Feedback']],
+            body: tableRows,
+            theme: 'striped',
+            headStyles: { fillColor: [44, 62, 80], textColor: 255, fontStyle: 'bold' },
+            styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
+            columnStyles: {
+                0: { cellWidth: 14, halign: 'center' }, // # Increased width
+                1: { cellWidth: 50 }, // Question
+                2: { cellWidth: 35 }, // Your Answer
+                3: { cellWidth: 35 }, // Correct Answer
+                4: { cellWidth: 'auto' } // AI Feedback - takes remaining space
+            },
+            didParseCell: (data) => {
                 if (data.section === 'body' && data.column.index === 4) {
-                    const status = data.cell.raw;
-                    if (status === 'Correct') data.cell.styles.textColor = [22, 163, 74];
-                    else data.cell.styles.textColor = [220, 38, 38];
+                    const text = data.cell.raw as string;
+                    if (text && text.includes("No explanation available")) {
+                        data.cell.styles.textColor = [150, 150, 150];
+                        data.cell.styles.fontStyle = 'italic';
+                    } else {
+                        data.cell.styles.textColor = [20, 83, 45]; // Greenish
+                    }
                 }
             }
         });
+
         doc.save(`Quiz_Report_${result.quizId || 'Report'}.pdf`);
     };
 
@@ -149,11 +364,11 @@ const QuizResults: React.FC = () => {
                             <div className="relative w-14 h-14 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-md shrink-0">
                                 {user?.name?.split(' ').map(n => n[0]).join('') || 'KM'}
                             </div>
-                            <div className="relative flex-1 min-w-0">
-                                <h4 className="font-bold text-[#141619] text-lg leading-tight uppercase tracking-tight truncate">{user?.name || 'Recruit'}</h4>
-                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 truncate">
-                                    {user?.department || 'COMPUTER SCIENCE'} • {user?.degree || 'SEM 4'}
-                                </p>
+                            <div className="text-right">
+                                <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">TOTAL SCORE</p>
+                                <div className="text-6xl font-black text-indigo-600 tracking-tight">
+                                    {Math.round(result.percentage)}<span className="text-3xl font-bold ml-1">%</span>
+                                </div>
                             </div>
                         </div>
                         <div className="relative text-center md:text-right border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex flex-row md:flex-col items-center justify-between md:justify-center gap-2">
@@ -309,7 +524,7 @@ const QuizResults: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        {!q.isCorrect && q.explanation && (
+                                        {q.explanation && (
                                             <div className="mt-10 pt-10 border-t border-slate-200">
                                                 <div className="flex gap-6 items-start">
                                                     <div className="text-indigo-600 text-xl mt-1">

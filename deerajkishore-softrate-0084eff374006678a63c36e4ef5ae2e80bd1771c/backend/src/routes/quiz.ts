@@ -25,7 +25,10 @@ router.get('/:id/questions', async (req: AuthRequest, res: Response) => {
         }
 
         // Return questions without correct answers for security
-        const questions = quiz.questions.map((q, index) => ({
+        // RANDOMIZATION FIX: Shuffle questions to prevent lab cheating
+        const shuffledQuestions = [...quiz.questions].sort(() => Math.random() - 0.5);
+
+        const questions = shuffledQuestions.map((q, index) => ({
             id: q._id?.toString() || `q${index}`,
             text: q.text,
             type: q.type,
@@ -655,6 +658,41 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                         }
                     }
 
+                    // --- AI INTELLIGENCE MERGE ---
+                    // If AI report is available, OVERRIDE the local isCorrect logic with AI's sophisticated judgment
+                    if (aiReportData && aiReportData.questions_attempted) {
+                        const aiQ = aiReportData.questions_attempted.find((aq: any) =>
+                            aq.question_text === q.text ||
+                            aq.question_id === q._id?.toString() ||
+                            aq.question_id === `q${idx}`
+                        );
+
+                        // Fallback by index if lengths match
+                        const aiQByIndex = !aiQ && aiReportData.questions_attempted.length === quiz.questions.length
+                            ? aiReportData.questions_attempted[idx]
+                            : null;
+
+                        const finalAiQ = aiQ || aiQByIndex;
+
+                        if (finalAiQ) {
+                            // User Answer (Verify)
+                            if (finalAiQ.user_answer) {
+                                // Optionally override user answer from AI record to be safe
+                                // answer.answer = finalAiQ.user_answer; 
+                            }
+
+                            // Correctness (Threshold 0.6)
+                            const aiScore = finalAiQ.final_score ?? finalAiQ.score ?? 0;
+                            // For descriptive, trust the score. For MCQ, trust the score (1.0 or 0.0)
+                            isCorrect = aiScore >= 0.6;
+
+                            // Explanation
+                            if (finalAiQ.explanation) {
+                                (q as any).explanation = finalAiQ.explanation;
+                            }
+                        }
+                    }
+
                     return {
                         id: q._id?.toString() || `q${idx}`,
                         text: q.text,
@@ -662,7 +700,8 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                         correctAnswer: q.correctAnswer || 'N/A',
                         isCorrect,
                         type: q.type,
-                        points: q.points
+                        points: q.points,
+                        explanation: (q as any).explanation || null
                     };
                 }),
                 careerPrediction: {
@@ -670,6 +709,23 @@ router.get('/:id/results', async (req: AuthRequest, res: Response) => {
                     salaryRange: finalSalaryRange,
                     confidence: Math.round(confidence),
                 },
+                // Pass full AI details for the PDF report
+                // Pass full AI details for the PDF report
+                // FIX: Prioritize raw 'job_readiness' object for numeric stats, then quick view
+                job_readiness: aiReportData?.job_readiness || aiReportData?.quick_summary_view?.job_readiness || null,
+
+                // FIX: Safer check for market value sources
+                market_value: (aiReportData?.lpa_estimation) ? {
+                    estimated_role: aiReportData.lpa_estimation.role,
+                    expected_lpa: aiReportData.lpa_estimation.estimated_lpa ? `₹${aiReportData.lpa_estimation.estimated_lpa} Lakhs/Year` : 'N/A',
+                    salary_range: aiReportData.lpa_estimation.range
+                } : (aiReportData?.quick_summary_view?.market_value ? {
+                    estimated_role: aiReportData.quick_summary_view.market_value.estimated_role,
+                    expected_lpa: aiReportData.quick_summary_view.market_value.expected_lpa,
+                    salary_range: aiReportData.quick_summary_view.market_value.salary_range
+                } : null),
+
+                interpretation: aiReportData?.interpretation || null,
                 questionTimings: submission.questionTimings || {},
             },
         });

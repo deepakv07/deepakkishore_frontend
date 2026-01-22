@@ -7,15 +7,20 @@ from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 import json
 
-# Load environment variables
-load_dotenv()
-
+# Force load .env from the same directory as this file
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+print(f"Loading .env from: {env_path}")
+load_dotenv(env_path)
 
 class DynamicConfig:
     """Dynamic configuration without MAX_QUESTIONS limit"""
 
     # MongoDB Configuration
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017')
+    # Debug print to verify what we are loading
+    _uri = os.getenv('MONGODB_URI')
+    print(f"DEBUG: MONGODB_URI loaded: {_uri.split('@')[1] if _uri and '@' in _uri else _uri}")
+    
+    MONGODB_URI = _uri or 'mongodb://localhost:27017'
     MONGODB_DATABASE = os.getenv('MONGODB_DATABASE', 'skillbuilder')
 
     # Collections

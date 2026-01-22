@@ -170,7 +170,53 @@ def submit_answer(request: QuizAnswerRequest):
         else:
              similarity = engine.answer_brain.score_answer(u_ans, c_ans, question_text=q_text)
              
-        marks_obtained = similarity * 10
+        # --- BANDIT SCORING INTEGRATION ---
+        # Calculate Context Factors
+        difficulty = current_q.get('difficulty', 0.5)
+        topics = current_q.get('topics', ['General'])
+        primary_topic = topics[0] if topics else 'General'
+        
+        # Get Mastery Context
+        mastery, _ = engine.knowledge_brain.get_mastery(session['user_id'], primary_topic)
+        
+        # Calculate Time Bonus (if answered faster than 60s)
+        time_bonus = 0.0
+        expected_time = 60.0
+        if request.time_taken < expected_time and similarity > 0.4:
+            time_bonus = 0.05 * (1 - (request.time_taken / expected_time))
+            
+        # Get Previous Performance (Current Session Avg)
+        prev_scores = session['performance']['scores']
+        prev_perf = (sum(prev_scores) / (len(prev_scores) * 10)) if prev_scores else 0.5
+        
+        # Call Bandit Brain
+        # If MCQ, we force similarity 1.0 or 0.0, but Bandit can still adjust based on time/difficulty if needed?
+        # Actually for MCQ, usually it's correct or not. But let's pass it through for consistency if 1.0, 
+        # though usually we trust 1.0 as 1.0.
+        # For Descriptive (is_mcq=False), this is CRITICAL.
+        
+        if is_mcq:
+            final_score = similarity
+            arm_idx = -1
+            arm_desc = "MCQ_Exact"
+            explanation = f"The correct answer is {c_ans}."
+        else:
+            final_score, arm_idx, arm_desc = engine.bandit_brain.score_answer(
+                similarity=similarity,
+                difficulty=difficulty,
+                time_taken=request.time_taken,
+                topic_mastery=mastery,
+                previous_performance=prev_perf,
+                time_bonus=time_bonus
+            )
+            # GENERATE EXPLANATION IMMEDIATELY
+            explanation = engine.answer_brain.generate_explanation(
+                user_answer=u_ans,
+                correct_answer=c_ans,
+                question_text=q_text
+            )
+        
+        marks_obtained = final_score * 10
         
         # 4. Update Session Data
         # Append to questions_attempted
@@ -181,7 +227,8 @@ def submit_answer(request: QuizAnswerRequest):
              'correct_answer': c_ans,
              'similarity_score': similarity,
              'marks_obtained': marks_obtained,
-             'final_score': similarity,
+             'final_score': final_score,
+             'explanation': explanation, # SAVED IMMEDIATELY
              'time_taken': request.time_taken,
              'difficulty': current_q.get('difficulty', 0.5),
              'topics': current_q.get('topics', ['General'])
@@ -419,7 +466,42 @@ def submit_quiz_bulk(request: BulkQuizSubmission):
                 # AI Scoring
                 similarity = engine.answer_brain.score_answer(user_response, c_ans, question_text=q_text)
                 
-            final_score = similarity # Use simple score for now, mimicking interactive mode logic if needed
+            # --- BANDIT SCORING INTEGRATION ---
+            difficulty = question.get('difficulty', 0.5)
+            topics = question.get('topics', ['General'])
+            primary_topic = topics[0] if topics else 'General'
+            
+            # Get Mastery Context (Approximate for bulk, as we update sequentially)
+            mastery, _ = engine.knowledge_brain.get_mastery(request.user_id, primary_topic)
+            
+            # Time Bonus
+            time_bonus = 0.0
+            expected_time = 60.0
+            if time_spent < expected_time and similarity > 0.4:
+                time_bonus = 0.05 * (1 - (time_spent / expected_time))
+            
+            # Previous Performance (Running Avg in this loop)
+            current_scores = session_data['performance']['scores']
+            prev_perf = (sum(current_scores) / (len(current_scores) * 10)) if current_scores else 0.5
+            
+            if is_mcq:
+                final_score = similarity
+                explanation = f"The correct answer is {c_ans}."
+            else:
+                 final_score, arm_idx, arm_desc = engine.bandit_brain.score_answer(
+                    similarity=similarity,
+                    difficulty=difficulty,
+                    time_taken=time_spent,
+                    topic_mastery=mastery,
+                    previous_performance=prev_perf,
+                    time_bonus=time_bonus
+                )
+                 explanation = engine.answer_brain.generate_explanation(
+                    user_answer=user_response,
+                    correct_answer=c_ans,
+                    question_text=q_text
+                 )
+
             marks_obtained = final_score * 10
             
             # Update Session Data
@@ -431,6 +513,7 @@ def submit_quiz_bulk(request: BulkQuizSubmission):
                  'similarity_score': similarity,
                  'marks_obtained': marks_obtained,
                  'final_score': final_score,
+                 'explanation': explanation,
                  'time_taken': time_spent,
                  'difficulty': question.get('difficulty', 0.5),
                  'topics': question.get('topics', ['General'])
